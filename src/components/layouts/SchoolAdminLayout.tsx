@@ -42,12 +42,17 @@ export function SchoolAdminLayout() {
         .from('schools')
         .select('name')
         .eq('admin_user_id', user?.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      setSchoolName(data.name);
+      if (data) {
+        setSchoolName(data.name);
+      } else {
+        setSchoolName(''); // Or handle the case where no school is found
+      }
     } catch (error) {
       console.error('Error fetching school:', error);
+      // Optionally, navigate to an error page or show a toast if a school is expected but not found
     }
   };
 

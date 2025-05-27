@@ -1,27 +1,18 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-interface Page {
-  id: string;
-  title: string;
-  content: string | null;
-  page_type: string;
-}
-
-interface School {
-  id: string;
-  name: string;
-  slug: string;
-}
+import SchoolPageRenderer from '@/components/templates/SchoolPageRenderer';
+import { getSchoolBySlug, getPageContent, createDefaultSections } from '@/lib/database';
+import { School, PageContent } from '@/lib/types';
 
 export function SchoolPageDisplay() {
   const { schoolSlug, pageType = 'homepage' } = useParams<{ schoolSlug: string; pageType?: string }>();
-  const [page, setPage] = useState<Page | null>(null);
   const [school, setSchool] = useState<School | null>(null);
+  const [pageContent, setPageContent] = useState<PageContent | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (schoolSlug) {
@@ -31,57 +22,76 @@ export function SchoolPageDisplay() {
 
   const fetchSchoolAndPage = async () => {
     try {
-      // First get the school
-      const { data: schoolData, error: schoolError } = await supabase
-        .from('schools')
-        .select('*')
-        .eq('slug', schoolSlug)
-        .single();
+      setLoading(true);
+      setError(null);
 
-      if (schoolError) throw schoolError;
-      setSchool(schoolData);
+      // Get school data
+      const schoolData = await getSchoolBySlug(schoolSlug!);
+      if (!schoolData) {
+        setError('School not found');
+        return;
+      }
 
-      // Then get the page
-      const { data: pageData, error: pageError } = await supabase
-        .from('pages')
-        .select('*')
-        .eq('school_id', schoolData.id)
-        .eq('page_type', pageType)
-        .single();
+      setSchool(schoolData.school);
 
-      if (pageError) {
-        console.error('Page not found:', pageError);
-        setPage(null);
+      // Get specific page content
+      const pageData = await getPageContent(schoolData.school.id, pageType || 'homepage');
+      
+      if (!pageData) {
+        // Create a default page if it doesn't exist
+        const defaultPage: PageContent = {
+          id: '',
+          created_at: '',
+          updated_at: '',
+          school_id: schoolData.school.id,
+          page_slug: pageType || 'homepage',
+          title: pageType === 'homepage' ? 'Welcome' : pageType?.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Page',
+          meta_description: `${pageType} page for ${schoolData.school.name}`,
+          sections: createDefaultSections(pageType || 'homepage')
+        };
+        setPageContent(defaultPage);
       } else {
-        setPage(pageData);
+        setPageContent(pageData);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
+      setError('Failed to load page');
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    // Set page title for SEO
-    if (page && school) {
-      document.title = `${page.title} - ${school.name}`;
-    }
-  }, [page, school]);
-
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="animate-pulse">
+        <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
           <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
           <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+          <div className="h-64 bg-gray-200 rounded"></div>
         </div>
       </div>
     );
   }
 
-  if (!page) {
+  if (error || !school) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>School Not Found</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">
+              {error || 'The requested school could not be found.'}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!pageContent) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
         <Card>
@@ -99,21 +109,14 @@ export function SchoolPageDisplay() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-3xl font-bold">{page.title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="prose max-w-none">
-            {page.content ? (
-              <div className="whitespace-pre-wrap">{page.content}</div>
-            ) : (
-              <p className="text-muted-foreground">Content coming soon...</p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <>
+      <Helmet>
+        <title>{pageContent.title} - {school.name}</title>
+        {pageContent.meta_description && (
+          <meta name="description" content={pageContent.meta_description} />
+        )}
+      </Helmet>
+      <SchoolPageRenderer school={school} pageContent={pageContent} />
+    </>
   );
 }

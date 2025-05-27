@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,6 +11,7 @@ import {
   DialogTitle 
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { createSchool } from '@/lib/database';
 
 interface AddSchoolDialogProps {
   open: boolean;
@@ -22,10 +22,8 @@ interface AddSchoolDialogProps {
 export function AddSchoolDialog({ open, onOpenChange, onSchoolAdded }: AddSchoolDialogProps) {
   const [formData, setFormData] = useState({
     name: '',
-    slug: '',
     logo_url: '',
-    admin_email: '',
-    admin_password: ''
+    admin_email: ''
   });
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -35,59 +33,38 @@ export function AddSchoolDialog({ open, onOpenChange, onSchoolAdded }: AddSchool
     setLoading(true);
 
     try {
-      // Create the school admin user without logging them in
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: formData.admin_email,
-        password: formData.admin_password,
-        user_metadata: {
-          role: 'SCHOOL_ADMIN'
-        },
-        email_confirm: true
-      });
-
-      if (authError) throw authError;
-
-      if (!authData.user) {
-        throw new Error('Failed to create user');
-      }
-
-      // Create the school with the admin user ID
-      const { error: schoolError } = await supabase
-        .from('schools')
-        .insert({
-          name: formData.name,
-          slug: formData.slug,
-          logo_url: formData.logo_url || null,
-          admin_user_id: authData.user.id
-        });
-
-      if (schoolError) throw schoolError;
+      // Create the school using our database utility function
+      const school = await createSchool({
+        name: formData.name,
+        logo_url: formData.logo_url || null,
+        admin_user_id: null, // Will be assigned later
+        theme_settings: null,
+        contact_info: null
+      }, formData.admin_email);
 
       toast({
         title: "Success",
-        description: "School and admin user created successfully",
+        description: `School "${school.name}" created successfully! Admin users can be assigned separately.`,
       });
 
+      // Reset form
       setFormData({
         name: '',
-        slug: '',
         logo_url: '',
-        admin_email: '',
-        admin_password: ''
+        admin_email: ''
       });
 
       onSchoolAdded();
     } catch (error: any) {
       console.error('Error creating school:', error);
       
-      // Provide more specific error messages
       let errorMessage = "Failed to create school";
-      if (error.message?.includes('admin.createUser')) {
-        errorMessage = "Failed to create admin user. You may need admin privileges.";
-      } else if (error.message?.includes('duplicate key')) {
-        errorMessage = "A school with this slug already exists";
-      } else if (error.message) {
-        errorMessage = error.message;
+      if (error?.message) {
+        if (error.message.includes('duplicate key') || error.message.includes('unique constraint')) {
+          errorMessage = "A school with this name or URL already exists";
+        } else {
+          errorMessage = error.message;
+        }
       }
 
       toast({
@@ -100,19 +77,11 @@ export function AddSchoolDialog({ open, onOpenChange, onSchoolAdded }: AddSchool
     }
   };
 
-  const generateSlug = (name: string) => {
-    return name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
-  };
-
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
     setFormData(prev => ({
       ...prev,
-      name,
-      slug: generateSlug(name)
+      name
     }));
   };
 
@@ -122,7 +91,7 @@ export function AddSchoolDialog({ open, onOpenChange, onSchoolAdded }: AddSchool
         <DialogHeader>
           <DialogTitle>Add New School</DialogTitle>
           <DialogDescription>
-            Create a new school and assign a school administrator.
+            Create a new school. Admin users can be assigned after creation.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -137,16 +106,6 @@ export function AddSchoolDialog({ open, onOpenChange, onSchoolAdded }: AddSchool
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="slug">URL Slug</Label>
-            <Input
-              id="slug"
-              value={formData.slug}
-              onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-              placeholder="school-name"
-              required
-            />
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="logo_url">Logo URL (optional)</Label>
             <Input
               id="logo_url"
@@ -157,27 +116,17 @@ export function AddSchoolDialog({ open, onOpenChange, onSchoolAdded }: AddSchool
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="admin_email">School Admin Email</Label>
+            <Label htmlFor="admin_email">Admin Email (for reference)</Label>
             <Input
               id="admin_email"
               type="email"
               value={formData.admin_email}
               onChange={(e) => setFormData(prev => ({ ...prev, admin_email: e.target.value }))}
-              placeholder="admin@school.com"
-              required
+              placeholder="admin@school.com (optional)"
             />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="admin_password">School Admin Password</Label>
-            <Input
-              id="admin_password"
-              type="password"
-              value={formData.admin_password}
-              onChange={(e) => setFormData(prev => ({ ...prev, admin_password: e.target.value }))}
-              placeholder="Enter password"
-              required
-              minLength={6}
-            />
+            <p className="text-xs text-muted-foreground">
+              Note: Admin users should sign up separately and can be linked to the school later.
+            </p>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

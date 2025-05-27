@@ -1,1 +1,6 @@
 project_id = "rzfilfpjxfinxxfldzuv"
+
+[functions.create-school-admin]
+entrypoint = "functions/create-school-admin/index.ts"
+import_map = "functions/import_map.json"
+# You might need to add `skip_net_verify = true` if you encounter network issues during deployment

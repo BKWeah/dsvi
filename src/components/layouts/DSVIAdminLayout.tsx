@@ -13,7 +13,7 @@ import {
   SidebarProvider,
   SidebarTrigger
 } from '@/components/ui/sidebar';
-import { School, LogOut } from 'lucide-react';
+import { School, LogOut, Users } from 'lucide-react';
 
 export function DSVIAdminLayout() {
   const { logout } = useAuth();
@@ -38,6 +38,14 @@ export function DSVIAdminLayout() {
                   <Link to="/dsvi-admin/schools">
                     <School className="h-4 w-4" />
                     <span>Schools</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link to="/dsvi-admin/requests">
+                    <Users className="h-4 w-4" />
+                    <span>School Requests</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

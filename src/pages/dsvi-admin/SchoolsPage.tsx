@@ -5,15 +5,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, ExternalLink, Edit } from 'lucide-react';
+import { Plus, ExternalLink, Edit, Settings, UserPlus } from 'lucide-react';
 import { AddSchoolDialog } from '@/components/dsvi-admin/AddSchoolDialog';
+import { InviteSchoolAdminDialog } from '@/components/dsvi-admin/InviteSchoolAdminDialog';
 import { useToast } from '@/hooks/use-toast';
 
 interface School {
   id: string;
   name: string;
-  slug: string;
-  logo_url: string | null;
   admin_user_id: string | null;
 }
 
@@ -21,6 +20,8 @@ export default function SchoolsPage() {
   const [schools, setSchools] = useState<School[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showInviteDialog, setShowInviteDialog] = useState(false);
+  const [selectedSchool, setSelectedSchool] = useState<School | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -53,6 +54,11 @@ export default function SchoolsPage() {
     setShowAddDialog(false);
   };
 
+  const handleInviteAdmin = (school: School) => {
+    setSelectedSchool(school);
+    setShowInviteDialog(true);
+  };
+
   if (loading) {
     return <div>Loading schools...</div>;
   }
@@ -82,8 +88,7 @@ export default function SchoolsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Slug</TableHead>
-                <TableHead>Logo URL</TableHead>
+                <TableHead>Admin Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -91,8 +96,13 @@ export default function SchoolsPage() {
               {schools.map((school) => (
                 <TableRow key={school.id}>
                   <TableCell className="font-medium">{school.name}</TableCell>
-                  <TableCell>{school.slug}</TableCell>
-                  <TableCell>{school.logo_url || 'No logo'}</TableCell>
+                  <TableCell>
+                    {school.admin_user_id ? (
+                      <span className="text-green-600 text-sm">✓ Admin Assigned</span>
+                    ) : (
+                      <span className="text-orange-600 text-sm">⚠ No Admin</span>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
                       <Button variant="outline" size="sm" asChild>
@@ -100,6 +110,20 @@ export default function SchoolsPage() {
                           <Edit className="h-4 w-4 mr-1" />
                           Edit Content
                         </Link>
+                      </Button>
+                      <Button variant="outline" size="sm" asChild>
+                        <Link to={`/dsvi-admin/schools/${school.id}/settings`}>
+                          <Settings className="h-4 w-4 mr-1" />
+                          Settings
+                        </Link>
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleInviteAdmin(school)}
+                      >
+                        <UserPlus className="h-4 w-4 mr-1" />
+                        Invite Admin
                       </Button>
                       <Button variant="outline" size="sm" asChild>
                         <Link to={`/s/${school.slug}/homepage`} target="_blank">
@@ -120,6 +144,12 @@ export default function SchoolsPage() {
         open={showAddDialog} 
         onOpenChange={setShowAddDialog}
         onSchoolAdded={handleSchoolAdded}
+      />
+
+      <InviteSchoolAdminDialog
+        open={showInviteDialog}
+        onOpenChange={setShowInviteDialog}
+        school={selectedSchool}
       />
     </div>
   );

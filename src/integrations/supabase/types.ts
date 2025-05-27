@@ -11,29 +11,35 @@ export type Database = {
     Tables: {
       pages: {
         Row: {
-          content: string | null
           created_at: string
           id: string
-          page_type: string
+          meta_description: string | null
+          page_slug: string
+          page_type: string | null
           school_id: string
+          sections: Json
           title: string
           updated_at: string
         }
         Insert: {
-          content?: string | null
           created_at?: string
           id?: string
-          page_type: string
+          meta_description?: string | null
+          page_slug: string
+          page_type?: string | null
           school_id: string
+          sections?: Json
           title: string
           updated_at?: string
         }
         Update: {
-          content?: string | null
           created_at?: string
           id?: string
-          page_type?: string
+          meta_description?: string | null
+          page_slug?: string
+          page_type?: string | null
           school_id?: string
+          sections?: Json
           title?: string
           updated_at?: string
         }
@@ -47,32 +53,103 @@ export type Database = {
           },
         ]
       }
+      school_requests: {
+        Row: {
+          admin_notes: string | null
+          address: string | null
+          contact_email: string
+          contact_name: string
+          created_at: string
+          id: string
+          message: string | null
+          phone: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          school_name: string
+          school_type: string | null
+          status: string
+          student_count: string | null
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          address?: string | null
+          contact_email: string
+          contact_name: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          phone?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          school_name: string
+          school_type?: string | null
+          status?: string
+          student_count?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          address?: string | null
+          contact_email?: string
+          contact_name?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          phone?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          school_name?: string
+          school_type?: string | null
+          status?: string
+          student_count?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       schools: {
         Row: {
           admin_user_id: string | null
+          contact_info: Json | null
           created_at: string
           id: string
           logo_url: string | null
           name: string
           slug: string
+          theme_settings: Json | null
           updated_at: string
         }
         Insert: {
           admin_user_id?: string | null
+          contact_info?: Json | null
           created_at?: string
           id?: string
           logo_url?: string | null
           name: string
           slug: string
+          theme_settings?: Json | null
           updated_at?: string
         }
         Update: {
           admin_user_id?: string | null
+          contact_info?: Json | null
           created_at?: string
           id?: string
           logo_url?: string | null
           name?: string
           slug?: string
+          theme_settings?: Json | null
           updated_at?: string
         }
         Relationships: []
