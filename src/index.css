@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import DSVI Theme System */
+@import './styles/theme-variables.css';
+
 @layer base {
   :root {
     --background: 0 0% 100%;

@@ -3,13 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, useParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
-
-interface School {
-  id: string;
-  name: string;
-  slug: string;
-  logo_url: string | null;
-}
+import { useTheme } from '@/contexts/ThemeContext';
+import { School } from '@/lib/types';
 
 const PAGE_TYPES = [
   { type: 'homepage', label: 'Home' },
@@ -24,6 +19,7 @@ export function PublicSchoolLayout() {
   const { schoolSlug } = useParams<{ schoolSlug: string }>();
   const [school, setSchool] = useState<School | null>(null);
   const [loading, setLoading] = useState(true);
+  const { applyTheme, isThemeLoaded } = useTheme();
 
   useEffect(() => {
     if (schoolSlug) {
@@ -41,6 +37,11 @@ export function PublicSchoolLayout() {
 
       if (error) throw error;
       setSchool(data);
+      
+      // Apply the school's theme
+      if (data) {
+        applyTheme(data);
+      }
     } catch (error) {
       console.error('Error fetching school:', error);
     } finally {
@@ -64,22 +65,45 @@ export function PublicSchoolLayout() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="bg-white shadow-sm border-b">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--theme-background, #ffffff)' }}>
+      <header 
+        className="shadow-sm border-b" 
+        style={{ 
+          backgroundColor: 'var(--theme-surface, #ffffff)',
+          borderColor: 'var(--theme-border, #e2e8f0)'
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               {school.logo_url && (
-                <img src={school.logo_url} alt={`${school.name} logo`} className="h-8 w-8 mr-3" />
+                <img 
+                  src={school.logo_url} 
+                  alt={`${school.name} logo`} 
+                  className="h-8 w-8 mr-3" 
+                  style={{ height: 'var(--theme-logo-size, 2rem)', width: 'auto' }}
+                />
               )}
-              <h1 className="text-xl font-bold">{school.name}</h1>
+              <h1 
+                className="text-xl font-bold"
+                style={{ 
+                  color: 'var(--theme-text-primary, #0f172a)',
+                  fontFamily: 'var(--theme-font-display, Inter, system-ui, sans-serif)'
+                }}
+              >
+                {school.name}
+              </h1>
             </div>
             <nav className="hidden md:flex space-x-8">
               {PAGE_TYPES.map((pageType) => (
                 <Link
                   key={pageType.type}
                   to={`/s/${school.slug}/${pageType.type}`}
-                  className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium"
+                  className="px-3 py-2 text-sm font-medium transition-colors hover:opacity-75"
+                  style={{ 
+                    color: 'var(--theme-text-secondary, #475569)',
+                    fontFamily: 'var(--theme-font-primary, Inter, system-ui, sans-serif)'
+                  }}
                 >
                   {pageType.label}
                 </Link>
@@ -102,16 +126,44 @@ export function PublicSchoolLayout() {
       </footer> */}
 
       {/* Footer */}
-      <footer className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700 text-center text-muted-foreground">
+      <footer 
+        className="mt-12 pt-8 border-t text-center"
+        style={{ 
+          backgroundColor: 'var(--theme-surface, #f8fafc)',
+          borderColor: 'var(--theme-border, #e2e8f0)',
+          color: 'var(--theme-text-secondary, #475569)'
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 md:mb-0">
+            <p 
+              className="text-sm mb-4 md:mb-0"
+              style={{ color: 'var(--theme-text-muted, #94a3b8)' }}
+            >
               &copy; {new Date().getFullYear()} DSVI. All rights reserved.
             </p>
             <nav className="flex space-x-4">
-              <a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Terms of Service</a>
-              <a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Contact Us</a>
+              <a 
+                href="#" 
+                className="text-sm hover:opacity-75 transition-colors"
+                style={{ color: 'var(--theme-text-muted, #94a3b8)' }}
+              >
+                Privacy Policy
+              </a>
+              <a 
+                href="#" 
+                className="text-sm hover:opacity-75 transition-colors"
+                style={{ color: 'var(--theme-text-muted, #94a3b8)' }}
+              >
+                Terms of Service
+              </a>
+              <a 
+                href="#" 
+                className="text-sm hover:opacity-75 transition-colors"
+                style={{ color: 'var(--theme-text-muted, #94a3b8)' }}
+              >
+                Contact Us
+              </a>
             </nav>
           </div>
         </div>

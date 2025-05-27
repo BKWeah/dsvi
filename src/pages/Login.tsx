@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,7 +12,7 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, role } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,7 +32,14 @@ export default function Login() {
         title: "Login successful",
         description: "Welcome back!",
       });
-      navigate('/');
+
+      if (role === 'DSVI_ADMIN') {
+        navigate('/dsvi-admin');
+      } else if (role === 'SCHOOL_ADMIN') {
+        navigate('/school-admin');
+      } else {
+        navigate('/dashboard');
+      }
     }
 
     setLoading(false);
@@ -74,9 +81,9 @@ export default function Login() {
             </Button>
           </form>
           <div className="mt-4 text-center">
-            <Link to="/signup" className="text-sm text-blue-600 hover:underline">
-              Need an account? Sign up
-            </Link>
+            <span className="text-sm text-gray-600">
+              Contact administrator for account access
+            </span>
           </div>
         </CardContent>
       </Card>

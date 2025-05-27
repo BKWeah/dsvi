@@ -9,6 +9,133 @@ export interface UserProfile {
   school_id?: string; // if SCHOOL_ADMIN, links to School.id
 }
 
+// Enhanced Theme Configuration Interfaces
+export interface ThemeColors {
+  primary?: string;
+  secondary?: string;
+  accent?: string;
+  background?: string;
+  surface?: string;
+  text?: {
+    primary?: string;
+    secondary?: string;
+    muted?: string;
+  };
+  border?: string;
+  success?: string;
+  warning?: string;
+  error?: string;
+}
+
+export interface ThemeTypography {
+  fontFamily?: {
+    primary?: string;
+    secondary?: string;
+    display?: string;
+  };
+  fontSize?: {
+    xs?: string;
+    sm?: string;
+    base?: string;
+    lg?: string;
+    xl?: string;
+    '2xl'?: string;
+    '3xl'?: string;
+    '4xl'?: string;
+  };
+  fontWeight?: {
+    light?: number;
+    normal?: number;
+    medium?: number;
+    semibold?: number;
+    bold?: number;
+  };
+  lineHeight?: {
+    tight?: number;
+    normal?: number;
+    relaxed?: number;
+  };
+}
+
+export interface ThemeLayout {
+  containerMaxWidth?: string;
+  borderRadius?: {
+    sm?: string;
+    base?: string;
+    lg?: string;
+    xl?: string;
+  };
+  spacing?: {
+    xs?: string;
+    sm?: string;
+    base?: string;
+    lg?: string;
+    xl?: string;
+  };
+  breakpoints?: {
+    sm?: string;
+    md?: string;
+    lg?: string;
+    xl?: string;
+  };
+}
+
+export interface ThemeNavigation {
+  style?: 'default' | 'centered' | 'split' | 'minimal';
+  background?: string;
+  textColor?: string;
+  borderColor?: string;
+  height?: string;
+  logoSize?: string;
+  dropShadow?: boolean;
+}
+
+export interface ThemeComponents {
+  cards?: {
+    background?: string;
+    borderColor?: string;
+    borderRadius?: string;
+    shadow?: string;
+  };
+  buttons?: {
+    borderRadius?: string;
+    fontSize?: string;
+    padding?: string;
+  };
+  forms?: {
+    borderRadius?: string;
+    borderColor?: string;
+    focusColor?: string;
+  };
+}
+
+export interface ThemeHero {
+  style?: 'default' | 'gradient' | 'image' | 'video';
+  overlayOpacity?: number;
+  overlayColor?: string;
+  textAlign?: 'left' | 'center' | 'right';
+  minHeight?: string;
+}
+
+export interface ThemeFooter {
+  background?: string;
+  textColor?: string;
+  borderColor?: string;
+  style?: 'simple' | 'columns' | 'centered';
+}
+
+export interface ComprehensiveThemeSettings {
+  colors?: ThemeColors;
+  typography?: ThemeTypography;
+  layout?: ThemeLayout;
+  navigation?: ThemeNavigation;
+  components?: ThemeComponents;
+  hero?: ThemeHero;
+  footer?: ThemeFooter;
+  // Legacy compatibility
+  primaryColor?: string;
+}
+
 export interface School {
   id: string;
   created_at: string;
@@ -17,7 +144,9 @@ export interface School {
   slug: string;
   logo_url?: string | null;
   admin_user_id?: string | null;
-  theme_settings?: { primaryColor?: string; [key: string]: any } | null;
+  theme_settings?: ComprehensiveThemeSettings | null;
+  custom_css?: string | null;
+  theme_version?: number;
   contact_info?: { 
     address?: string; 
     phone?: string; 

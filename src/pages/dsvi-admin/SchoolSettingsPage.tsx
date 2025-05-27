@@ -6,11 +6,13 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Save, Upload } from 'lucide-react';
+import { ArrowLeft, Save, Upload, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { getSchoolById, updateSchool, uploadSchoolLogo } from '@/lib/database';
-import { School } from '@/lib/types';
+import { School, ComprehensiveThemeSettings } from '@/lib/types';
 import { ImageUpload } from '@/components/ui/custom/ImageUpload';
+import { ComprehensiveBrandingTab } from '@/components/ui/custom/ComprehensiveBrandingTab';
+import { LiveThemePreview } from '@/components/ui/custom/LiveThemePreview';
 
 export default function SchoolSettingsPage() {
   const { schoolId } = useParams<{ schoolId: string }>();
@@ -22,7 +24,8 @@ export default function SchoolSettingsPage() {
   // Form state
   const [name, setName] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
-  const [primaryColor, setPrimaryColor] = useState('#000000');
+  const [themeSettings, setThemeSettings] = useState<ComprehensiveThemeSettings>({});
+  const [customCSS, setCustomCSS] = useState('');
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -46,7 +49,8 @@ export default function SchoolSettingsPage() {
         setSchool(school);
         setName(school.name);
         setLogoUrl(school.logo_url || '');
-        setPrimaryColor(school.theme_settings?.primaryColor || '#000000');
+        setThemeSettings(school.theme_settings || {});
+        setCustomCSS(school.custom_css || '');
         setAddress(school.contact_info?.address || '');
         setPhone(school.contact_info?.phone || '');
         setEmail(school.contact_info?.email || '');
@@ -64,6 +68,19 @@ export default function SchoolSettingsPage() {
     }
   };
 
+  const handlePreview = () => {
+    if (school?.slug) {
+      // Open school's public page in a new tab for preview
+      window.open(`/s/${school.slug}`, '_blank');
+    } else {
+      toast({
+        title: "Error",
+        description: "School slug not found for preview",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSave = async () => {
     if (!schoolId || !school) return;
     
@@ -73,10 +90,9 @@ export default function SchoolSettingsPage() {
       const updatedData = {
         name,
         logo_url: logoUrl,
-        theme_settings: {
-          ...school.theme_settings,
-          primaryColor
-        },
+        theme_settings: themeSettings,
+        custom_css: customCSS,
+        theme_version: (school.theme_version || 1) + 1,
         contact_info: {
           address,
           phone,
@@ -141,6 +157,7 @@ export default function SchoolSettingsPage() {
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="branding">Branding</TabsTrigger>
           <TabsTrigger value="contact">Contact Info</TabsTrigger>
+          <TabsTrigger value="preview">Preview</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" className="space-y-4">
@@ -163,40 +180,15 @@ export default function SchoolSettingsPage() {
         </TabsContent>
 
         <TabsContent value="branding" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Branding & Theme</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <ImageUpload
-                  label="School Logo"
-                  value={logoUrl}
-                  onChange={setLogoUrl}
-                  schoolId={schoolId!}
-                  sectionId="logo"
-                  placeholder="Upload school logo or enter URL"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="color">Primary Color</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="color"
-                    value={primaryColor}
-                    onChange={(e) => setPrimaryColor(e.target.value)}
-                    className="w-16 h-10"
-                  />
-                  <Input
-                    value={primaryColor}
-                    onChange={(e) => setPrimaryColor(e.target.value)}
-                    placeholder="#000000"
-                    className="flex-1"
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <ComprehensiveBrandingTab
+            themeSettings={themeSettings}
+            customCSS={customCSS}
+            logoUrl={logoUrl}
+            onThemeChange={setThemeSettings}
+            onCustomCSSChange={setCustomCSS}
+            onLogoChange={setLogoUrl}
+            onPreview={handlePreview}
+          />
         </TabsContent>
 
         <TabsContent value="contact" className="space-y-4">
@@ -245,6 +237,14 @@ export default function SchoolSettingsPage() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="preview" className="space-y-4">
+          <LiveThemePreview
+            school={school}
+            themeSettings={themeSettings}
+            customCSS={customCSS}
+          />
         </TabsContent>
       </Tabs>
     </div>

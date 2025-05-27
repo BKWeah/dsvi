@@ -28,20 +28,46 @@ interface SchoolPageRendererProps {
 }
 
 const HeroSection: React.FC<{ config: HeroSectionConfig }> = ({ config }) => (
-  <div className="relative w-full h-64 md:h-96 mb-8 rounded-lg overflow-hidden">
+  <div 
+    className="relative w-full h-64 md:h-96 mb-8 rounded-lg overflow-hidden"
+    style={{ borderRadius: 'var(--theme-border-radius, 0.5rem)' }}
+  >
     <img 
       src={config.imageUrl || '/placeholder-hero.jpg'} 
       alt={config.title}
       className="w-full h-full object-cover"
     />
-    <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+    <div 
+      className="absolute inset-0 flex items-center justify-center"
+      style={{ 
+        backgroundColor: `var(--theme-hero-overlay, rgba(0,0,0,0.4))`,
+        textAlign: 'var(--theme-hero-text-align, center)' as any
+      }}
+    >
       <div className="text-center text-white px-4">
-        <h1 className="text-4xl md:text-6xl font-bold mb-4">{config.title}</h1>
+        <h1 
+          className="text-4xl md:text-6xl font-bold mb-4"
+          style={{ fontFamily: 'var(--theme-font-display, Inter, system-ui, sans-serif)' }}
+        >
+          {config.title}
+        </h1>
         {config.subtitle && (
-          <p className="text-xl md:text-2xl mb-6">{config.subtitle}</p>
+          <p 
+            className="text-xl md:text-2xl mb-6"
+            style={{ fontFamily: 'var(--theme-font-primary, Inter, system-ui, sans-serif)' }}
+          >
+            {config.subtitle}
+          </p>
         )}
         {config.ctaText && config.ctaLink && (
-          <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
+          <Button 
+            asChild 
+            size="lg" 
+            style={{ 
+              backgroundColor: 'var(--theme-primary, #3b82f6)',
+              borderRadius: 'var(--theme-button-radius, 0.375rem)'
+            }}
+          >
             <a href={config.ctaLink}>{config.ctaText}</a>
           </Button>
         )}
@@ -51,13 +77,38 @@ const HeroSection: React.FC<{ config: HeroSectionConfig }> = ({ config }) => (
 );
 
 const TextSection: React.FC<{ config: TextSectionConfig }> = ({ config }) => (
-  <Card className="mb-8">
+  <Card 
+    className="mb-8"
+    style={{ 
+      backgroundColor: 'var(--theme-surface, #ffffff)',
+      borderColor: 'var(--theme-border, #e2e8f0)',
+      borderRadius: 'var(--theme-border-radius, 0.5rem)'
+    }}
+  >
     <CardHeader>
-      {config.heading && <CardTitle className="text-2xl">{config.heading}</CardTitle>}
+      {config.heading && (
+        <CardTitle 
+          className="text-2xl"
+          style={{ 
+            color: 'var(--theme-text-primary, #0f172a)',
+            fontFamily: 'var(--theme-font-display, Inter, system-ui, sans-serif)'
+          }}
+        >
+          {config.heading}
+        </CardTitle>
+      )}
     </CardHeader>
     <CardContent>
       <div className="prose max-w-none">
-        <div className="whitespace-pre-wrap text-foreground">{config.body}</div>
+        <div 
+          className="whitespace-pre-wrap"
+          style={{ 
+            color: 'var(--theme-text-secondary, #475569)',
+            fontFamily: 'var(--theme-font-primary, Inter, system-ui, sans-serif)'
+          }}
+        >
+          {config.body}
+        </div>
       </div>
     </CardContent>
   </Card>
@@ -186,7 +237,13 @@ const renderSection = (section: ContentSection): React.ReactNode => {
 
 export default function SchoolPageRenderer({ school, pageContent }: SchoolPageRendererProps) {
   return (
-    <div className="container mx-auto p-4">
+    <div 
+      className="container mx-auto p-4"
+      style={{ 
+        maxWidth: 'var(--theme-container-max-width, 1200px)',
+        fontFamily: 'var(--theme-font-primary, Inter, system-ui, sans-serif)'
+      }}
+    >
       {/* School Header */}
       <header className="mb-8 text-center">
         {school.logo_url && (
@@ -196,8 +253,24 @@ export default function SchoolPageRenderer({ school, pageContent }: SchoolPageRe
             className="mx-auto h-24 w-auto mb-4" 
           />
         )}
-        <h1 className="text-4xl font-bold">{school.name}</h1>
-        <p className="text-xl text-muted-foreground">{pageContent.title}</p>
+        <h1 
+          className="text-4xl font-bold"
+          style={{ 
+            color: 'var(--theme-text-primary, #0f172a)',
+            fontFamily: 'var(--theme-font-display, Inter, system-ui, sans-serif)'
+          }}
+        >
+          {school.name}
+        </h1>
+        <p 
+          className="text-xl"
+          style={{ 
+            color: 'var(--theme-text-secondary, #475569)',
+            fontFamily: 'var(--theme-font-primary, Inter, system-ui, sans-serif)'
+          }}
+        >
+          {pageContent.title}
+        </p>
       </header>
 
       {/* Dynamic Sections */}
@@ -213,29 +286,58 @@ export default function SchoolPageRenderer({ school, pageContent }: SchoolPageRe
 
       {/* Contact Info & Footer */}
       {school.contact_info && (
-        <Card className="mb-8">
+        <Card 
+          className="mb-8"
+          style={{ 
+            backgroundColor: 'var(--theme-surface, #ffffff)',
+            borderColor: 'var(--theme-border, #e2e8f0)',
+            borderRadius: 'var(--theme-border-radius, 0.5rem)'
+          }}
+        >
           <CardHeader>
-            <CardTitle className="text-2xl">Contact Information</CardTitle>
+            <CardTitle 
+              className="text-2xl"
+              style={{ 
+                color: 'var(--theme-text-primary, #0f172a)',
+                fontFamily: 'var(--theme-font-display, Inter, system-ui, sans-serif)'
+              }}
+            >
+              Contact Information
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {school.contact_info.address && (
               <div className="flex items-center space-x-2">
-                <MapPin className="h-5 w-5 text-muted-foreground" />
-                <span>{school.contact_info.address}</span>
+                <MapPin 
+                  className="h-5 w-5"
+                  style={{ color: 'var(--theme-text-muted, #94a3b8)' }}
+                />
+                <span style={{ color: 'var(--theme-text-secondary, #475569)' }}>
+                  {school.contact_info.address}
+                </span>
               </div>
             )}
             {school.contact_info.phone && (
               <div className="flex items-center space-x-2">
-                <Phone className="h-5 w-5 text-muted-foreground" />
-                <span>{school.contact_info.phone}</span>
+                <Phone 
+                  className="h-5 w-5"
+                  style={{ color: 'var(--theme-text-muted, #94a3b8)' }}
+                />
+                <span style={{ color: 'var(--theme-text-secondary, #475569)' }}>
+                  {school.contact_info.phone}
+                </span>
               </div>
             )}
             {school.contact_info.email && (
               <div className="flex items-center space-x-2">
-                <Mail className="h-5 w-5 text-muted-foreground" />
+                <Mail 
+                  className="h-5 w-5"
+                  style={{ color: 'var(--theme-text-muted, #94a3b8)' }}
+                />
                 <a 
                   href={`mailto:${school.contact_info.email}`} 
-                  className="text-primary hover:underline"
+                  className="hover:underline"
+                  style={{ color: 'var(--theme-primary, #3b82f6)' }}
                 >
                   {school.contact_info.email}
                 </a>

@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { DSVIAdminLayout } from "./components/layouts/DSVIAdminLayout";
 import { SchoolAdminLayout } from "./components/layouts/SchoolAdminLayout";
@@ -32,9 +33,10 @@ const App = () => (
     <HelmetProvider>
       <TooltipProvider>
         <AuthProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
+          <ThemeProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
@@ -82,7 +84,8 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
-      </AuthProvider>
+      </ThemeProvider>
+    </AuthProvider>
     </TooltipProvider>
   </HelmetProvider>
 </QueryClientProvider>
