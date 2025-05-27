@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Edit } from 'lucide-react';
+import { ArrowLeft, Edit } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface School {
@@ -31,6 +31,7 @@ const PAGE_TYPES = [
 
 export default function SchoolContentPage() {
   const { schoolId } = useParams<{ schoolId: string }>();
+  const navigate = useNavigate();
   const [school, setSchool] = useState<School | null>(null);
   const [pages, setPages] = useState<Page[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,9 +86,19 @@ export default function SchoolContentPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Edit Content: {school.name}</h1>
-        <p className="text-muted-foreground">Manage all pages for this school</p>
+      <div className="flex items-center gap-4">
+        <Button
+          variant="outline"
+          onClick={() => navigate('/dsvi-admin/schools')}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Schools
+        </Button>
+        <div>
+          <h1 className="text-3xl font-bold">Edit Content: {school.name}</h1>
+          <p className="text-muted-foreground">Manage all pages for this school</p>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
