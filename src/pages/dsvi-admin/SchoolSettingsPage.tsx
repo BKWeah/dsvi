@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { getSchoolById, updateSchool, uploadSchoolLogo } from '@/lib/database';
 import { School, ComprehensiveThemeSettings } from '@/lib/types';
 import { ImageUpload } from '@/components/ui/custom/ImageUpload';
+import { SchoolLogoUpload } from '@/components/ui/custom/SchoolLogoUpload';
 import { ComprehensiveBrandingTab } from '@/components/ui/custom/ComprehensiveBrandingTab';
 import { LiveThemePreview } from '@/components/ui/custom/LiveThemePreview';
 
@@ -173,6 +174,14 @@ export default function SchoolSettingsPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter school name"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <SchoolLogoUpload
+                  value={logoUrl}
+                  onChange={setLogoUrl}
+                  schoolId={schoolId!}
                 />
               </div>
             </CardContent>

@@ -174,8 +174,42 @@ export async function uploadFile(file: File, path: string): Promise<string> {
   return publicUrl;
 }
 
+export async function uploadFileWithProgress(
+  file: File, 
+  path: string, 
+  onProgress?: (progress: number) => void
+): Promise<string> {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+  const filePath = `${path}/${fileName}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('public')
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false,
+      duplex: 'half'
+    });
+
+  if (uploadError) throw uploadError;
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('public')
+    .getPublicUrl(filePath);
+
+  return publicUrl;
+}
+
 export async function uploadSchoolLogo(schoolId: string, file: File): Promise<string> {
   return uploadFile(file, `schools/${schoolId}/logo`);
+}
+
+export async function uploadSchoolLogoWithProgress(
+  schoolId: string, 
+  file: File, 
+  onProgress?: (progress: number) => void
+): Promise<string> {
+  return uploadFileWithProgress(file, `schools/${schoolId}/logo`, onProgress);
 }
 
 export async function uploadSectionImage(schoolId: string, sectionId: string, file: File): Promise<string> {
