@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -36,15 +35,14 @@ export function AddSchoolDialog({ open, onOpenChange, onSchoolAdded }: AddSchool
     setLoading(true);
 
     try {
-      // First, create the school admin user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      // Create the school admin user without logging them in
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email: formData.admin_email,
         password: formData.admin_password,
-        options: {
-          data: {
-            role: 'SCHOOL_ADMIN'
-          }
-        }
+        user_metadata: {
+          role: 'SCHOOL_ADMIN'
+        },
+        email_confirm: true
       });
 
       if (authError) throw authError;
@@ -79,11 +77,22 @@ export function AddSchoolDialog({ open, onOpenChange, onSchoolAdded }: AddSchool
       });
 
       onSchoolAdded();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating school:', error);
+      
+      // Provide more specific error messages
+      let errorMessage = "Failed to create school";
+      if (error.message?.includes('admin.createUser')) {
+        errorMessage = "Failed to create admin user. You may need admin privileges.";
+      } else if (error.message?.includes('duplicate key')) {
+        errorMessage = "A school with this slug already exists";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
       toast({
         title: "Error",
-        description: "Failed to create school",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

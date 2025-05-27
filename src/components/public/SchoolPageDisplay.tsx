@@ -1,15 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { useParams, useOutletContext } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-interface School {
-  id: string;
-  name: string;
-  slug: string;
-  logo_url: string | null;
-}
 
 interface Page {
   id: string;
@@ -18,120 +11,105 @@ interface Page {
   page_type: string;
 }
 
-interface OutletContext {
-  school: School;
+interface School {
+  id: string;
+  name: string;
+  slug: string;
 }
 
 export function SchoolPageDisplay() {
-  const { schoolSlug, pageType } = useParams<{ schoolSlug: string; pageType: string }>();
-  const { school } = useOutletContext<OutletContext>();
+  const { schoolSlug, pageType = 'homepage' } = useParams<{ schoolSlug: string; pageType?: string }>();
   const [page, setPage] = useState<Page | null>(null);
+  const [school, setSchool] = useState<School | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (school && pageType) {
-      fetchPage();
+    if (schoolSlug) {
+      fetchSchoolAndPage();
     }
-  }, [school, pageType]);
+  }, [schoolSlug, pageType]);
 
-  const fetchPage = async () => {
+  const fetchSchoolAndPage = async () => {
     try {
-      setLoading(true);
-      setError(null);
-
-      // Map URL paths to page types
-      const pageTypeMap: Record<string, string> = {
-        'homepage': 'homepage',
-        'about-us': 'about-us',
-        'academics': 'academics',
-        'admissions': 'admissions',
-        'faculty': 'faculty',
-        'contact': 'contact'
-      };
-
-      const actualPageType = pageTypeMap[pageType || ''] || pageType;
-
-      const { data, error } = await supabase
-        .from('pages')
+      // First get the school
+      const { data: schoolData, error: schoolError } = await supabase
+        .from('schools')
         .select('*')
-        .eq('school_id', school.id)
-        .eq('page_type', actualPageType)
+        .eq('slug', schoolSlug)
         .single();
 
-      if (error) {
-        if (error.code === 'PGRST116') {
-          // No rows returned
-          setError('Page not found');
-        } else {
-          throw error;
-        }
+      if (schoolError) throw schoolError;
+      setSchool(schoolData);
+
+      // Then get the page
+      const { data: pageData, error: pageError } = await supabase
+        .from('pages')
+        .select('*')
+        .eq('school_id', schoolData.id)
+        .eq('page_type', pageType)
+        .single();
+
+      if (pageError) {
+        console.error('Page not found:', pageError);
+        setPage(null);
       } else {
-        setPage(data);
+        setPage(pageData);
       }
     } catch (error) {
-      console.error('Error fetching page:', error);
-      setError('Failed to load page content');
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Set page title for SEO
   useEffect(() => {
+    // Set page title for SEO
     if (page && school) {
-      document.title = `${page.title} | ${school.name}`;
-    } else if (school) {
-      document.title = school.name;
+      document.title = `${page.title} - ${school.name}`;
     }
-
-    return () => {
-      document.title = 'DSVI Platform';
-    };
   }, [page, school]);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Loading page content...</p>
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-5/6"></div>
         </div>
       </div>
     );
   }
 
-  if (error || !page) {
+  if (!page) {
     return (
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle>Page Not Available</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            {error || 'This page is not available yet. Please check back later.'}
-          </p>
-        </CardContent>
-      </Card>
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Page Not Found</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">
+              This page is coming soon. Please check back later.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto px-4 py-8">
       <Card>
         <CardHeader>
-          <CardTitle className="text-3xl">{page.title}</CardTitle>
+          <CardTitle className="text-3xl font-bold">{page.title}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="prose max-w-none">
             {page.content ? (
-              <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
-                {page.content}
-              </div>
+              <div className="whitespace-pre-wrap">{page.content}</div>
             ) : (
-              <p className="text-muted-foreground italic">
-                Content coming soon...
-              </p>
+              <p className="text-muted-foreground">Content coming soon...</p>
             )}
           </div>
         </CardContent>

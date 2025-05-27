@@ -21,6 +21,7 @@ interface Page {
 interface School {
   id: string;
   name: string;
+  slug: string;
 }
 
 export default function EditSchoolPagePage() {
@@ -170,7 +171,7 @@ export default function EditSchoolPagePage() {
                 variant="outline" 
                 onClick={() => {
                   if (school) {
-                    window.open(`/s/${school.name.toLowerCase().replace(/\s+/g, '-')}/homepage`, '_blank');
+                    window.open(`/s/${school.slug}/${pageType}`, '_blank');
                   }
                 }}
               >

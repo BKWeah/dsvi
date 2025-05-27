@@ -67,8 +67,8 @@ const App = () => (
             
             {/* Public School Website Routes */}
             <Route path="/s/:schoolSlug" element={<PublicSchoolLayout />}>
-              <Route path=":pageType" element={<SchoolPageDisplay />} />
               <Route index element={<SchoolPageDisplay />} />
+              <Route path=":pageType" element={<SchoolPageDisplay />} />
             </Route>
             
             {/* Catch-all route */}
