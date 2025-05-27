@@ -1,0 +1,118 @@
+
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Edit } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+
+interface School {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+interface Page {
+  id: string;
+  page_type: string;
+  title: string;
+  content: string | null;
+}
+
+const PAGE_TYPES = [
+  { type: 'homepage', label: 'Homepage' },
+  { type: 'about-us', label: 'About Us' },
+  { type: 'academics', label: 'Academics' },
+  { type: 'admissions', label: 'Admissions' },
+  { type: 'faculty', label: 'Faculty' },
+  { type: 'contact', label: 'Contact' }
+];
+
+export default function SchoolContentPage() {
+  const { schoolId } = useParams<{ schoolId: string }>();
+  const [school, setSchool] = useState<School | null>(null);
+  const [pages, setPages] = useState<Page[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (schoolId) {
+      fetchSchoolAndPages();
+    }
+  }, [schoolId]);
+
+  const fetchSchoolAndPages = async () => {
+    try {
+      // Fetch school details
+      const { data: schoolData, error: schoolError } = await supabase
+        .from('schools')
+        .select('*')
+        .eq('id', schoolId)
+        .single();
+
+      if (schoolError) throw schoolError;
+      setSchool(schoolData);
+
+      // Fetch pages for this school
+      const { data: pagesData, error: pagesError } = await supabase
+        .from('pages')
+        .select('*')
+        .eq('school_id', schoolId)
+        .order('page_type');
+
+      if (pagesError) throw pagesError;
+      setPages(pagesData || []);
+    } catch (error) {
+      console.error('Error fetching school and pages:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch school content",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <div>Loading school content...</div>;
+  }
+
+  if (!school) {
+    return <div>School not found</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold">Edit Content: {school.name}</h1>
+        <p className="text-muted-foreground">Manage all pages for this school</p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {PAGE_TYPES.map((pageType) => {
+          const page = pages.find(p => p.page_type === pageType.type);
+          return (
+            <Card key={pageType.type}>
+              <CardHeader>
+                <CardTitle className="text-lg">{pageType.label}</CardTitle>
+                <CardDescription>
+                  {page ? `Title: ${page.title}` : 'Page not found'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button asChild className="w-full">
+                  <Link to={`/dsvi-admin/schools/${schoolId}/pages/${pageType.type}/edit`}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Page
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
