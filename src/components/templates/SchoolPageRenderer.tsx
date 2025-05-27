@@ -245,10 +245,7 @@ export default function SchoolPageRenderer({ school, pageContent }: SchoolPageRe
         </Card>
       )}
 
-      {/* Footer */}
-      <footer className="mt-12 pt-8 border-t text-center text-muted-foreground">
-        <p>© {new Date().getFullYear()} {school.name}. Powered by DSVI.</p>
-      </footer>
+      
     </div>
   );
 }
