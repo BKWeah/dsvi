@@ -59,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signup = async (email: string, password: string, role: string, metadata?: any) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -69,6 +69,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
       },
     });
+
+    // If signup successful and it's a school admin, ensure assignment with fallback
+    if (!error && data.user && role === 'SCHOOL_ADMIN' && metadata?.school_id) {
+      // Wait for database trigger to process, then verify assignment
+      setTimeout(async () => {
+        try {
+          // Check if the assignment worked
+          const { data: school } = await supabase
+            .from('schools')
+            .select('admin_user_id')
+            .eq('id', metadata.school_id)
+            .single();
+
+          // If still not assigned, do it manually
+          if (school && !school.admin_user_id) {
+            const { error: updateError } = await supabase
+              .from('schools')
+              .update({ 
+                admin_user_id: data.user.id,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', metadata.school_id)
+              .is('admin_user_id', null);
+            
+            if (updateError) {
+              console.warn('Manual admin assignment failed:', updateError);
+            } else {
+              console.log('Manual admin assignment successful');
+            }
+          }
+        } catch (err) {
+          console.warn('Admin assignment verification failed:', err);
+        }
+      }, 2000); // Wait 2 seconds for trigger to complete
+    }
+
     return { error };
   };
 

@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Plus, ExternalLink, Edit, Settings, UserPlus } from 'lucide-react';
 import { AddSchoolDialog } from '@/components/dsvi-admin/AddSchoolDialog';
 import { InviteSchoolAdminDialog } from '@/components/dsvi-admin/InviteSchoolAdminDialog';
+import { FixAdminAssignments } from '@/components/dsvi-admin/FixAdminAssignments';
 import { useToast } from '@/hooks/use-toast';
 
 interface School {
