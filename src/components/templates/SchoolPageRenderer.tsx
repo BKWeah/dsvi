@@ -29,32 +29,55 @@ interface SchoolPageRendererProps {
 
 const HeroSection: React.FC<{ config: HeroSectionConfig }> = ({ config }) => (
   <div 
-    className="relative w-full h-64 md:h-96 mb-8 rounded-lg overflow-hidden"
-    style={{ borderRadius: 'var(--theme-border-radius, 0.5rem)' }}
+    className="relative w-full mb-8 rounded-lg overflow-hidden hero"
+    style={{ 
+      borderRadius: 'var(--border-radius-lg, 0.75rem)',
+      minHeight: 'var(--hero-min-height, 400px)'
+    }}
   >
+    {/* Background Image */}
     <img 
       src={config.imageUrl || '/placeholder-hero.jpg'} 
       alt={config.title}
-      className="w-full h-full object-cover"
+      className="absolute inset-0 w-full h-full object-cover"
     />
+    
+    {/* Overlay Layer - positioned between image and content */}
     <div 
-      className="absolute inset-0 flex items-center justify-center"
+      className="absolute inset-0"
       style={{ 
-        backgroundColor: `var(--theme-hero-overlay, rgba(0,0,0,0.4))`,
-        textAlign: 'var(--theme-hero-text-align, center)' as any
+        backgroundColor: `var(--hero-overlay-color, rgba(0,0,0,0.4))`,
+        opacity: 'var(--hero-overlay-opacity, 0.4)'
+      }}
+    />
+    
+    {/* Content Layer - positioned above overlay */}
+    <div 
+      className="relative z-10 flex items-center justify-center h-full"
+      style={{ 
+        textAlign: 'var(--hero-text-align, center)' as any,
+        minHeight: 'var(--hero-min-height, 400px)'
       }}
     >
-      <div className="text-center text-white px-4">
+      <div className="hero-content text-white px-4">
         <h1 
           className="text-4xl md:text-6xl font-bold mb-4"
-          style={{ fontFamily: 'var(--theme-font-display, Inter, system-ui, sans-serif)' }}
+          style={{ 
+            fontFamily: 'var(--font-display, Inter, system-ui, sans-serif)',
+            fontWeight: 'var(--font-weight-bold, 700)',
+            color: 'white'
+          }}
         >
           {config.title}
         </h1>
         {config.subtitle && (
           <p 
             className="text-xl md:text-2xl mb-6"
-            style={{ fontFamily: 'var(--theme-font-primary, Inter, system-ui, sans-serif)' }}
+            style={{ 
+              fontFamily: 'var(--font-primary, Inter, system-ui, sans-serif)',
+              fontWeight: 'var(--font-weight-normal, 400)',
+              color: 'white'
+            }}
           >
             {config.subtitle}
           </p>
@@ -63,9 +86,13 @@ const HeroSection: React.FC<{ config: HeroSectionConfig }> = ({ config }) => (
           <Button 
             asChild 
             size="lg" 
+            className="button"
             style={{ 
               backgroundColor: 'var(--theme-primary, #3b82f6)',
-              borderRadius: 'var(--theme-button-radius, 0.375rem)'
+              borderRadius: 'var(--button-border-radius, 0.375rem)',
+              fontSize: 'var(--button-font-size, 0.875rem)',
+              padding: 'var(--button-padding, 0.5rem 1rem)',
+              color: 'white'
             }}
           >
             <a href={config.ctaLink}>{config.ctaText}</a>
@@ -78,11 +105,12 @@ const HeroSection: React.FC<{ config: HeroSectionConfig }> = ({ config }) => (
 
 const TextSection: React.FC<{ config: TextSectionConfig }> = ({ config }) => (
   <Card 
-    className="mb-8"
+    className="mb-8 card"
     style={{ 
-      backgroundColor: 'var(--theme-surface, #ffffff)',
-      borderColor: 'var(--theme-border, #e2e8f0)',
-      borderRadius: 'var(--theme-border-radius, 0.5rem)'
+      backgroundColor: 'var(--card-background, #ffffff)',
+      borderColor: 'var(--card-border-color, #e2e8f0)',
+      borderRadius: 'var(--card-border-radius, 0.5rem)',
+      padding: 'var(--spacing-base, 1rem)'
     }}
   >
     <CardHeader>
@@ -91,7 +119,9 @@ const TextSection: React.FC<{ config: TextSectionConfig }> = ({ config }) => (
           className="text-2xl"
           style={{ 
             color: 'var(--theme-text-primary, #0f172a)',
-            fontFamily: 'var(--theme-font-display, Inter, system-ui, sans-serif)'
+            fontFamily: 'var(--font-display, Inter, system-ui, sans-serif)',
+            fontSize: 'var(--font-size-2xl, 1.5rem)',
+            fontWeight: 'var(--font-weight-bold, 700)'
           }}
         >
           {config.heading}
@@ -104,7 +134,9 @@ const TextSection: React.FC<{ config: TextSectionConfig }> = ({ config }) => (
           className="whitespace-pre-wrap"
           style={{ 
             color: 'var(--theme-text-secondary, #475569)',
-            fontFamily: 'var(--theme-font-primary, Inter, system-ui, sans-serif)'
+            fontFamily: 'var(--font-primary, Inter, system-ui, sans-serif)',
+            fontSize: 'var(--font-size-base, 1rem)',
+            lineHeight: 'var(--line-height-normal, 1.5)'
           }}
         >
           {config.body}
@@ -266,24 +298,35 @@ export default function SchoolPageRenderer({ school, pageContent }: SchoolPageRe
     <div 
       className="container mx-auto p-4"
       style={{ 
-        maxWidth: 'var(--theme-container-max-width, 1200px)',
-        fontFamily: 'var(--theme-font-primary, Inter, system-ui, sans-serif)'
+        maxWidth: 'var(--container-max-width, 1200px)',
+        fontFamily: 'var(--font-primary, Inter, system-ui, sans-serif)',
+        backgroundColor: 'var(--theme-background, #ffffff)',
+        color: 'var(--theme-text-primary, #0f172a)',
+        padding: 'var(--spacing-base, 1rem)'
       }}
     >
       {/* School Header */}
-      <header className="mb-8 text-center">
+      <header className="mb-8 text-center" style={{ textAlign: 'var(--hero-text-align, center)' as any }}>
         {school.logo_url && (
           <img 
             src={school.logo_url} 
             alt={`${school.name} Logo`} 
-            className="mx-auto h-24 w-auto mb-4" 
+            className="mx-auto mb-4" 
+            style={{ 
+              height: 'var(--nav-logo-size, 40px)',
+              maxHeight: '96px',
+              width: 'auto'
+            }}
           />
         )}
         <h1 
           className="text-4xl font-bold"
           style={{ 
             color: 'var(--theme-text-primary, #0f172a)',
-            fontFamily: 'var(--theme-font-display, Inter, system-ui, sans-serif)'
+            fontFamily: 'var(--font-display, Inter, system-ui, sans-serif)',
+            fontSize: 'var(--font-size-4xl, 2.25rem)',
+            fontWeight: 'var(--font-weight-bold, 700)',
+            marginBottom: 'var(--spacing-base, 1rem)'
           }}
         >
           {school.name}
@@ -292,7 +335,9 @@ export default function SchoolPageRenderer({ school, pageContent }: SchoolPageRe
           className="text-xl"
           style={{ 
             color: 'var(--theme-text-secondary, #475569)',
-            fontFamily: 'var(--theme-font-primary, Inter, system-ui, sans-serif)'
+            fontFamily: 'var(--font-primary, Inter, system-ui, sans-serif)',
+            fontSize: 'var(--font-size-xl, 1.25rem)',
+            fontWeight: 'var(--font-weight-normal, 400)'
           }}
         >
           {pageContent.title}
@@ -313,11 +358,12 @@ export default function SchoolPageRenderer({ school, pageContent }: SchoolPageRe
       {/* Contact Info & Footer */}
       {school.contact_info && (
         <Card 
-          className="mb-8"
+          className="mb-8 card"
           style={{ 
-            backgroundColor: 'var(--theme-surface, #ffffff)',
-            borderColor: 'var(--theme-border, #e2e8f0)',
-            borderRadius: 'var(--theme-border-radius, 0.5rem)'
+            backgroundColor: 'var(--card-background, #ffffff)',
+            borderColor: 'var(--card-border-color, #e2e8f0)',
+            borderRadius: 'var(--card-border-radius, 0.5rem)',
+            padding: 'var(--spacing-base, 1rem)'
           }}
         >
           <CardHeader>
@@ -325,7 +371,9 @@ export default function SchoolPageRenderer({ school, pageContent }: SchoolPageRe
               className="text-2xl"
               style={{ 
                 color: 'var(--theme-text-primary, #0f172a)',
-                fontFamily: 'var(--theme-font-display, Inter, system-ui, sans-serif)'
+                fontFamily: 'var(--font-display, Inter, system-ui, sans-serif)',
+                fontSize: 'var(--font-size-2xl, 1.5rem)',
+                fontWeight: 'var(--font-weight-bold, 700)'
               }}
             >
               Contact Information
@@ -338,7 +386,10 @@ export default function SchoolPageRenderer({ school, pageContent }: SchoolPageRe
                   className="h-5 w-5"
                   style={{ color: 'var(--theme-text-muted, #94a3b8)' }}
                 />
-                <span style={{ color: 'var(--theme-text-secondary, #475569)' }}>
+                <span style={{ 
+                  color: 'var(--theme-text-secondary, #475569)',
+                  fontFamily: 'var(--font-primary, Inter, system-ui, sans-serif)'
+                }}>
                   {school.contact_info.address}
                 </span>
               </div>
@@ -349,7 +400,10 @@ export default function SchoolPageRenderer({ school, pageContent }: SchoolPageRe
                   className="h-5 w-5"
                   style={{ color: 'var(--theme-text-muted, #94a3b8)' }}
                 />
-                <span style={{ color: 'var(--theme-text-secondary, #475569)' }}>
+                <span style={{ 
+                  color: 'var(--theme-text-secondary, #475569)',
+                  fontFamily: 'var(--font-primary, Inter, system-ui, sans-serif)'
+                }}>
                   {school.contact_info.phone}
                 </span>
               </div>
@@ -363,7 +417,10 @@ export default function SchoolPageRenderer({ school, pageContent }: SchoolPageRe
                 <a 
                   href={`mailto:${school.contact_info.email}`} 
                   className="hover:underline"
-                  style={{ color: 'var(--theme-primary, #3b82f6)' }}
+                  style={{ 
+                    color: 'var(--theme-primary, #3b82f6)',
+                    fontFamily: 'var(--font-primary, Inter, system-ui, sans-serif)'
+                  }}
                 >
                   {school.contact_info.email}
                 </a>

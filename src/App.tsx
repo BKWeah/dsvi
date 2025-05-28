@@ -25,6 +25,7 @@ import EditPagePage from "./pages/dsvi-admin/EditPagePage";
 import SchoolSettingsPage from "./pages/dsvi-admin/SchoolSettingsPage";
 import SchoolAdminDashboard from "./pages/school-admin/SchoolAdminDashboard";
 import EditSchoolPagePage from "./pages/school-admin/EditSchoolPagePage";
+import SchoolBrandingPageAdmin from "./pages/school-admin/SchoolBrandingPageAdmin";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +73,7 @@ const App = () => (
             >
               <Route index element={<SchoolAdminDashboard />} />
               <Route path="pages/:pageType/edit" element={<EditSchoolPagePage />} />
+              <Route path="branding" element={<SchoolBrandingPageAdmin />} />
             </Route>
             
             {/* Public School Website Routes */}

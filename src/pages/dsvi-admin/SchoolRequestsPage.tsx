@@ -36,6 +36,7 @@ export default function SchoolRequestsPage() {
   const [adminNotes, setAdminNotes] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
+
   useEffect(() => {
     fetchRequests();
   }, []);
@@ -63,7 +64,6 @@ export default function SchoolRequestsPage() {
       setLoading(false);
     }
   };
-
   const handleApprove = async (request: SchoolRequest) => {
     setIsProcessing(true);
     
@@ -98,27 +98,26 @@ export default function SchoolRequestsPage() {
           status: 'approved',
           admin_notes: adminNotes,
           reviewed_at: new Date().toISOString(),
-          reviewed_by: (await supabase.auth.getUser()).data.user?.id
         })
         .eq('id', request.id);
+
       if (updateError) {
         throw updateError;
       }
 
       toast({
-        title: "School Request Approved!",
-        description: `School "${request.school_name}" has been created successfully. You can now invite a school administrator.`,
+        title: "Success",
+        description: `School "${request.school_name}" has been approved and created.`,
       });
 
-      fetchRequests();
+      // Refresh the requests list
+      await fetchRequests();
       setSelectedRequest(null);
-      setAdminNotes('');
-      
     } catch (error) {
       console.error('Error approving request:', error);
       toast({
         title: "Error",
-        description: "Failed to approve school request. Please try again.",
+        description: "Failed to approve school request.",
         variant: "destructive",
       });
     } finally {
@@ -136,7 +135,6 @@ export default function SchoolRequestsPage() {
           status: 'rejected',
           admin_notes: adminNotes,
           reviewed_at: new Date().toISOString(),
-          reviewed_by: (await supabase.auth.getUser()).data.user?.id
         })
         .eq('id', request.id);
 
@@ -145,19 +143,18 @@ export default function SchoolRequestsPage() {
       }
 
       toast({
-        title: "School Request Rejected",
-        description: "The school request has been rejected.",
+        title: "Success",
+        description: `School request "${request.school_name}" has been rejected.`,
       });
 
-      fetchRequests();
+      // Refresh the requests list
+      await fetchRequests();
       setSelectedRequest(null);
-      setAdminNotes('');
-      
     } catch (error) {
       console.error('Error rejecting request:', error);
       toast({
         title: "Error",
-        description: "Failed to reject school request. Please try again.",
+        description: "Failed to reject school request.",
         variant: "destructive",
       });
     } finally {
@@ -166,14 +163,12 @@ export default function SchoolRequestsPage() {
   };
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'pending':
-        return <Badge variant="outline" className="bg-yellow-50 text-yellow-700">Pending</Badge>;
       case 'approved':
-        return <Badge variant="outline" className="bg-green-50 text-green-700">Approved</Badge>;
+        return <Badge className="bg-green-100 text-green-800">Approved</Badge>;
       case 'rejected':
-        return <Badge variant="outline" className="bg-red-50 text-red-700">Rejected</Badge>;
+        return <Badge className="bg-red-100 text-red-800">Rejected</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>;
     }
   };
 
@@ -219,55 +214,149 @@ export default function SchoolRequestsPage() {
               <p className="text-gray-500">All school requests will appear here when submitted.</p>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>School Name</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Submitted</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>              <TableBody>
+            <>
+              {/* Desktop Table View */}
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>School Name</TableHead>
+                      <TableHead>Contact</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Submitted</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {requests.map((request) => (
+                      <TableRow key={request.id}>
+                        <TableCell className="font-medium">{request.school_name}</TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            <div className="font-medium">{request.contact_name}</div>
+                            <div className="text-sm text-gray-500">{request.contact_email}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {request.school_type ? (
+                            <Badge variant="secondary">
+                              {request.school_type.replace('_', ' ').toUpperCase()}
+                            </Badge>
+                          ) : (
+                            <span className="text-gray-400">Not specified</span>
+                          )}
+                        </TableCell>
+                        <TableCell>{getStatusBadge(request.status)}</TableCell>
+                        <TableCell className="text-sm text-gray-500">
+                          {formatDate(request.created_at)}
+                        </TableCell>
+                        <TableCell>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedRequest(request);
+                                  setAdminNotes(request.admin_notes || '');
+                                }}
+                              >
+                                <Eye className="h-4 w-4 mr-1" />
+                                Review
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl">
+                              <DialogHeader>
+                                <DialogTitle>Review School Request</DialogTitle>
+                                <DialogDescription>
+                                  School registration request from {request.contact_name}
+                                </DialogDescription>
+                              </DialogHeader>
+                              
+                              {selectedRequest && (
+                                <RequestDetailsContent
+                                  request={selectedRequest}
+                                  adminNotes={adminNotes}
+                                  setAdminNotes={setAdminNotes}
+                                  onApprove={() => handleApprove(selectedRequest)}
+                                  onReject={() => handleReject(selectedRequest)}
+                                  isProcessing={isProcessing}
+                                />
+                              )}
+                            </DialogContent>
+                          </Dialog>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              {/* Mobile Card View */}
+              <div className="block md:hidden space-y-4">
                 {requests.map((request) => (
-                  <TableRow key={request.id}>
-                    <TableCell className="font-medium">{request.school_name}</TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="font-medium">{request.contact_name}</div>
-                        <div className="text-sm text-gray-500">{request.contact_email}</div>
+                  <Card key={request.id} className="border border-gray-200 shadow-sm">
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg text-gray-900 mb-1">
+                            {request.school_name}
+                          </h3>
+                          <div className="flex items-center gap-2 mb-2">
+                            {getStatusBadge(request.status)}
+                            {request.school_type && (
+                              <Badge variant="secondary" className="text-xs">
+                                {request.school_type.replace('_', ' ').toUpperCase()}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      {request.school_type ? (
-                        <Badge variant="secondary">
-                          {request.school_type.replace('_', ' ').toUpperCase()}
-                        </Badge>
-                      ) : (
-                        <span className="text-gray-400">Not specified</span>
-                      )}
-                    </TableCell>
-                    <TableCell>{getStatusBadge(request.status)}</TableCell>
-                    <TableCell className="text-sm text-gray-500">
-                      {formatDate(request.created_at)}
-                    </TableCell>
-                    <TableCell>
+                      
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Mail className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                          <div>
+                            <div className="font-medium">{request.contact_name}</div>
+                            <div className="text-gray-500">{request.contact_email}</div>
+                          </div>
+                        </div>
+                        
+                        {request.phone && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Phone className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                            <span className="text-gray-600">{request.phone}</span>
+                          </div>
+                        )}
+                        
+                        {request.address && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                            <span className="text-gray-600">{request.address}</span>
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center gap-2 text-sm">
+                          <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                          <span className="text-gray-500">Submitted {formatDate(request.created_at)}</span>
+                        </div>
+                      </div>
+                      
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button
                             variant="outline"
-                            size="sm"
+                            className="w-full"
                             onClick={() => {
                               setSelectedRequest(request);
                               setAdminNotes(request.admin_notes || '');
                             }}
                           >
-                            <Eye className="h-4 w-4 mr-1" />
-                            Review
+                            <Eye className="h-4 w-4 mr-2" />
+                            Review Request
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl">
+                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                           <DialogHeader>
                             <DialogTitle>Review School Request</DialogTitle>
                             <DialogDescription>
@@ -276,94 +365,115 @@ export default function SchoolRequestsPage() {
                           </DialogHeader>
                           
                           {selectedRequest && (
-                            <div className="space-y-6">
-                              <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                  <h4 className="font-semibold text-gray-900 mb-2">School Information</h4>
-                                  <div className="space-y-2 text-sm">
-                                    <div><strong>Name:</strong> {selectedRequest.school_name}</div>
-                                    <div><strong>Type:</strong> {selectedRequest.school_type || 'Not specified'}</div>
-                                    <div><strong>Students:</strong> {selectedRequest.student_count || 'Not specified'}</div>
-                                    {selectedRequest.website && (
-                                      <div><strong>Website:</strong> {selectedRequest.website}</div>
-                                    )}
-                                  </div>
-                                </div>                                
-                                <div>
-                                  <h4 className="font-semibold text-gray-900 mb-2">Contact Information</h4>
-                                  <div className="space-y-2 text-sm">
-                                    <div className="flex items-center gap-2">
-                                      <Mail className="h-4 w-4 text-gray-400" />
-                                      {selectedRequest.contact_email}
-                                    </div>
-                                    {selectedRequest.phone && (
-                                      <div className="flex items-center gap-2">
-                                        <Phone className="h-4 w-4 text-gray-400" />
-                                        {selectedRequest.phone}
-                                      </div>
-                                    )}
-                                    {selectedRequest.address && (
-                                      <div className="flex items-center gap-2">
-                                        <MapPin className="h-4 w-4 text-gray-400" />
-                                        {selectedRequest.address}
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-
-                              {selectedRequest.message && (
-                                <div>
-                                  <h4 className="font-semibold text-gray-900 mb-2">Additional Information</h4>
-                                  <div className="bg-gray-50 p-3 rounded text-sm">
-                                    {selectedRequest.message}
-                                  </div>
-                                </div>
-                              )}
-
-                              <div>
-                                <Label htmlFor="adminNotes">Admin Notes</Label>
-                                <Textarea
-                                  id="adminNotes"
-                                  value={adminNotes}
-                                  onChange={(e) => setAdminNotes(e.target.value)}
-                                  placeholder="Add notes about this request..."
-                                  rows={3}
-                                />
-                              </div>
-
-                              {selectedRequest.status === 'pending' && (
-                                <div className="flex gap-2 pt-4">
-                                  <Button
-                                    onClick={() => handleApprove(selectedRequest)}
-                                    disabled={isProcessing}
-                                    className="bg-green-600 hover:bg-green-700"
-                                  >
-                                    <CheckCircle className="h-4 w-4 mr-2" />
-                                    Approve & Create School
-                                  </Button>
-                                  <Button
-                                    variant="destructive"
-                                    onClick={() => handleReject(selectedRequest)}
-                                    disabled={isProcessing}
-                                  >
-                                    <XCircle className="h-4 w-4 mr-2" />
-                                    Reject Request
-                                  </Button>
-                                </div>
-                              )}
-                            </div>
+                            <RequestDetailsContent
+                              request={selectedRequest}
+                              adminNotes={adminNotes}
+                              setAdminNotes={setAdminNotes}
+                              onApprove={() => handleApprove(selectedRequest)}
+                              onReject={() => handleReject(selectedRequest)}
+                              isProcessing={isProcessing}
+                            />
                           )}
                         </DialogContent>
                       </Dialog>
-                    </TableCell>
-                  </TableRow>
+                    </CardContent>
+                  </Card>
                 ))}
-              </TableBody>
-            </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
     </div>
   );
 }
+// Helper component for request details dialog content
+const RequestDetailsContent: React.FC<{
+  request: SchoolRequest;
+  adminNotes: string;
+  setAdminNotes: (notes: string) => void;
+  onApprove: () => void;
+  onReject: () => void;
+  isProcessing: boolean;
+}> = ({ request, adminNotes, setAdminNotes, onApprove, onReject, isProcessing }) => (
+  <div className="space-y-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <h4 className="font-semibold text-gray-900 mb-2">School Information</h4>
+        <div className="space-y-2 text-sm">
+          <div><strong>Name:</strong> {request.school_name}</div>
+          <div><strong>Type:</strong> {request.school_type || 'Not specified'}</div>
+          <div><strong>Students:</strong> {request.student_count || 'Not specified'}</div>
+          {request.website && (
+            <div><strong>Website:</strong> {request.website}</div>
+          )}
+        </div>
+      </div>
+      
+      <div>
+        <h4 className="font-semibold text-gray-900 mb-2">Contact Information</h4>
+        <div className="space-y-2 text-sm">
+          <div className="flex items-center gap-2">
+            <Mail className="h-4 w-4 text-gray-400" />
+            {request.contact_email}
+          </div>
+          {request.phone && (
+            <div className="flex items-center gap-2">
+              <Phone className="h-4 w-4 text-gray-400" />
+              {request.phone}
+            </div>
+          )}
+          {request.address && (
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-gray-400" />
+              {request.address}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+    
+    {request.message && (
+      <div>
+        <h4 className="font-semibold text-gray-900 mb-2">Additional Message</h4>
+        <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
+          {request.message}
+        </p>
+      </div>
+    )}
+    
+    <div>
+      <Label htmlFor="adminNotes">Admin Notes</Label>
+      <Textarea
+        id="adminNotes"
+        value={adminNotes}
+        onChange={(e) => setAdminNotes(e.target.value)}
+        placeholder="Add notes for this request..."
+        className="mt-2"
+        rows={3}
+      />
+    </div>
+    
+    {request.status === 'pending' && (
+      <div className="flex gap-2 pt-4">
+        <Button
+          onClick={onApprove}
+          disabled={isProcessing}
+          className="flex-1"
+        >
+          <CheckCircle className="h-4 w-4 mr-2" />
+          Approve & Create School
+        </Button>
+        <Button
+          variant="destructive"
+          onClick={onReject}
+          disabled={isProcessing}
+          className="flex-1"
+        >
+          <XCircle className="h-4 w-4 mr-2" />
+          Reject Request
+        </Button>
+      </div>
+    )}
+  </div>
+);

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrandingInterface } from '@/components/ui/custom/BrandingInterface';
 import { ComprehensiveThemeSettings } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SchoolBrandingPageProps {
   schoolId: string;
@@ -30,22 +31,20 @@ export const SchoolBrandingPage: React.FC<SchoolBrandingPageProps> = ({
   ) => {
     setIsSaving(true);
     try {
-      // Replace this with your actual API call
-      const response = await fetch(`/api/schools/${schoolId}/theme`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      // Use Supabase instead of fetch for consistency with the rest of the app
+      const { error } = await supabase
+        .from('schools')
+        .update({
           theme_settings: theme,
           custom_css: customCSS,
           logo_url: logoUrl,
+          theme_version: Date.now(), // Simple versioning
           updated_at: new Date().toISOString(),
-        }),
-      });
+        })
+        .eq('id', schoolId);
 
-      if (!response.ok) {
-        throw new Error('Failed to save theme');
+      if (error) {
+        throw error;
       }
 
       toast({

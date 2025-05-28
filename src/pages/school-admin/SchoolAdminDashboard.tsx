@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Edit, ExternalLink, Home, Info, GraduationCap, UserCheck, Users, Phone } from 'lucide-react';
+import { Edit, ExternalLink, Home, Info, GraduationCap, UserCheck, Users, Phone, Palette } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getSchoolById } from '@/lib/database';
 import { School as SchoolType } from '@/lib/types';
@@ -163,6 +163,30 @@ export default function SchoolAdminDashboard() {
               </MobileCard>
             );
           })}
+          
+          {/* Branding Card for Mobile */}
+          <MobileCard
+            title="Branding & Theme"
+            subtitle="Customize your school's appearance and branding"
+            className="border-l-4 border-l-purple-500"
+            actions={[
+              {
+                label: "Customize",
+                icon: <Palette className="h-3 w-3" />,
+                variant: "default",
+                onClick: () => window.open(`/school-admin/branding`, '_self')
+              }
+            ]}
+          >
+            <div className="flex items-center space-x-3">
+              <div className="p-2 rounded-lg bg-purple-500 text-white">
+                <Palette className="h-4 w-4" />
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Customize colors, fonts, and layout
+              </div>
+            </div>
+          </MobileCard>
         </div>
       </div>
 
@@ -187,6 +211,14 @@ export default function SchoolAdminDashboard() {
           >
             <Edit className="h-4 w-4 mr-2" />
             Quick Edit Homepage
+          </Button>
+          <Button 
+            variant="outline" 
+            className="w-full justify-start"
+            onClick={() => window.open(`/school-admin/branding`, '_self')}
+          >
+            <Palette className="h-4 w-4 mr-2" />
+            Customize Branding & Theme
           </Button>
         </CardContent>
       </Card>

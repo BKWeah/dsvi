@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Eye, Settings, Download, Upload, RotateCcw } from 'lucide-react';
+import { Eye, Settings, Download, Upload, RotateCcw, Save } from 'lucide-react';
 import { ComprehensiveThemeSettings } from '@/lib/types';
 import { ComprehensiveBrandingTab } from './ComprehensiveBrandingTab';
 import { ThemePreview } from './ThemePreview';
@@ -18,6 +18,7 @@ interface BrandingInterfaceProps {
   onCustomCSSChange?: (css: string) => void;
   onLogoChange?: (url: string) => void;
   onSave?: (theme: ComprehensiveThemeSettings, customCSS: string, logoUrl: string) => void;
+  onUnsavedChanges?: (hasChanges: boolean) => void;
 }
 
 export const BrandingInterface: React.FC<BrandingInterfaceProps> = ({
@@ -29,6 +30,7 @@ export const BrandingInterface: React.FC<BrandingInterfaceProps> = ({
   onCustomCSSChange,
   onLogoChange,
   onSave,
+  onUnsavedChanges,
 }) => {
   const {
     theme,
@@ -57,6 +59,7 @@ export const BrandingInterface: React.FC<BrandingInterfaceProps> = ({
     setTheme(newTheme);
     setHasUnsavedChanges(true);
     onThemeChange?.(newTheme);
+    onUnsavedChanges?.(true);
   };
 
   // Handle custom CSS changes
@@ -64,6 +67,7 @@ export const BrandingInterface: React.FC<BrandingInterfaceProps> = ({
     setCustomCSS(css);
     setHasUnsavedChanges(true);
     onCustomCSSChange?.(css);
+    onUnsavedChanges?.(true);
   };
 
   // Handle logo changes
@@ -71,6 +75,7 @@ export const BrandingInterface: React.FC<BrandingInterfaceProps> = ({
     setLogoUrl(url);
     setHasUnsavedChanges(true);
     onLogoChange?.(url);
+    onUnsavedChanges?.(true);
   };
 
   // Handle preview
@@ -84,6 +89,7 @@ export const BrandingInterface: React.FC<BrandingInterfaceProps> = ({
     if (isThemeValid) {
       onSave?.(theme, customCSS, logoUrl);
       setHasUnsavedChanges(false);
+      onUnsavedChanges?.(false);
     }
   };
 
@@ -92,6 +98,7 @@ export const BrandingInterface: React.FC<BrandingInterfaceProps> = ({
     resetTheme();
     setLogoUrl('');
     setHasUnsavedChanges(false);
+    onUnsavedChanges?.(false);
   };
 
   // Handle export
@@ -160,6 +167,49 @@ export const BrandingInterface: React.FC<BrandingInterfaceProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Floating Save Button */}
+      {hasUnsavedChanges && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <style jsx>{`
+            @keyframes rainbow-border {
+              0% { background-position: 0% 50%; }
+              50% { background-position: 100% 50%; }
+              100% { background-position: 0% 50%; }
+            }
+            .rainbow-border {
+              background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+              background-size: 400%;
+              animation: rainbow-border 2s ease infinite;
+              padding: 2px;
+              border-radius: 50px;
+            }
+            .save-button-inner {
+              background: white;
+              border-radius: 48px;
+              padding: 12px 24px;
+              font-weight: 600;
+              color: #1f2937;
+              transition: all 0.2s ease;
+            }
+            .save-button-inner:hover {
+              background: #f9fafb;
+              transform: translateY(-1px);
+            }
+          `}</style>
+          <div className="rainbow-border">
+            <Button
+              onClick={handleSave}
+              disabled={!isThemeValid}
+              className="save-button-inner flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200"
+              style={{ background: 'white', color: '#1f2937' }}
+            >
+              <Save className="h-4 w-4" />
+              Save Changes
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -267,15 +317,6 @@ export const BrandingInterface: React.FC<BrandingInterfaceProps> = ({
               </div>
             </DialogContent>
           </Dialog>
-          
-          <Button 
-            onClick={handleSave}
-            disabled={!isThemeValid || !hasUnsavedChanges}
-            className="flex items-center gap-2"
-          >
-            <Settings className="h-4 w-4" />
-            Save Theme
-          </Button>
         </div>
       </div>
 

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import SchoolPageRenderer from '@/components/templates/SchoolPageRenderer';
 import { getSchoolBySlug, getPageContent, createDefaultSections } from '@/lib/database';
 import { School, PageContent } from '@/lib/types';
+import { applyTheme } from '@/lib/theme-utils';
 
 export function SchoolPageDisplay() {
   const { schoolSlug, pageType = 'homepage' } = useParams<{ schoolSlug: string; pageType?: string }>();
@@ -18,6 +19,14 @@ export function SchoolPageDisplay() {
     if (schoolSlug) {
       fetchSchoolAndPage();
     }
+    
+    // Cleanup theme styles when component unmounts or schoolSlug changes
+    return () => {
+      const existingStyle = document.getElementById('theme-styles');
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+    };
   }, [schoolSlug, pageType]);
 
   const fetchSchoolAndPage = async () => {
@@ -33,6 +42,11 @@ export function SchoolPageDisplay() {
       }
 
       setSchool(schoolData.school);
+
+      // Apply school theme if available
+      if (schoolData.school.theme_settings) {
+        applyTheme(schoolData.school.theme_settings, schoolData.school.custom_css || '');
+      }
 
       // Get specific page content
       const pageData = await getPageContent(schoolData.school.id, pageType || 'homepage');

@@ -30,6 +30,7 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
   const [school, setSchool] = useState<School | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
   // Comprehensive form state
   const [name, setName] = useState('');
@@ -46,6 +47,74 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
       fetchSchool();
     }
   }, [schoolId]);
+
+  // Monitor toast notifications to adjust save button position
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const toastElements = document.querySelectorAll('[data-sonner-toaster] [data-sonner-toast]');
+      if (toastElements.length > 0) {
+        document.body.classList.add('toast-present');
+      } else {
+        document.body.classList.remove('toast-present');
+      }
+    });
+
+    // Start observing
+    const toastContainer = document.querySelector('[data-sonner-toaster]');
+    if (toastContainer) {
+      observer.observe(toastContainer, { childList: true, subtree: true });
+    }
+
+    // Cleanup
+    return () => {
+      observer.disconnect();
+      document.body.classList.remove('toast-present');
+    };
+  }, []);
+
+  // Helper function to mark changes
+  const markAsChanged = () => {
+    setHasUnsavedChanges(true);
+  };
+
+  // Enhanced change handlers that track modifications
+  const handleNameChange = (value: string) => {
+    setName(value);
+    markAsChanged();
+  };
+
+  const handleLogoChange = (url: string) => {
+    setLogoUrl(url);
+    markAsChanged();
+  };
+
+  const handleThemeChange = (theme: ComprehensiveThemeSettings) => {
+    setThemeSettings(theme);
+    markAsChanged();
+  };
+
+  const handleCustomCSSChange = (css: string) => {
+    setCustomCSS(css);
+    markAsChanged();
+  };
+
+  const handleContactChange = (field: string, value: string) => {
+    markAsChanged();
+    switch (field) {
+      case 'address':
+        setAddress(value);
+        break;
+      case 'phone':
+        setPhone(value);
+        break;
+      case 'email':
+        setEmail(value);
+        break;
+      case 'mapEmbedUrl':
+        setMapEmbedUrl(value);
+        break;
+    }
+  };
   const fetchSchool = async () => {
     try {
       setLoading(true);
@@ -115,6 +184,9 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
         description: "School settings saved successfully",
       });
       
+      // Reset unsaved changes flag
+      setHasUnsavedChanges(false);
+      
     } catch (error) {
       console.error('Error saving school:', error);
       toast({
@@ -164,6 +236,74 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
   }
   return (
     <div className="min-h-screen bg-background">
+      {/* Floating Save Button */}
+      {hasUnsavedChanges && (
+        <div className="fixed bottom-6 right-6 z-50 transition-all duration-300 ease-in-out" id="floating-save-button">
+          <style jsx>{`
+            @keyframes rainbow-border {
+              0% { background-position: 0% 50%; }
+              50% { background-position: 100% 50%; }
+              100% { background-position: 0% 50%; }
+            }
+            .rainbow-border {
+              background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+              background-size: 400%;
+              animation: rainbow-border 2s ease infinite;
+              padding: 2px;
+              border-radius: 50px;
+            }
+            .save-button-inner {
+              background: white;
+              border-radius: 48px;
+              padding: 12px 24px;
+              font-weight: 600;
+              color: #1f2937;
+              transition: all 0.2s ease;
+            }
+            .save-button-inner:hover {
+              background: #f9fafb;
+              transform: translateY(-1px);
+            }
+            /* Adjust position when toasts are visible */
+            @media (max-width: 768px) {
+              #floating-save-button {
+                bottom: calc(5rem + env(safe-area-inset-bottom));
+                right: 1rem;
+                left: 1rem;
+                z-index: 60;
+              }
+              .rainbow-border {
+                width: 100%;
+                border-radius: 12px;
+              }
+              .save-button-inner {
+                width: 100%;
+                border-radius: 10px;
+                padding: 16px 24px;
+                text-align: center;
+                font-size: 16px;
+                font-weight: 600;
+              }
+            }
+            /* Push up when toast notifications are present */
+            .toast-present #floating-save-button {
+              bottom: calc(5rem + 6rem + env(safe-area-inset-bottom)) !important;
+            }
+          `}</style>
+          <div className="rainbow-border">
+            <Button
+              onClick={handleSave}
+              disabled={saving}
+              className="save-button-inner flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200"
+              style={{ background: 'white', color: '#1f2937' }}
+            >
+              <Save className="h-4 w-4" />
+              {saving ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Native-like Mobile Top Bar */}
       <MobileTopBar 
         title="School Settings" 
@@ -187,10 +327,6 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
             <p className="text-muted-foreground">Configure school information and appearance</p>
           </div>
         </div>
-        <Button onClick={handleSave} disabled={saving} className="flex items-center gap-2">
-          <Save className="h-4 w-4" />
-          {saving ? 'Saving...' : 'Save Settings'}
-        </Button>
       </div>
       
       {/* Main Content with improved mobile spacing */}
@@ -223,7 +359,7 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
                   <Input
                     id="schoolName"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => handleNameChange(e.target.value)}
                     className="h-12 text-base"
                     placeholder="Enter school name"
                   />
@@ -232,7 +368,7 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
                 <div className="space-y-3">
                   <SchoolLogoUpload
                     value={logoUrl}
-                    onChange={setLogoUrl}
+                    onChange={handleLogoChange}
                     schoolId={schoolId!}
                   />
                 </div>
@@ -248,9 +384,9 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
                 themeSettings={themeSettings}
                 customCSS={customCSS}
                 logoUrl={logoUrl}
-                onThemeChange={setThemeSettings}
-                onCustomCSSChange={setCustomCSS}
-                onLogoChange={setLogoUrl}
+                onThemeChange={handleThemeChange}
+                onCustomCSSChange={handleCustomCSSChange}
+                onLogoChange={handleLogoChange}
                 onPreview={handlePreview}
               />
             </div>
@@ -1292,7 +1428,7 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
                   <Textarea
                     id="address"
                     value={address}
-                    onChange={(e) => setAddress(e.target.value)}
+                    onChange={(e) => handleContactChange('address', e.target.value)}
                     placeholder="School address"
                     rows={3}
                     className="text-base"
@@ -1303,7 +1439,7 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
                   <Input
                     id="phone"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => handleContactChange('phone', e.target.value)}
                     placeholder="Phone number"
                     className="h-12 text-base"
                   />
@@ -1314,7 +1450,7 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
                     id="email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => handleContactChange('email', e.target.value)}
                     placeholder="Contact email"
                     className="h-12 text-base"
                   />
@@ -1324,7 +1460,7 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
                   <Input
                     id="map"
                     value={mapEmbedUrl}
-                    onChange={(e) => setMapEmbedUrl(e.target.value)}
+                    onChange={(e) => handleContactChange('mapEmbedUrl', e.target.value)}
                     placeholder="Google Maps embed URL (optional)"
                     className="h-12 text-base"
                   />
@@ -1362,17 +1498,6 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
-
-      {/* Fixed Save Button at Bottom for Mobile */}
-      <div className="md:hidden fixed bottom-16 left-0 right-0 p-4 bg-background border-t">
-        <Button 
-          onClick={handleSave}
-          className="w-full h-12 text-base"
-          disabled={saving}
-        >
-          {saving ? 'Saving...' : 'Save Settings'}
-        </Button>
       </div>
 
       {/* Bottom Navigation */}

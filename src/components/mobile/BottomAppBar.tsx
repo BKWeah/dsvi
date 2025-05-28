@@ -88,6 +88,7 @@ export function BottomAppBar({ userRole, className }: BottomAppBarProps) {
   return (
     <div className={cn(
       "fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t z-50 pb-safe",
+      "block md:hidden", // Ensure it's only shown on mobile
       className
     )}>
       <div className="grid grid-cols-3 h-16">

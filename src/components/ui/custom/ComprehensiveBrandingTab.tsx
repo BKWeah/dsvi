@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { 
   Eye, Palette, Type, Layout, Navigation, Image, Code, RefreshCw, 
-  Upload, Monitor, Tablet, Smartphone, Home, Hash
+  Upload, Monitor, Tablet, Smartphone, Home, Hash, Minus, Plus
 } from 'lucide-react';
 import { ComprehensiveThemeSettings } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
@@ -185,25 +185,75 @@ export const ComprehensiveBrandingTab: React.FC<ComprehensiveBrandingTabProps> =
     onChange: (value: number) => void;
     unit?: string;
     description?: string;
-  }> = ({ label, value, min, max, step, onChange, unit = '', description }) => (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <Label>{label}</Label>
-        <span className="text-sm text-muted-foreground">{value}{unit}</span>
+  }> = ({ label, value, min, max, step, onChange, unit = '', description }) => {
+    const handleIncrement = () => {
+      const newValue = Math.min(max, value + step);
+      onChange(newValue);
+    };
+
+    const handleDecrement = () => {
+      const newValue = Math.max(min, value - step);
+      onChange(newValue);
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = parseFloat(e.target.value);
+      if (!isNaN(newValue) && newValue >= min && newValue <= max) {
+        onChange(newValue);
+      }
+    };
+
+    return (
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <Label>{label}</Label>
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleDecrement}
+              disabled={value <= min}
+              className="h-8 w-8 p-0"
+            >
+              <Minus className="h-3 w-3" />
+            </Button>
+            <Input
+              type="number"
+              value={value.toString()}
+              onChange={handleInputChange}
+              min={min}
+              max={max}
+              step={step}
+              className="w-20 h-8 text-center text-sm"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleIncrement}
+              disabled={value >= max}
+              className="h-8 w-8 p-0"
+            >
+              <Plus className="h-3 w-3" />
+            </Button>
+            <span className="text-sm text-muted-foreground min-w-0">{unit}</span>
+          </div>
+        </div>
+        {description && (
+          <p className="text-xs text-muted-foreground">{description}</p>
+        )}
+        <Slider
+          value={[value]}
+          min={min}
+          max={max}
+          step={step}
+          onValueChange={(values) => onChange(values[0])}
+          className="w-full"
+        />
       </div>
-      {description && (
-        <p className="text-xs text-muted-foreground">{description}</p>
-      )}
-      <Slider
-        value={[value]}
-        min={min}
-        max={max}
-        step={step}
-        onValueChange={(values) => onChange(values[0])}
-        className="w-full"
-      />
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="space-y-6">
