@@ -106,20 +106,20 @@ export function SchoolLogoUpload({ value, onChange, schoolId }: SchoolLogoUpload
             <div className="w-16 h-16 rounded-lg overflow-hidden bg-white border shadow-sm flex items-center justify-center">
               <img src={value} alt="School Logo" className="w-full h-full object-contain" />
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <p className="text-sm font-medium">Current Logo</p>
               <p className="text-xs text-muted-foreground truncate mt-1">{value}</p>
-              <div className="flex gap-2 mt-2">
-                <Button variant="outline" size="sm" onClick={() => setShowPreview(!showPreview)}>
-                  <Eye className="w-3 h-3 mr-1" />
-                  {showPreview ? 'Hide' : 'Preview'}
-                </Button>
-                <Button variant="outline" size="sm" onClick={handleRemoveLogo}>
-                  <X className="w-3 h-3 mr-1" />
-                  Remove
-                </Button>
-              </div>
             </div>
+          </div>
+          <div className="flex gap-2 mt-4">
+            <Button variant="outline" size="sm" onClick={() => setShowPreview(!showPreview)}>
+              <Eye className="w-3 h-3 mr-1" />
+              {showPreview ? 'Hide' : 'Preview'}
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleRemoveLogo}>
+              <X className="w-3 h-3 mr-1" />
+              Remove
+            </Button>
           </div>
           
           {/* Large Preview */}
