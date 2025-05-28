@@ -87,7 +87,7 @@ export function ImageUpload({
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs truncate">{value}</p>
+            {/* <p className="text-xs truncate">{value}</p> */}
           </div>
           <Button variant="outline" size="sm" onClick={() => onChange('')}>
             <X className="w-3 h-3" />
@@ -110,13 +110,13 @@ export function ImageUpload({
       </div>
 
       {/* URL Input */}
-      <Input
+      {/* <Input
         type="url"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         disabled={uploading}
-      />
+      /> */}
 
       {/* Hidden File Input */}
       <input

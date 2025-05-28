@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { Outlet, useParams, Link } from 'react-router-dom';
+import { Outlet, useParams, Link, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
+import { FullScreenMobileMenu } from '@/components/mobile/FullScreenMobileMenu';
 import { useTheme } from '@/contexts/ThemeContext';
 import { School } from '@/lib/types';
 
@@ -17,9 +18,13 @@ const PAGE_TYPES = [
 
 export function PublicSchoolLayout() {
   const { schoolSlug } = useParams<{ schoolSlug: string }>();
+  const location = useLocation();
   const [school, setSchool] = useState<School | null>(null);
   const [loading, setLoading] = useState(true);
   const { applyTheme, isThemeLoaded } = useTheme();
+
+  // Get current page from URL
+  const currentPage = location.pathname.split('/').pop() || 'homepage';
 
   useEffect(() => {
     if (schoolSlug) {
@@ -67,7 +72,7 @@ export function PublicSchoolLayout() {
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--theme-background, #ffffff)' }}>
       <header 
-        className="shadow-sm border-b" 
+        className="shadow-sm border-b relative" 
         style={{ 
           backgroundColor: 'var(--theme-surface, #ffffff)',
           borderColor: 'var(--theme-border, #e2e8f0)'
@@ -94,6 +99,8 @@ export function PublicSchoolLayout() {
                 {school.name}
               </h1>
             </div>
+            
+            {/* Desktop Navigation */}
             <nav className="hidden md:flex space-x-8">
               {PAGE_TYPES.map((pageType) => (
                 <Link
@@ -109,6 +116,12 @@ export function PublicSchoolLayout() {
                 </Link>
               ))}
             </nav>
+            
+            {/* Mobile Menu */}
+            <FullScreenMobileMenu 
+              schoolSlug={school.slug} 
+              currentPage={currentPage}
+            />
           </div>
         </div>
       </header>

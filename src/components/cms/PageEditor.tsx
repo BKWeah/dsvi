@@ -11,6 +11,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Plus, Trash2, MoveUp, MoveDown, Save, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ImageUpload } from '@/components/ui/custom/ImageUpload';
+import { GalleryEditor } from '@/components/ui/custom/GalleryEditor';
+import { FacultyEditor } from '@/components/ui/custom/FacultyEditor';
 import { 
   PageContent, 
   ContentSection, 
@@ -179,12 +181,13 @@ export function PageEditor({ schoolId, pageSlug, onSave }: PageEditorProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold">Edit Page: {pageSlug}</h2>
-          <p className="text-muted-foreground">Manage the content sections for this page</p>
-        </div>
-        <Button onClick={handleSave} disabled={saving} className="flex items-center gap-2">
+      {/* Save Button */}
+      <div className="flex justify-end">
+        <Button 
+          onClick={handleSave} 
+          disabled={saving}
+          className="flex items-center gap-2"
+        >
           <Save className="h-4 w-4" />
           {saving ? 'Saving...' : 'Save Page'}
         </Button>
@@ -499,22 +502,22 @@ function SectionConfigEditor({ type, config, onUpdate, schoolId, sectionId }: Se
 
     case 'gallery':
       return (
-        <div className="space-y-4">
-          <Label>Gallery Images</Label>
-          <p className="text-sm text-muted-foreground">
-            Gallery editor will be available soon. For now, please contact an administrator.
-          </p>
-        </div>
+        <GalleryEditor
+          config={config}
+          onUpdate={onUpdate}
+          schoolId={schoolId}
+          sectionId={sectionId}
+        />
       );
 
     case 'facultyList':
       return (
-        <div className="space-y-4">
-          <Label>Faculty Members</Label>
-          <p className="text-sm text-muted-foreground">
-            Faculty list editor will be available soon. For now, please contact an administrator.
-          </p>
-        </div>
+        <FacultyEditor
+          config={config}
+          onUpdate={onUpdate}
+          schoolId={schoolId}
+          sectionId={sectionId}
+        />
       );
 
     case 'contactForm':

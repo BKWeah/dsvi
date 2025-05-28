@@ -1,0 +1,183 @@
+/* Mobile-First CSS Styles for DSVI School CMS */
+
+@layer base {
+  /* Touch-friendly sizing */
+  .mobile-touch {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Mobile typography */
+  .mobile-heading {
+    @apply text-lg sm:text-xl md:text-2xl font-bold;
+  }
+  
+  .mobile-subheading {
+    @apply text-sm sm:text-base md:text-lg font-medium;
+  }
+  
+  .mobile-text {
+    @apply text-sm sm:text-base;
+  }
+}
+
+@layer components {
+  /* Mobile Navigation */
+  .mobile-nav {
+    @apply fixed bottom-0 left-0 right-0 bg-background border-t z-50 md:hidden;
+  }
+  
+  .mobile-nav-item {
+    @apply flex-1 flex flex-col items-center justify-center py-2 px-1;
+  }
+  
+  /* Mobile Cards */
+  .mobile-card {
+    @apply rounded-lg border bg-card shadow-sm hover:shadow-md transition-shadow;
+  }
+  
+  .mobile-card-compact {
+    @apply p-3 sm:p-4;
+  }
+  
+  /* Mobile Forms */
+  .mobile-form-field {
+    @apply space-y-2;
+  }
+  
+  .mobile-input {
+    @apply h-12 text-base border-2 rounded-lg px-4;
+  }
+  
+  .mobile-button {
+    @apply h-12 text-base font-medium rounded-lg px-6;
+  }
+  
+  .mobile-button-full {
+    @apply w-full mobile-button;
+  }
+  
+  /* Mobile Grid */
+  .mobile-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4;
+  }
+  
+  .mobile-grid-auto {
+    @apply grid grid-cols-1 sm:grid-cols-auto gap-4;
+  }
+  
+  /* Mobile Spacing */
+  .mobile-container {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .mobile-section {
+    @apply py-6 sm:py-8 lg:py-12;
+  }
+  
+  .mobile-padding {
+    @apply p-4 sm:p-6 lg:p-8;
+  }
+  
+  /* Mobile Layout */
+  .mobile-layout {
+    @apply min-h-screen flex flex-col;
+  }
+  
+  .mobile-header {
+    @apply sticky top-0 z-50 bg-background/95 backdrop-blur border-b;
+  }
+  
+  .mobile-main {
+    @apply flex-1 p-4 pb-20 sm:pb-4;
+  }
+  
+  /* Mobile-specific utilities */
+  .hide-mobile {
+    @apply hidden md:block;
+  }
+  
+  .show-mobile {
+    @apply block md:hidden;
+  }
+  
+  .mobile-scroll {
+    @apply overflow-x-auto -mx-4 px-4;
+  }
+  
+  /* Touch feedback */
+  .touch-feedback {
+    @apply active:scale-95 transition-transform;
+  }
+  
+  /* Scrollbar utilities */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Mobile-safe heights */
+  .mobile-vh {
+    @apply min-h-screen;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+  
+  /* Safe area handling for mobile devices */
+  .mobile-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  .mobile-safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* Mobile-specific responsive tweaks */
+@media (max-width: 767px) {
+  /* Ensure tables are scrollable on mobile */
+  .mobile-table-container {
+    @apply overflow-x-auto -mx-4;
+  }
+  
+  .mobile-table-container table {
+    @apply min-w-full;
+  }
+  
+  /* Adjust dialog widths for mobile */
+  [data-radix-dialog-content] {
+    width: calc(100vw - 2rem);
+    max-width: none;
+    margin: 1rem;
+  }
+  
+  /* Better mobile sheet sizing */
+  [data-radix-sheet-content] {
+    width: 85vw;
+    max-width: 400px;
+  }
+}
+
+/* Landscape mobile adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+  .mobile-header {
+    position: relative;
+  }
+  
+  .mobile-main {
+    padding-bottom: 1rem;
+  }
+}
+
+/* High DPI mobile displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
+  .mobile-icon {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}

@@ -141,17 +141,33 @@ const TextWithImageSection: React.FC<{ config: TextWithImageSectionConfig }> = (
 const GallerySection: React.FC<{ config: GallerySectionConfig }> = ({ config }) => (
   <Card className="mb-8">
     <CardContent className="p-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {config.images.map((image, index) => (
-          <div key={index} className="aspect-square">
-            <img 
-              src={image.url} 
-              alt={image.alt}
-              className="w-full h-full object-cover rounded-lg"
-            />
-          </div>
-        ))}
-      </div>
+      {config.images && config.images.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {config.images.map((image, index) => (
+            <div key={index} className="aspect-square group relative overflow-hidden rounded-lg">
+              <img 
+                src={image.url} 
+                alt={image.alt}
+                className="w-full h-full object-cover transition-transform group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity flex items-end">
+                <div className="p-3 text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                  {image.title && (
+                    <p className="font-medium text-sm">{image.title}</p>
+                  )}
+                  {image.description && (
+                    <p className="text-xs">{image.description}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">Gallery coming soon</p>
+        </div>
+      )}
     </CardContent>
   </Card>
 );
@@ -162,23 +178,33 @@ const FacultyListSection: React.FC<{ config: FacultyListSectionConfig }> = ({ co
       <CardTitle className="text-2xl">Faculty & Staff</CardTitle>
     </CardHeader>
     <CardContent>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {config.facultyMembers.map((member, index) => (
-          <Card key={index} className="text-center">
-            <CardContent className="p-4">
-              <Avatar className="w-20 h-20 mx-auto mb-4">
-                <AvatarImage src={member.imageUrl} alt={member.name} />
-                <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-              </Avatar>
-              <h3 className="font-semibold text-lg">{member.name}</h3>
-              <Badge variant="secondary" className="mb-2">{member.title}</Badge>
-              {member.bio && (
-                <p className="text-sm text-muted-foreground">{member.bio}</p>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {config.facultyMembers && config.facultyMembers.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {config.facultyMembers.map((member, index) => (
+            <Card key={index} className="text-center hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <Avatar className="w-24 h-24 mx-auto mb-4">
+                  <AvatarImage src={member.imageUrl} alt={member.name} />
+                  <AvatarFallback className="text-lg">
+                    {member.name.split(' ').map(n => n[0]).join('')}
+                  </AvatarFallback>
+                </Avatar>
+                <h3 className="font-bold text-lg mb-2">{member.name}</h3>
+                <Badge variant="secondary" className="mb-3">{member.title}</Badge>
+                {member.bio && (
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {member.bio}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">Faculty information coming soon</p>
+        </div>
+      )}
     </CardContent>
   </Card>
 );

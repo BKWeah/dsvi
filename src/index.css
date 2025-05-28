@@ -1,9 +1,11 @@
+/* Import DSVI Theme System and Mobile Styles - Must be first */
+@import url('./styles/mobile.css');
+@import url('./styles/mobile-enhancements.css');
+@import './styles/theme-variables.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import DSVI Theme System */
-@import './styles/theme-variables.css';
 
 @layer base {
   :root {

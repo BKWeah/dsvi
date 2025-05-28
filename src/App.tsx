@@ -8,8 +8,8 @@ import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { DSVIAdminLayout } from "./components/layouts/DSVIAdminLayout";
-import { SchoolAdminLayout } from "./components/layouts/SchoolAdminLayout";
+import { UpdatedResponsiveDSVIAdminLayout } from "./components/layouts/UpdatedResponsiveDSVIAdminLayout";
+import { UpdatedResponsiveSchoolAdminLayout } from "./components/layouts/UpdatedResponsiveSchoolAdminLayout";
 import { PublicSchoolLayout } from "./components/layouts/PublicSchoolLayout";
 import { SchoolPageDisplay } from "./components/public/SchoolPageDisplay";
 import Index from "./pages/Index";
@@ -49,7 +49,7 @@ const App = () => (
               path="/dsvi-admin" 
               element={
                 <ProtectedRoute roles={['DSVI_ADMIN']}>
-                  <DSVIAdminLayout />
+                  <UpdatedResponsiveDSVIAdminLayout />
                 </ProtectedRoute>
               }
             >
@@ -66,7 +66,7 @@ const App = () => (
               path="/school-admin" 
               element={
                 <ProtectedRoute roles={['SCHOOL_ADMIN']}>
-                  <SchoolAdminLayout />
+                  <UpdatedResponsiveSchoolAdminLayout />
                 </ProtectedRoute>
               }
             >
