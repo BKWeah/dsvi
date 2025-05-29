@@ -18,6 +18,17 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
+
+// Public Pages
+import AboutPage from "./pages/public/AboutPage";
+import TeamPage from "./pages/public/TeamPage";
+import HowItWorksPage from "./pages/public/HowItWorksPage";
+import PackagesPage from "./pages/public/PackagesPage";
+import TestimonialsPage from "./pages/public/TestimonialsPage";
+import ContactPage from "./pages/public/ContactPage";
+import ThankYouPage from "./pages/public/ThankYouPage";
+import FAQPage from "./pages/public/FAQPage";
+import RegisterPage from "./pages/public/RegisterPage";
 import SchoolsPage from "./pages/dsvi-admin/SchoolsPage";
 import SchoolRequestsPage from "./pages/dsvi-admin/SchoolRequestsPage";
 import SchoolContentPage from "./pages/dsvi-admin/SchoolContentPage";
@@ -44,6 +55,17 @@ const App = () => (
             <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
+            
+            {/* Public Website Pages */}
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/team" element={<TeamPage />} />
+            <Route path="/how-it-works" element={<HowItWorksPage />} />
+            <Route path="/packages" element={<PackagesPage />} />
+            <Route path="/testimonials" element={<TestimonialsPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/thank-you" element={<ThankYouPage />} />
+            <Route path="/faq" element={<FAQPage />} />
             
             {/* DSVI Admin Routes */}
             <Route 
