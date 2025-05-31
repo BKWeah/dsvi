@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2025-05-31T14:14:28.183Z",
+  "lastUpdated": "2025-05-31T14:18:20.632Z",
   "features": {
     "dashboard": {
       "enabled": false,
@@ -63,7 +63,7 @@
               "description": "Basic school information editing"
             },
             "subscription": {
-              "enabled": true,
+              "enabled": false,
               "description": "Subscription management"
             },
             "branding": {
@@ -71,11 +71,11 @@
               "description": "School branding and theme settings"
             },
             "adminAssignments": {
-              "enabled": true,
+              "enabled": false,
               "description": "School admin assignments"
             },
             "contentManagement": {
-              "enabled": true,
+              "enabled": false,
               "description": "School content management access"
             }
           }
