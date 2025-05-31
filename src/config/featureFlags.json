@@ -1,9 +1,9 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2025-05-31T00:00:00Z",
+  "lastUpdated": "2025-05-31T14:14:28.183Z",
   "features": {
     "dashboard": {
-      "enabled": true,
+      "enabled": false,
       "description": "Main admin dashboard with statistics and overview",
       "route": "/dsvi-admin/dashboard",
       "priority": 1,

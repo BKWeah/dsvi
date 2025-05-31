@@ -1,254 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import defaultFeatureFlags from '@/config/featureFlags.json';
 
-// Import the default feature flags configuration
-// import defaultFeatureFlags from '@/config/featureFlags.json';
-
-// Default configuration (inline to avoid JSON import issues)
-const defaultFeatureFlags = {
-  "version": "1.0.0",
-  "lastUpdated": "2025-05-31T00:00:00Z",
-  "features": {
-    "dashboard": {
-      "enabled": true,
-      "description": "Main admin dashboard with statistics and overview",
-      "route": "/dsvi-admin/dashboard",
-      "priority": 1,
-      "icon": "BarChart3",
-      "subFeatures": {
-        "statistics": {
-          "enabled": true,
-          "description": "Dashboard statistics cards"
-        },
-        "recentActivity": {
-          "enabled": true,
-          "description": "Recent activity feed"
-        },
-        "quickActions": {
-          "enabled": true,
-          "description": "Quick action buttons"
-        },
-        "alerts": {
-          "enabled": true,
-          "description": "System alerts and notifications"
-        },
-        "packageDistribution": {
-          "enabled": true,
-          "description": "Package distribution chart"
-        }
-      }
-    },
-    "schools": {
-      "enabled": true,
-      "description": "School management system",
-      "route": "/dsvi-admin/schools",
-      "priority": 2,
-      "icon": "School",
-      "subFeatures": {
-        "schoolsList": {
-          "enabled": true,
-          "description": "View all schools list"
-        },
-        "addSchool": {
-          "enabled": true,
-          "description": "Add new school functionality"
-        },
-        "searchFilter": {
-          "enabled": true,
-          "description": "Search and filter schools"
-        },
-        "schoolActions": {
-          "enabled": true,
-          "description": "School action buttons (edit, view, settings)"
-        },
-        "schoolSettings": {
-          "enabled": true,
-          "description": "Individual school settings",
-          "subFeatures": {
-            "basicInfo": {
-              "enabled": true,
-              "description": "Basic school information editing"
-            },
-            "subscription": {
-              "enabled": true,
-              "description": "Subscription management"
-            },
-            "branding": {
-              "enabled": true,
-              "description": "School branding and theme settings"
-            },
-            "adminAssignments": {
-              "enabled": true,
-              "description": "School admin assignments"
-            },
-            "contentManagement": {
-              "enabled": true,
-              "description": "School content management access"
-            }
-          }
-        },
-        "inviteAdmin": {
-          "enabled": true,
-          "description": "Invite school admin functionality"
-        }
-      }
-    },
-    "requests": {
-      "enabled": true,
-      "description": "School access requests management",
-      "route": "/dsvi-admin/requests",
-      "priority": 3,
-      "icon": "Users",
-      "subFeatures": {
-        "pendingRequests": {
-          "enabled": true,
-          "description": "View pending school requests"
-        },
-        "requestDetails": {
-          "enabled": true,
-          "description": "Detailed request information"
-        },
-        "approvalActions": {
-          "enabled": true,
-          "description": "Approve/reject request actions"
-        },
-        "adminNotes": {
-          "enabled": true,
-          "description": "Admin notes for requests"
-        },
-        "requestHistory": {
-          "enabled": true,
-          "description": "Historical request data"
-        }
-      }
-    },
-    "subscriptions": {
-      "enabled": true,
-      "description": "Subscription tracking and management",
-      "route": "/dsvi-admin/subscriptions",
-      "priority": 4,
-      "icon": "CreditCard",
-      "subFeatures": {
-        "subscriptionList": {
-          "enabled": true,
-          "description": "List all school subscriptions"
-        },
-        "statusTracking": {
-          "enabled": true,
-          "description": "Subscription status tracking"
-        },
-        "renewalActions": {
-          "enabled": true,
-          "description": "Manual renewal functionality"
-        },
-        "expiryAlerts": {
-          "enabled": true,
-          "description": "Expiration alerts and warnings"
-        },
-        "revenueTracking": {
-          "enabled": true,
-          "description": "Revenue calculation and tracking"
-        },
-        "packageManagement": {
-          "enabled": true,
-          "description": "Package type management"
-        }
-      }
-    },
-    "messaging": {
-      "enabled": true,
-      "description": "Messaging and communication system",
-      "route": "/dsvi-admin/messaging",
-      "priority": 5,
-      "icon": "MessageSquare",
-      "subFeatures": {
-        "composeMessage": {
-          "enabled": true,
-          "description": "Compose new messages"
-        },
-        "messageTemplates": {
-          "enabled": true,
-          "description": "Message template management"
-        },
-        "messageHistory": {
-          "enabled": true,
-          "description": "Message history and tracking"
-        },
-        "emailSettings": {
-          "enabled": true,
-          "description": "Email configuration settings"
-        },
-        "systemTesting": {
-          "enabled": true,
-          "description": "Messaging system testing tools"
-        },
-        "recipientSelection": {
-          "enabled": true,
-          "description": "Select message recipients"
-        }
-      }
-    },
-    "reports": {
-      "enabled": false,
-      "description": "Reports and analytics system",
-      "route": "/dsvi-admin/reports",
-      "priority": 6,
-      "icon": "FileText",
-      "subFeatures": {
-        "dataExport": {
-          "enabled": false,
-          "description": "Export data to CSV/PDF"
-        },
-        "activityLogs": {
-          "enabled": false,
-          "description": "View system activity logs"
-        },
-        "performanceMetrics": {
-          "enabled": false,
-          "description": "Performance metrics and analytics"
-        },
-        "customReports": {
-          "enabled": false,
-          "description": "Custom report builder"
-        }
-      }
-    }
-  },
-  "navigation": {
-    "sidebar": {
-      "enabled": true,
-      "description": "Desktop sidebar navigation"
-    },
-    "bottomAppBar": {
-      "enabled": true,
-      "description": "Mobile bottom app bar navigation"
-    },
-    "breadcrumbs": {
-      "enabled": true,
-      "description": "Breadcrumb navigation"
-    }
-  },
-  "routing": {
-    "defaultRedirect": "/dsvi-admin/dashboard",
-    "fallbackRoute": "/dsvi-admin/schools",
-    "description": "Routing configuration for feature-based redirects"
-  },
-  "ui": {
-    "animations": {
-      "enabled": true,
-      "description": "UI animations and transitions"
-    },
-    "darkMode": {
-      "enabled": true,
-      "description": "Dark mode toggle"
-    },
-    "loadingStates": {
-      "enabled": true,
-      "description": "Loading spinners and states"
-    }
-  }
-};
-
-// Types for feature flag system
 export interface SubFeature {
   enabled: boolean;
   description: string;
@@ -300,6 +52,56 @@ interface FeatureFlagContextType {
 const FeatureFlagContext = createContext<FeatureFlagContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'dsvi_feature_flags';
+const API_BASE_URL = 'http://localhost:3001/api';
+
+// API helper functions
+const apiClient = {
+  async getConfig(): Promise<FeatureFlagConfig> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/feature-flags`);
+      if (!response.ok) throw new Error('Failed to fetch config');
+      return await response.json();
+    } catch (error) {
+      console.warn('API not available, using localStorage fallback:', error);
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : defaultFeatureFlags as FeatureFlagConfig;
+    }
+  },
+
+  async saveConfig(config: FeatureFlagConfig): Promise<FeatureFlagConfig> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/feature-flags`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config)
+      });
+      if (!response.ok) throw new Error('Failed to save config');
+      const savedConfig = await response.json();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(savedConfig));
+      return savedConfig;
+    } catch (error) {
+      console.warn('API not available, saving to localStorage only:', error);
+      const configToSave = { ...config, lastUpdated: new Date().toISOString() };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(configToSave));
+      return configToSave;
+    }
+  },
+
+  async toggleFeature(featurePath: string): Promise<any> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/feature-flags/toggle`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ featurePath })
+      });
+      if (!response.ok) throw new Error('Failed to toggle feature');
+      return await response.json();
+    } catch (error) {
+      console.warn('API not available for toggle, using fallback:', error);
+      throw error;
+    }
+  }
+};
 
 export const useFeatureFlags = () => {
   const context = useContext(FeatureFlagContext);
@@ -309,13 +111,11 @@ export const useFeatureFlags = () => {
   return context;
 };
 
-// Hook for checking if a specific feature is enabled
 export const useFeature = (featurePath: string) => {
   const { isFeatureEnabled } = useFeatureFlags();
   return isFeatureEnabled(featurePath);
 };
 
-// Hook for getting enabled navigation items
 export const useEnabledNavigation = () => {
   const { config, isFeatureEnabled } = useFeatureFlags();
   
@@ -337,16 +137,19 @@ interface FeatureFlagProviderProps {
 
 export const FeatureFlagProvider: React.FC<FeatureFlagProviderProps> = ({ children }) => {
   const [config, setConfig] = useState<FeatureFlagConfig>(defaultFeatureFlags as FeatureFlagConfig);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load configuration from localStorage on mount
   useEffect(() => {
     loadConfig();
   }, []);
 
-  // Check if a feature is enabled by path (e.g., "dashboard" or "schools.schoolSettings.subscription")
   const isFeatureEnabled = (featurePath: string): boolean => {
     const pathParts = featurePath.split('.');
-    let current: any = config.features;
+    let current: any = featurePath.startsWith('navigation.') ? config.navigation : config.features;
+    
+    if (featurePath.startsWith('navigation.')) {
+      pathParts.shift(); // Remove 'navigation' prefix
+    }
 
     for (const part of pathParts) {
       if (current[part] === undefined) {
@@ -354,12 +157,10 @@ export const FeatureFlagProvider: React.FC<FeatureFlagProviderProps> = ({ childr
       }
       current = current[part];
       
-      // If we hit a feature or subfeature, check if it's enabled
       if (current.enabled !== undefined) {
         if (!current.enabled) {
           return false;
         }
-        // If there are more path parts, continue into subFeatures
         if (pathParts.indexOf(part) < pathParts.length - 1) {
           current = current.subFeatures || {};
         }
@@ -369,52 +170,54 @@ export const FeatureFlagProvider: React.FC<FeatureFlagProviderProps> = ({ childr
     return current.enabled !== undefined ? current.enabled : false;
   };
 
-  // Toggle a feature on/off
-  const toggleFeature = (featurePath: string) => {
-    const pathParts = featurePath.split('.');
-    const newConfig = JSON.parse(JSON.stringify(config)); // Deep clone
-    
-    // Determine if this is a navigation feature or regular feature
-    let current: any;
-    if (pathParts[0] === 'navigation') {
-      current = newConfig.navigation;
-      pathParts.shift(); // Remove 'navigation' from the path
-    } else {
-      current = newConfig.features;
-    }
-    
-    for (let i = 0; i < pathParts.length; i++) {
-      const part = pathParts[i];
+  const toggleFeature = async (featurePath: string) => {
+    try {
+      const result = await apiClient.toggleFeature(featurePath);
+      if (result.success) {
+        setConfig(result.config);
+        console.log(`✅ Toggled feature: ${featurePath} → ${result.enabled}`);
+      }
+    } catch (error) {
+      // Fallback to local toggle
+      const pathParts = featurePath.split('.');
+      const newConfig = JSON.parse(JSON.stringify(config));
       
-      if (i === pathParts.length - 1) {
-        // This is the final part, toggle it
-        if (current[part] && current[part].enabled !== undefined) {
-          current[part].enabled = !current[part].enabled;
-        }
+      let current: any;
+      if (pathParts[0] === 'navigation') {
+        current = newConfig.navigation;
+        pathParts.shift();
       } else {
-        // Navigate deeper
-        current = current[part];
-        if (pathParts[i + 1] && current.subFeatures) {
-          current = current.subFeatures;
+        current = newConfig.features;
+      }
+      
+      for (let i = 0; i < pathParts.length; i++) {
+        const part = pathParts[i];
+        
+        if (i === pathParts.length - 1) {
+          if (current[part] && current[part].enabled !== undefined) {
+            current[part].enabled = !current[part].enabled;
+          }
+        } else {
+          current = current[part];
+          if (pathParts[i + 1] && current.subFeatures) {
+            current = current.subFeatures;
+          }
         }
       }
-    }
 
-    newConfig.lastUpdated = new Date().toISOString();
-    setConfig(newConfig);
-    
-    // Auto-save to localStorage
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newConfig));
+      newConfig.lastUpdated = new Date().toISOString();
+      setConfig(newConfig);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newConfig));
+      console.log(`⚠️ Local toggle: ${featurePath}`);
+    }
   };
 
-  // Update entire configuration
   const updateConfig = (newConfig: FeatureFlagConfig) => {
     newConfig.lastUpdated = new Date().toISOString();
     setConfig(newConfig);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newConfig));
   };
 
-  // Get all enabled routes for navigation
   const getEnabledRoutes = (): string[] => {
     return Object.entries(config.features)
       .filter(([_, feature]) => feature.enabled && feature.route)
@@ -422,65 +225,52 @@ export const FeatureFlagProvider: React.FC<FeatureFlagProviderProps> = ({ childr
       .map(([_, feature]) => feature.route!);
   };
 
-  // Get the default route based on enabled features
   const getDefaultRoute = (): string => {
     const enabledRoutes = getEnabledRoutes();
     
-    // Try to use the configured default redirect if that feature is enabled
     if (isFeatureEnabled('dashboard') && config.routing.defaultRedirect.includes('dashboard')) {
       return config.routing.defaultRedirect;
     }
     
-    // Otherwise, use the first enabled route
     if (enabledRoutes.length > 0) {
       return enabledRoutes[0];
     }
     
-    // Fallback to the configured fallback route
     return config.routing.fallbackRoute;
   };
 
-  // Save configuration to localStorage and potentially to server
   const saveConfig = async (): Promise<void> => {
     try {
-      const configToSave = {
-        ...config,
-        lastUpdated: new Date().toISOString()
-      };
-      
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(configToSave));
-      setConfig(configToSave);
-      
-      // Future: Save to server/database
-      console.log('Feature flags saved to localStorage');
+      setIsLoading(true);
+      const savedConfig = await apiClient.saveConfig(config);
+      setConfig(savedConfig);
+      console.log('✅ Feature flags saved to file and localStorage');
     } catch (error) {
       console.error('Failed to save feature flags:', error);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Load configuration from localStorage
   const loadConfig = async (): Promise<void> => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const savedConfig = JSON.parse(saved);
-        setConfig(savedConfig);
-        console.log('Feature flags loaded from localStorage');
-      } else {
-        console.log('Using default feature flags');
-      }
+      setIsLoading(true);
+      const loadedConfig = await apiClient.getConfig();
+      setConfig(loadedConfig);
+      console.log('✅ Feature flags loaded from file/localStorage');
     } catch (error) {
       console.error('Failed to load feature flags, using defaults:', error);
       setConfig(defaultFeatureFlags as FeatureFlagConfig);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Reset to default configuration
   const resetToDefaults = () => {
     setConfig(defaultFeatureFlags as FeatureFlagConfig);
     localStorage.removeItem(STORAGE_KEY);
-    console.log('Feature flags reset to defaults');
+    console.log('🔄 Feature flags reset to defaults');
   };
 
   const contextValue: FeatureFlagContextType = {

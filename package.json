@@ -15,7 +15,12 @@
     "features:toggle": "node scripts/featureFlagManager.js --toggle",
     "features:list": "node scripts/featureFlagManager.js --list",
     "features:status": "node scripts/featureFlagManager.js --status",
-    "features:reset": "node scripts/featureFlagManager.js --reset"
+    "features:reset": "node scripts/featureFlagManager.js --reset",
+    "server": "cd server && npm start",
+    "server:dev": "cd server && npm run dev",
+    "server:install": "cd server && npm install",
+    "server:start": "node scripts/startFeatureFlagServer.js",
+    "dev:full": "npm run server:start && npm run dev"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
