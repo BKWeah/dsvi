@@ -32,7 +32,7 @@ export const PackagesSection: React.FC<PackageSectionProps> = () => {
       buttonColor: "bg-blue-600 hover:bg-blue-700"
     },
     {
-      name: "Advanced Template 1",
+      name: "Prime Essentials",
       price: "$150",
       period: "/year",
       popular: true,
@@ -53,12 +53,12 @@ export const PackagesSection: React.FC<PackageSectionProps> = () => {
       buttonColor: "bg-green-600 hover:bg-green-700"
     },
     {
-      name: "Advanced Template 2",
+      name: "Prime Elite",
       price: "$200",
       period: "/year",
       popular: false,
       features: [
-        "Everything in Template 1",
+        "Everything in Prime Essentials",
         "Unlimited pages",
         "E-learning platform integration",
         "Online admission system",

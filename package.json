@@ -8,7 +8,14 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "features": "node scripts/featureFlagManager.js",
+    "features:enable": "node scripts/featureFlagManager.js --enable",
+    "features:disable": "node scripts/featureFlagManager.js --disable",
+    "features:toggle": "node scripts/featureFlagManager.js --toggle",
+    "features:list": "node scripts/featureFlagManager.js --list",
+    "features:status": "node scripts/featureFlagManager.js --status",
+    "features:reset": "node scripts/featureFlagManager.js --reset"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

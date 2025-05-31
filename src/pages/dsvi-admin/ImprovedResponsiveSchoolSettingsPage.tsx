@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useFeature } from '@/contexts/FeatureFlagContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,7 +12,7 @@ import { MobileBottomActionBar } from '@/components/mobile/MobileBottomActionBar
 import { ScrollableTabs } from '@/components/mobile/ScrollableTabs';
 import { BottomAppBar } from '@/components/mobile/BottomAppBar';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Save, Upload, Eye } from 'lucide-react';
+import { ArrowLeft, Save, Upload, Eye, CreditCard } from 'lucide-react';
 
 // Import the missing components and functions
 import { getSchoolById, updateSchool, uploadSchoolLogo } from '@/lib/database';
@@ -20,6 +21,7 @@ import { ImageUpload } from '@/components/ui/custom/ImageUpload';
 import { SchoolLogoUpload } from '@/components/ui/custom/SchoolLogoUpload';
 import { ComprehensiveBrandingTab } from '@/components/ui/custom/ComprehensiveBrandingTab';
 import { LiveThemePreview } from '@/components/ui/custom/LiveThemePreview';
+import { SchoolAssignmentManager } from '@/components/dsvi-admin/SchoolAssignmentManager';
 
 export default function ImprovedResponsiveSchoolSettingsPage() {
   const { schoolId } = useParams<{ schoolId: string }>();
@@ -41,6 +43,28 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [mapEmbedUrl, setMapEmbedUrl] = useState('');
+  
+  // Subscription state
+  const [packageType, setPackageType] = useState<'standard' | 'advanced'>('standard');
+  const [subscriptionStart, setSubscriptionStart] = useState('');
+  const [subscriptionEnd, setSubscriptionEnd] = useState('');
+  const [subscriptionStatus, setSubscriptionStatus] = useState<'active' | 'expiring' | 'inactive' | 'trial'>('active');
+  const [autoRenewal, setAutoRenewal] = useState(true);
+  const [subscriptionNotes, setSubscriptionNotes] = useState('');
+
+  // Feature flag checks with fallback to true (non-destructive)
+  let isSubscriptionEnabled = true;
+  let isAdminAssignmentsEnabled = true;
+  let isContentManagementEnabled = true;
+
+  try {
+    isSubscriptionEnabled = useFeature('schools.schoolSettings.subscription');
+    isAdminAssignmentsEnabled = useFeature('schools.schoolSettings.adminAssignments');
+    isContentManagementEnabled = useFeature('schools.schoolSettings.contentManagement');
+  } catch (error) {
+    // If feature flag system is not available, show all tabs (non-destructive)
+    console.warn('Feature flag system not available, showing all tabs');
+  }
 
   useEffect(() => {
     if (schoolId) {
@@ -131,6 +155,14 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
         setPhone(school.contact_info?.phone || '');
         setEmail(school.contact_info?.email || '');
         setMapEmbedUrl(school.contact_info?.mapEmbedUrl || '');
+        
+        // Set subscription fields
+        setPackageType(school.package_type || 'standard');
+        setSubscriptionStart(school.subscription_start || '');
+        setSubscriptionEnd(school.subscription_end || '');
+        setSubscriptionStatus(school.subscription_status || 'active');
+        setAutoRenewal(school.auto_renewal !== false);
+        setSubscriptionNotes(school.subscription_notes || '');
       }
     } catch (error) {
       console.error('Error fetching school:', error);
@@ -174,7 +206,13 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
           phone,
           email,
           mapEmbedUrl
-        }
+        },
+        package_type: packageType,
+        subscription_start: subscriptionStart,
+        subscription_end: subscriptionEnd,
+        subscription_status: subscriptionStatus,
+        auto_renewal: autoRenewal,
+        subscription_notes: subscriptionNotes
       };
 
       await updateSchool(schoolId, updatedData);
@@ -234,67 +272,17 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
       </div>
     );
   }
+  
   return (
     <div className="min-h-screen bg-background">
       {/* Floating Save Button */}
       {hasUnsavedChanges && (
-        <div className="fixed bottom-6 right-6 z-50 transition-all duration-300 ease-in-out" id="floating-save-button">
-          <style jsx>{`
-            @keyframes rainbow-border {
-              0% { background-position: 0% 50%; }
-              50% { background-position: 100% 50%; }
-              100% { background-position: 0% 50%; }
-            }
-            .rainbow-border {
-              background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
-              background-size: 400%;
-              animation: rainbow-border 2s ease infinite;
-              padding: 2px;
-              border-radius: 50px;
-            }
-            .save-button-inner {
-              background: white;
-              border-radius: 48px;
-              padding: 12px 24px;
-              font-weight: 600;
-              color: #1f2937;
-              transition: all 0.2s ease;
-            }
-            .save-button-inner:hover {
-              background: #f9fafb;
-              transform: translateY(-1px);
-            }
-            /* Adjust position when toasts are visible */
-            @media (max-width: 768px) {
-              #floating-save-button {
-                bottom: calc(5rem + env(safe-area-inset-bottom));
-                right: 1rem;
-                left: 1rem;
-                z-index: 60;
-              }
-              .rainbow-border {
-                width: 100%;
-                border-radius: 12px;
-              }
-              .save-button-inner {
-                width: 100%;
-                border-radius: 10px;
-                padding: 16px 24px;
-                text-align: center;
-                font-size: 16px;
-                font-weight: 600;
-              }
-            }
-            /* Push up when toast notifications are present */
-            .toast-present #floating-save-button {
-              bottom: calc(5rem + 6rem + env(safe-area-inset-bottom)) !important;
-            }
-          `}</style>
-          <div className="rainbow-border">
+        <div className="fixed bottom-6 right-6 md:bottom-6 md:right-6 left-4 md:left-auto z-50">
+          <div className="relative p-0.5 rounded-full bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 animate-pulse">
             <Button
               onClick={handleSave}
               disabled={saving}
-              className="save-button-inner flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200"
+              className="w-full bg-white text-gray-900 hover:bg-gray-50 font-semibold px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2"
               style={{ background: 'white', color: '#1f2937' }}
             >
               <Save className="h-4 w-4" />
@@ -333,16 +321,44 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
       <div className="p-4 pb-32 md:pb-4 space-y-6">
         <Tabs defaultValue="general" className="space-y-6">
           {/* Main Tabs - Mobile Optimized with better spacing */}
-          <TabsList className="grid w-full grid-cols-4 h-12 bg-muted/50 rounded-lg p-1">
+          <TabsList className={`grid w-full h-12 bg-muted/50 rounded-lg p-1 ${
+            // Dynamic grid based on available tabs
+            [
+              true, // general (always shown)
+              true, // branding (always shown)
+              isSubscriptionEnabled,
+              true, // contact (always shown)
+              isAdminAssignmentsEnabled,
+              true  // preview (always shown)
+            ].filter(Boolean).length === 6 ? 'grid-cols-6' :
+            [
+              true, // general
+              true, // branding
+              isSubscriptionEnabled,
+              true, // contact
+              isAdminAssignmentsEnabled,
+              true  // preview
+            ].filter(Boolean).length === 5 ? 'grid-cols-5' : 'grid-cols-4'
+          }`}>
             <TabsTrigger value="general" className="text-sm font-medium h-10 rounded-md">
               General
             </TabsTrigger>
             <TabsTrigger value="branding" className="text-sm font-medium h-10 rounded-md">
               Branding
             </TabsTrigger>
+            {isSubscriptionEnabled && (
+              <TabsTrigger value="subscription" className="text-sm font-medium h-10 rounded-md">
+                Subscription
+              </TabsTrigger>
+            )}
             <TabsTrigger value="contact" className="text-sm font-medium h-10 rounded-md">
               Contact
             </TabsTrigger>
+            {isAdminAssignmentsEnabled && (
+              <TabsTrigger value="assignments" className="text-sm font-medium h-10 rounded-md">
+                Assignments
+              </TabsTrigger>
+            )}
             <TabsTrigger value="preview" className="text-sm font-medium h-10 rounded-md">
               Preview
             </TabsTrigger>
@@ -1416,6 +1432,111 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
               </Card>
             </div>
           </TabsContent>
+          
+          {/* Subscription Management Tab */}
+          {isSubscriptionEnabled && (
+            <TabsContent value="subscription" className="space-y-6">
+            <Card className="shadow-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <CreditCard className="h-5 w-5" />
+                  Subscription Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <Label htmlFor="packageType" className="text-sm font-medium">Package Type</Label>
+                    <select
+                      id="packageType"
+                      value={packageType}
+                      onChange={(e) => {
+                        setPackageType(e.target.value as 'standard' | 'advanced');
+                        markAsChanged();
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="standard">Standard Package ($100/year)</option>
+                      <option value="advanced">Advanced Package ($200/year)</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label htmlFor="subscriptionStart" className="text-sm font-medium">Start Date</Label>
+                    <Input
+                      id="subscriptionStart"
+                      type="date"
+                      value={subscriptionStart}
+                      onChange={(e) => {
+                        setSubscriptionStart(e.target.value);
+                        markAsChanged();
+                      }}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label htmlFor="subscriptionEnd" className="text-sm font-medium">End Date</Label>
+                    <Input
+                      id="subscriptionEnd"
+                      type="date"
+                      value={subscriptionEnd}
+                      onChange={(e) => {
+                        setSubscriptionEnd(e.target.value);
+                        markAsChanged();
+                      }}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label htmlFor="subscriptionStatus" className="text-sm font-medium">Status</Label>
+                    <select
+                      id="subscriptionStatus"
+                      value={subscriptionStatus}
+                      onChange={(e) => {
+                        setSubscriptionStatus(e.target.value as 'active' | 'expiring' | 'inactive' | 'trial');
+                        markAsChanged();
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="active">Active</option>
+                      <option value="expiring">Expiring Soon</option>
+                      <option value="inactive">Inactive</option>
+                      <option value="trial">Trial</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-medium text-gray-900 mb-3">Current Status</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-600">Package:</span>
+                      <div className="font-medium">
+                        {packageType === 'advanced' ? 'Advanced ($200/year)' : 'Standard ($100/year)'}
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Status:</span>
+                      <div className="font-medium capitalize">{subscriptionStatus}</div>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Days until expiry:</span>
+                      <div className="font-medium">
+                        {subscriptionEnd 
+                          ? Math.ceil((new Date(subscriptionEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+                          : 'N/A'
+                        } days
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          )}
+          
           {/* Contact Information Tab */}
           <TabsContent value="contact" className="space-y-6">
             <Card className="shadow-sm">
@@ -1468,6 +1589,26 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
               </CardContent>
             </Card>
           </TabsContent>
+          
+          {/* Assignments Tab */}
+          {isAdminAssignmentsEnabled && (
+            <TabsContent value="assignments" className="space-y-6">
+            {school && (
+              <SchoolAssignmentManager 
+                schoolId={school.id}
+                schoolName={school.name}
+                onAssignmentChange={() => {
+                  // Optionally refresh school data or trigger other updates
+                  toast({
+                    title: "Assignment Updated",
+                    description: "School admin assignments have been updated",
+                  });
+                }}
+              />
+            )}
+          </TabsContent>
+          )}
+          
           {/* Live Preview Tab */}
           <TabsContent value="preview" className="space-y-6">
             <Card className="shadow-sm">

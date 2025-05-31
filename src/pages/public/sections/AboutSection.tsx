@@ -14,12 +14,25 @@ export const AboutSection: React.FC = () => {
               About DSVI
             </Badge>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              What is DSVI?
+              Who We Are
             </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              The Digital School Visibility Initiative (DSVI) is dedicated to empowering Liberian educational institutions 
-              with professional digital solutions that enhance visibility, foster connections, and promote sustainable growth.
-            </p>
+            <div className="text-left max-w-4xl mx-auto space-y-6 text-gray-700 leading-relaxed">
+              <p className="text-lg">
+                Founded on <span className="font-semibold text-blue-600">March 14, 2025</span>, the Digital School Visibility Initiative (DSVI) is a practical response to a pressing need: helping Liberian schools establish a meaningful and professional presence online. Powered by <span className="font-semibold text-green-600">LIB No. 1 Business Center</span>, DSVI offers schools custom-built websites, intuitive, reliable, and affordable, starting at just <span className="font-bold text-orange-600">$100 per year</span>.
+              </p>
+              <p>
+                The initiative stems from more than business ambition. LIB No. 1 Business Center, a well-regarded name in Liberia's electronics sector, established by CEO <span className="font-semibold">John Gyawu</span>, has long understood the value of accessible technology. With DSVI, the company has extended its reach, applying its technical strengths to support the education sector in a direct and measurable way.
+              </p>
+              <p>
+                Led by Director <span className="font-semibold">Boniface Koffa Weah, Jr.</span>, the team behind DSVI is focused on real outcomes: clear communication between schools and communities, increased credibility in the eyes of partners and stakeholders, and the practical benefits of a digital platform tailored for education.
+              </p>
+              <p>
+                DSVI is built for schools that want to move forward, those ready to be seen, to inform, and to operate with greater confidence in a connected world. Each site is a reflection of the school it represents, carefully crafted to support administrators, engage parents, and showcase the work happening in classrooms every day.
+              </p>
+              <p className="font-semibold text-blue-800">
+                We don't offer empty promises. We deliver working solutions, backed by experience, driven by purpose, and designed to last.
+              </p>
+            </div>
           </div>
 
           {/* Mission, Vision, Values Grid */}

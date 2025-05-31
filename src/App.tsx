@@ -3,11 +3,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { FeatureFlagProvider } from "./contexts/FeatureFlagContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { FeatureProtectedRoute } from "./components/feature-flags/FeatureProtectedRoute";
 import { UpdatedResponsiveDSVIAdminLayout } from "./components/layouts/UpdatedResponsiveDSVIAdminLayout";
 import { UpdatedResponsiveSchoolAdminLayout } from "./components/layouts/UpdatedResponsiveSchoolAdminLayout";
 import { PublicSchoolLayout } from "./components/layouts/PublicSchoolLayout";
@@ -29,14 +31,22 @@ import ContactPage from "./pages/public/ContactPage";
 import ThankYouPage from "./pages/public/ThankYouPage";
 import FAQPage from "./pages/public/FAQPage";
 import RegisterPage from "./pages/public/RegisterPage";
+import TodoTrackerPage from "./pages/public/TodoTrackerPage";
+import ClientApprovalPage from "./pages/public/ClientApprovalPage";
+import DebugSupabasePage from "./pages/public/DebugSupabasePage";
+import DSVIAdminDashboard from "./pages/dsvi-admin/DSVIAdminDashboard";
 import SchoolsPage from "./pages/dsvi-admin/SchoolsPage";
 import SchoolRequestsPage from "./pages/dsvi-admin/SchoolRequestsPage";
 import SchoolContentPage from "./pages/dsvi-admin/SchoolContentPage";
 import EditPagePage from "./pages/dsvi-admin/EditPagePage";
 import SchoolSettingsPage from "./pages/dsvi-admin/SchoolSettingsPage";
+import SubscriptionTrackerPage from "./pages/dsvi-admin/SubscriptionTrackerPage";
+import MessagingPanelPage from "./pages/dsvi-admin/MessagingPanelPage";
 import SchoolAdminDashboard from "./pages/school-admin/SchoolAdminDashboard";
 import EditSchoolPagePage from "./pages/school-admin/EditSchoolPagePage";
 import SchoolBrandingPageAdmin from "./pages/school-admin/SchoolBrandingPageAdmin";
+import SchoolAdminMessagingPage from "./pages/school-admin/SchoolAdminMessagingPage";
+import DeploymentManagePage from "./pages/deploy/DeploymentManagePage";
 
 const queryClient = new QueryClient();
 
@@ -44,11 +54,12 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <HelmetProvider>
       <TooltipProvider>
-        <AuthProvider>
-          <ThemeProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
+        <FeatureFlagProvider>
+          <AuthProvider>
+            <ThemeProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
@@ -66,6 +77,9 @@ const App = () => (
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/thank-you" element={<ThankYouPage />} />
             <Route path="/faq" element={<FAQPage />} />
+            <Route path="/todo-tracker" element={<TodoTrackerPage />} />
+            <Route path="/client-approval" element={<ClientApprovalPage />} />
+            <Route path="/debug-supabase" element={<DebugSupabasePage />} />
             
             {/* DSVI Admin Routes */}
             <Route 
@@ -76,13 +90,62 @@ const App = () => (
                 </ProtectedRoute>
               }
             >
-              <Route index element={<SchoolsPage />} />
-              <Route path="schools" element={<SchoolsPage />} />
-              <Route path="requests" element={<SchoolRequestsPage />} />
-              <Route path="schools/:schoolId/content" element={<SchoolContentPage />} />
-              <Route path="schools/:schoolId/pages/:pageType/edit" element={<EditPagePage />} />
-              <Route path="schools/:schoolId/settings" element={<SchoolSettingsPage />} />
+              <Route index element={
+                <FeatureProtectedRoute feature="dashboard">
+                  <DSVIAdminDashboard />
+                </FeatureProtectedRoute>
+              } />
+              <Route path="dashboard" element={
+                <FeatureProtectedRoute feature="dashboard">
+                  <DSVIAdminDashboard />
+                </FeatureProtectedRoute>
+              } />
+              <Route path="schools" element={
+                <FeatureProtectedRoute feature="schools">
+                  <SchoolsPage />
+                </FeatureProtectedRoute>
+              } />
+              <Route path="requests" element={
+                <FeatureProtectedRoute feature="requests">
+                  <SchoolRequestsPage />
+                </FeatureProtectedRoute>
+              } />
+              <Route path="subscriptions" element={
+                <FeatureProtectedRoute feature="subscriptions">
+                  <SubscriptionTrackerPage />
+                </FeatureProtectedRoute>
+              } />
+              <Route path="messaging" element={
+                <FeatureProtectedRoute feature="messaging">
+                  <MessagingPanelPage />
+                </FeatureProtectedRoute>
+              } />
+              <Route path="schools/:schoolId/content" element={
+                <FeatureProtectedRoute feature="schools">
+                  <SchoolContentPage />
+                </FeatureProtectedRoute>
+              } />
+              <Route path="schools/:schoolId/pages/:pageType/edit" element={
+                <FeatureProtectedRoute feature="schools">
+                  <EditPagePage />
+                </FeatureProtectedRoute>
+              } />
+              <Route path="schools/:schoolId/settings" element={
+                <FeatureProtectedRoute feature="schools">
+                  <SchoolSettingsPage />
+                </FeatureProtectedRoute>
+              } />
             </Route>
+            
+            {/* Deployment Management Route - Feature Flag System */}
+            <Route 
+              path="/deploy" 
+              element={
+                <ProtectedRoute roles={['DSVI_ADMIN']}>
+                  <DeploymentManagePage />
+                </ProtectedRoute>
+              } 
+            />
             
             {/* School Admin Routes */}
             <Route 
@@ -96,6 +159,7 @@ const App = () => (
               <Route index element={<SchoolAdminDashboard />} />
               <Route path="pages/:pageType/edit" element={<EditSchoolPagePage />} />
               <Route path="branding" element={<SchoolBrandingPageAdmin />} />
+              <Route path="messaging" element={<SchoolAdminMessagingPage />} />
             </Route>
             
             {/* Public School Website Routes */}
@@ -110,6 +174,7 @@ const App = () => (
         </BrowserRouter>
       </ThemeProvider>
     </AuthProvider>
+  </FeatureFlagProvider>
     </TooltipProvider>
   </HelmetProvider>
 </QueryClientProvider>

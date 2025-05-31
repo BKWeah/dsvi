@@ -3,28 +3,69 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Edit, ExternalLink, Home, Info, GraduationCap, UserCheck, Users, Phone, Palette } from 'lucide-react';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Edit, ExternalLink, Home, Info, GraduationCap, UserCheck, Users, Phone, Palette, ChevronDown } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getSchoolById } from '@/lib/database';
+import { getSchoolById, getAssignedSchools } from '@/lib/database';
 import { School as SchoolType } from '@/lib/types';
 import { MobileCard } from '@/components/mobile/MobileCard';
 
 export default function SchoolAdminDashboard() {
   const { user } = useAuth();
-  const [school, setSchool] = useState<SchoolType | null>(null);
+  const [schools, setSchools] = useState<SchoolType[]>([]);
+  const [selectedSchool, setSelectedSchool] = useState<SchoolType | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const schoolId = user?.user_metadata?.school_id;
-    if (schoolId) {
-      getSchoolById(schoolId).then(data => {
-        if (data?.school) setSchool(data.school);
-        setLoading(false);
-      });
+    if (user?.id) {
+      loadAssignedSchools();
     } else {
       setLoading(false);
     }
   }, [user]);
+
+  const loadAssignedSchools = async () => {
+    try {
+      // First try to get schools from assignments
+      const assignedSchools = await getAssignedSchools(user!.id);
+      
+      // Also check if they're a direct admin of any school
+      const schoolId = user?.user_metadata?.school_id;
+      if (schoolId) {
+        const directSchool = await getSchoolById(schoolId);
+        if (directSchool?.school) {
+          // Combine assigned and direct schools, avoid duplicates
+          const allSchools = [...assignedSchools];
+          const isDuplicate = allSchools.some(s => s.id === directSchool.school.id);
+          if (!isDuplicate) {
+            allSchools.push(directSchool.school);
+          }
+          setSchools(allSchools);
+          setSelectedSchool(directSchool.school); // Default to direct assignment
+        } else {
+          setSchools(assignedSchools);
+          if (assignedSchools.length > 0) {
+            setSelectedSchool(assignedSchools[0]);
+          }
+        }
+      } else {
+        setSchools(assignedSchools);
+        if (assignedSchools.length > 0) {
+          setSelectedSchool(assignedSchools[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading assigned schools:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const pages = [
     { type: 'homepage', label: 'Homepage', icon: Home, color: 'bg-blue-500' },
@@ -46,16 +87,16 @@ export default function SchoolAdminDashboard() {
     );
   }
 
-  if (!school) {
+  if (!selectedSchool && schools.length === 0) {
     return (
       <div className="space-y-6 max-w-4xl mx-auto p-4 sm:p-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-center">No School Assigned</CardTitle>
+            <CardTitle className="text-center">No Schools Assigned</CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-muted-foreground">
-              Contact DSVI admin for school assignment.
+              You haven't been assigned to any schools yet. Contact your DSVI admin for school assignment.
             </p>
             <Button variant="outline" size="sm">
               Contact Support
@@ -65,6 +106,8 @@ export default function SchoolAdminDashboard() {
       </div>
     );
   }
+
+  const school = selectedSchool;
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto p-4 sm:p-6">
@@ -79,6 +122,38 @@ export default function SchoolAdminDashboard() {
           </p>
         </CardHeader>
       </Card>
+
+      {/* School Selector - if multiple schools */}
+      {schools.length > 1 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Select School to Manage</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Select 
+              value={selectedSchool?.id || ''} 
+              onValueChange={(schoolId) => {
+                const school = schools.find(s => s.id === schoolId);
+                setSelectedSchool(school || null);
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a school to manage" />
+              </SelectTrigger>
+              <SelectContent>
+                {schools.map((school) => (
+                  <SelectItem key={school.id} value={school.id}>
+                    {school.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground mt-2">
+              You have access to {schools.length} school{schools.length > 1 ? 's' : ''}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Quick Stats - Mobile Grid */}
       <div className="grid grid-cols-2 gap-4">

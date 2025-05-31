@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Edit } from 'lucide-react';
 import { MobileTopBar } from '@/components/mobile/MobileTopBar';
 import { useToast } from '@/hooks/use-toast';
+import { useSchoolAccess } from '@/hooks/useSchoolAccess';
 
 interface School {
   id: string;
@@ -37,12 +38,20 @@ export default function SchoolContentPage() {
   const [pages, setPages] = useState<Page[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { hasAccess, loading: accessLoading } = useSchoolAccess(schoolId);
 
   useEffect(() => {
-    if (schoolId) {
+    if (schoolId && hasAccess && !accessLoading) {
       fetchSchoolAndPages();
+    } else if (!accessLoading && !hasAccess) {
+      toast({
+        title: "Access Denied",
+        description: "You don't have permission to access this school",
+        variant: "destructive",
+      });
+      navigate('/dsvi-admin/schools');
     }
-  }, [schoolId]);
+  }, [schoolId, hasAccess, accessLoading]);
 
   const fetchSchoolAndPages = async () => {
     try {

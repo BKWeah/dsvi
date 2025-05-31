@@ -7,6 +7,8 @@ export interface UserProfile {
   name?: string;
   role: 'DSVI_ADMIN' | 'SCHOOL_ADMIN';
   school_id?: string; // if SCHOOL_ADMIN, links to School.id
+  created_at?: string;
+  updated_at?: string;
 }
 
 // Enhanced Theme Configuration Interfaces
@@ -153,6 +155,15 @@ export interface School {
     email?: string; 
     mapEmbedUrl?: string; 
   } | null;
+  // Subscription Management Fields
+  package_type?: 'standard' | 'advanced';
+  subscription_start?: string;
+  subscription_end?: string;
+  subscription_status?: 'active' | 'expiring' | 'inactive' | 'trial';
+  last_reminder_sent?: string;
+  payment_status?: 'paid' | 'pending' | 'overdue';
+  auto_renewal?: boolean;
+  subscription_notes?: string;
 }
 
 export interface PageContent {
@@ -237,3 +248,54 @@ export const isFacultyListConfig = (config: any): config is FacultyListSectionCo
 export const isContactFormConfig = (config: any): config is ContactFormSectionConfig => {
   return config !== null && typeof config === 'object';
 };
+
+// Phase 1: Admin Assignment & Activity Types
+export interface AdminSchoolAssignment {
+  id: string;
+  school_admin_id: string;
+  school_id: string;
+  assigned_by: string;
+  permissions: {
+    can_edit?: boolean;
+    can_approve?: boolean;
+    can_manage_content?: boolean;
+  };
+  created_at: string;
+  updated_at: string;
+  // Relations
+  school?: School;
+  school_admin?: UserProfile;
+  assigned_by_user?: UserProfile;
+}
+
+export interface ActivityLog {
+  id: string;
+  user_id: string;
+  school_id?: string;
+  action: string;
+  details: Record<string, any>;
+  ip_address?: string;
+  user_agent?: string;
+  created_at: string;
+  // Relations
+  user?: UserProfile;
+  school?: School;
+}
+
+export interface DashboardStats {
+  totalSchools: number;
+  activeSchools: number;
+  inactiveSchools: number;
+  expiringSchools: number;
+  pendingRequests: number;
+  recentActivity: ActivityLog[];
+  subscriptionBreakdown: {
+    standard: number;
+    advanced: number;
+  };
+}
+
+export interface SchoolWithAssignments extends School {
+  assignments?: AdminSchoolAssignment[];
+  assigned_admins?: UserProfile[];
+}

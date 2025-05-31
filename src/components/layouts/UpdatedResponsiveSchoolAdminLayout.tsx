@@ -22,7 +22,8 @@ import {
   GraduationCap, 
   UserCheck, 
   Users, 
-  Phone 
+  Phone,
+  MessageSquare
 } from 'lucide-react';
 
 const PAGE_TYPES = [
@@ -103,6 +104,14 @@ export function UpdatedResponsiveSchoolAdminLayout() {
                       </SidebarMenuItem>
                     );
                   })}
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link to="/school-admin/messaging">
+                        <MessageSquare className="h-4 w-4" />
+                        <span>Messaging</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton onClick={handleLogout}>
                       <LogOut className="h-4 w-4" />

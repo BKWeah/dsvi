@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFeature } from '@/contexts/FeatureFlagContext';
 import { Button } from '@/components/ui/button';
 import { BottomAppBar } from '@/components/mobile/BottomAppBar';
 import { 
@@ -11,14 +12,33 @@ import {
   SidebarMenuItem, 
   SidebarMenuButton,
   SidebarProvider,
-  SidebarTrigger
+  SidebarTrigger,
+  SidebarSeparator
 } from '@/components/ui/sidebar';
-import { School, LogOut, Users, GraduationCap } from 'lucide-react';
+import { School, LogOut, Users, BarChart3, CreditCard, MessageSquare, Settings2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function UpdatedResponsiveDSVIAdminLayout() {
   const { logout } = useAuth();
   const navigate = useNavigate();
+
+  // Feature flag checks with fallback to true (non-destructive)
+  let isDashboardEnabled = true;
+  let isSchoolsEnabled = true;
+  let isRequestsEnabled = true;
+  let isSubscriptionsEnabled = true;
+  let isMessagingEnabled = true;
+
+  try {
+    isDashboardEnabled = useFeature('dashboard');
+    isSchoolsEnabled = useFeature('schools'); 
+    isRequestsEnabled = useFeature('requests');
+    isSubscriptionsEnabled = useFeature('subscriptions');
+    isMessagingEnabled = useFeature('messaging');
+  } catch (error) {
+    // If feature flag system is not available, show everything (non-destructive)
+    console.warn('Feature flag system not available, showing all navigation items');
+  }
 
   const handleLogout = async () => {
     await logout();
@@ -45,22 +65,59 @@ export function UpdatedResponsiveDSVIAdminLayout() {
               </SidebarHeader>
               <SidebarContent>
                 <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <Link to="/dsvi-admin/schools">
-                        <School className="h-4 w-4" />
-                        <span>Schools</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <Link to="/dsvi-admin/requests">
-                        <Users className="h-4 w-4" />
-                        <span>School Requests</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
+                  {isDashboardEnabled && (
+                    <SidebarMenuItem>
+                      <SidebarMenuButton asChild>
+                        <Link to="/dsvi-admin/dashboard">
+                          <BarChart3 className="h-4 w-4" />
+                          <span>Dashboard</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )}
+                  {isSchoolsEnabled && (
+                    <SidebarMenuItem>
+                      <SidebarMenuButton asChild>
+                        <Link to="/dsvi-admin/schools">
+                          <School className="h-4 w-4" />
+                          <span>Schools</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )}
+                  {isRequestsEnabled && (
+                    <SidebarMenuItem>
+                      <SidebarMenuButton asChild>
+                        <Link to="/dsvi-admin/requests">
+                          <Users className="h-4 w-4" />
+                          <span>School Requests</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )}
+                  {isSubscriptionsEnabled && (
+                    <SidebarMenuItem>
+                      <SidebarMenuButton asChild>
+                        <Link to="/dsvi-admin/subscriptions">
+                          <CreditCard className="h-4 w-4" />
+                          <span>Subscriptions</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )}
+                  {isMessagingEnabled && (
+                    <SidebarMenuItem>
+                      <SidebarMenuButton asChild>
+                        <Link to="/dsvi-admin/messaging">
+                          <MessageSquare className="h-4 w-4" />
+                          <span>Messaging</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )}
+                  
+                  <SidebarSeparator />
+                  
                   <SidebarMenuItem>
                     <SidebarMenuButton onClick={handleLogout}>
                       <LogOut className="h-4 w-4" />

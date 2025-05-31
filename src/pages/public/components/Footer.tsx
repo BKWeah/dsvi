@@ -31,13 +31,13 @@ export const Footer: React.FC = () => {
               Empowering Liberian educational institutions with modern digital solutions for enhanced visibility and community engagement.
             </p>
             <div className="flex space-x-4">
-              <a href="https://wa.me/231XXXXXXX" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+              <a href="https://wa.me/2317739102999" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                 <MessageSquare className="h-5 w-5" />
               </a>
               <Link to="/contact" className="text-gray-400 hover:text-white transition-colors">
                 <Mail className="h-5 w-5" />
               </Link>
-              <a href="tel:+231XXXXXXX" className="text-gray-400 hover:text-white transition-colors">
+              <a href="tel:+2317739102999" className="text-gray-400 hover:text-white transition-colors">
                 <Phone className="h-5 w-5" />
               </a>
               <a href="https://libdsvi.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
@@ -141,21 +141,28 @@ export const Footer: React.FC = () => {
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="h-4 w-4 flex-shrink-0" />
-                <a href="tel:+231XXXXXXX" className="hover:text-white transition-colors">
-                  +231-XXX-XXXX
-                </a>
+                <div className="space-y-1">
+                  <a href="tel:+2317739102999" className="hover:text-white transition-colors block">
+                    +231-77 391 0299
+                  </a>
+                  <a href="tel:+2315551827422" className="hover:text-white transition-colors block">
+                    +231-55 518 2742
+                  </a>
+                </div>
               </div>
               <div className="flex items-center space-x-3">
                 <MessageSquare className="h-4 w-4 flex-shrink-0" />
-                <a href="https://wa.me/231XXXXXXX" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
-                  WhatsApp Support
+                <a href="https://wa.me/2317739102999" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                  WhatsApp Support (+231-77 391 0299)
                 </a>
               </div>
               <div className="flex items-start space-x-3">
                 <MapPin className="h-4 w-4 flex-shrink-0 mt-1" />
                 <div>
                   <p>DSVI Office</p>
-                  <p>Monrovia, Liberia</p>
+                  <p>Outland Community, Opp. LTC Compound</p>
+                  <p>Paynesville, Montserrado County</p>
+                  <p>Republic of Liberia</p>
                 </div>
               </div>
             </div>

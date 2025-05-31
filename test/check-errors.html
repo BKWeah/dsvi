@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Error Checker</title>
+</head>
+<body>
+    <h1>Checking for Console Errors</h1>
+    <div id="errors"></div>
+    <script>
+        const errorsDiv = document.getElementById('errors');
+        const errors = [];
+        
+        // Capture console errors
+        window.addEventListener('error', (event) => {
+            const errorMsg = `Error: ${event.message} at ${event.filename}:${event.lineno}:${event.colno}`;
+            errors.push(errorMsg);
+            errorsDiv.innerHTML += `<div style="color: red;">${errorMsg}</div>`;
+        });
+        
+        // Capture unhandled promise rejections
+        window.addEventListener('unhandledrejection', (event) => {
+            const errorMsg = `Unhandled Promise Rejection: ${event.reason}`;
+            errors.push(errorMsg);
+            errorsDiv.innerHTML += `<div style="color: orange;">${errorMsg}</div>`;
+        });
+        
+        //

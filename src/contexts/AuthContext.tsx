@@ -35,6 +35,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      
+      // Sync user profile if user exists
+      if (session?.user) {
+        syncUserProfile(session.user);
+      }
+      
       setLoading(false);
     });
 
@@ -44,17 +50,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      
+      // Sync user profile on auth change
+      if (session?.user) {
+        syncUserProfile(session.user);
+      }
+      
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
+  // Helper function to sync user profile
+  const syncUserProfile = async (user: any) => {
+    try {
+      const role = user.user_metadata?.role || 'SCHOOL_ADMIN';
+      const name = user.user_metadata?.name || user.email;
+      
+      await supabase.rpc('upsert_user_profile', {
+        p_user_id: user.id,
+        p_email: user.email,
+        p_role: role,
+        p_name: name
+      });
+    } catch (error) {
+      console.warn('Failed to sync user profile:', error);
+    }
+  };
+
   const login = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+
+    // If login successful, sync user profile
+    if (!error && data.user) {
+      try {
+        const role = data.user.user_metadata?.role || 'SCHOOL_ADMIN';
+        const name = data.user.user_metadata?.name || data.user.email;
+        
+        await supabase.rpc('upsert_user_profile', {
+          p_user_id: data.user.id,
+          p_email: data.user.email,
+          p_role: role,
+          p_name: name
+        });
+      } catch (syncError) {
+        console.warn('Failed to sync user profile:', syncError);
+        // Don't fail login for this
+      }
+    }
+
     return { error };
   };
 
@@ -69,6 +117,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
       },
     });
+
+    // If signup successful, sync user profile
+    if (!error && data.user) {
+      try {
+        const name = metadata?.name || data.user.email;
+        
+        await supabase.rpc('upsert_user_profile', {
+          p_user_id: data.user.id,
+          p_email: data.user.email,
+          p_role: role,
+          p_name: name
+        });
+      } catch (syncError) {
+        console.warn('Failed to sync user profile during signup:', syncError);
+        // Don't fail signup for this
+      }
+    }
 
     // If signup successful and it's a school admin, ensure assignment with fallback
     if (!error && data.user && role === 'SCHOOL_ADMIN' && metadata?.school_id) {

@@ -1,0 +1,32 @@
+-- Fix RLS policies for project_tasks table
+-- Date: 2025-05-29
+-- Purpose: Fix permission denied error by correcting RLS policies
+
+-- Drop the incorrect policies
+DROP POLICY IF EXISTS "project_tasks_public_read" ON project_tasks;
+DROP POLICY IF EXISTS "project_tasks_authenticated_all" ON project_tasks;
+
+-- Create correct policies for anon key usage
+-- Allow public read access (for client approval page)
+CREATE POLICY "project_tasks_public_read" ON project_tasks 
+FOR SELECT USING (true);
+
+-- Allow public update access for approvals (since using anon key)
+CREATE POLICY "project_tasks_public_update" ON project_tasks 
+FOR UPDATE USING (true);
+
+-- Allow public insert access (for creating new tasks if needed)
+CREATE POLICY "project_tasks_public_insert" ON project_tasks 
+FOR INSERT WITH CHECK (true);
+
+-- Also fix audit table policies
+DROP POLICY IF EXISTS "project_task_audit_authenticated_read" ON project_task_audit;
+DROP POLICY IF EXISTS "project_task_audit_system_insert" ON project_task_audit;
+
+CREATE POLICY "project_task_audit_public_read" ON project_task_audit 
+FOR SELECT USING (true);
+
+CREATE POLICY "project_task_audit_public_insert" ON project_task_audit 
+FOR INSERT WITH CHECK (true);
+
+SELECT 'RLS policies fixed successfully!' as status;

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logActivity } from '@/lib/database';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -105,6 +106,22 @@ export default function SchoolRequestsPage() {
         throw updateError;
       }
 
+      // Log the approval activity
+      const { data: currentUser } = await supabase.auth.getUser();
+      if (currentUser.user) {
+        await logActivity(
+          currentUser.user.id,
+          schoolData.id,
+          'SCHOOL_REQUEST_APPROVED',
+          { 
+            request_id: request.id,
+            school_name: request.school_name,
+            contact_email: request.contact_email,
+            admin_notes: adminNotes
+          }
+        );
+      }
+
       toast({
         title: "Success",
         description: `School "${request.school_name}" has been approved and created.`,
@@ -140,6 +157,22 @@ export default function SchoolRequestsPage() {
 
       if (error) {
         throw error;
+      }
+
+      // Log the rejection activity
+      const { data: currentUser } = await supabase.auth.getUser();
+      if (currentUser.user) {
+        await logActivity(
+          currentUser.user.id,
+          null, // No school created for rejection
+          'SCHOOL_REQUEST_REJECTED',
+          { 
+            request_id: request.id,
+            school_name: request.school_name,
+            contact_email: request.contact_email,
+            admin_notes: adminNotes
+          }
+        );
       }
 
       toast({

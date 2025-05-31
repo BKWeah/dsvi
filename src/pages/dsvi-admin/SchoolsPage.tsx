@@ -19,6 +19,9 @@ interface School {
   name: string;
   admin_user_id: string | null;
   slug?: string;
+  package_type?: string;
+  subscription_status?: string;
+  subscription_end?: string;
 }
 
 export default function SchoolsPage() {
@@ -68,6 +71,53 @@ export default function SchoolsPage() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getSubscriptionStatusBadge = (status: string | undefined, endDate: string | undefined) => {
+    if (!status) return <Badge variant="secondary">No Status</Badge>;
+    
+    switch (status) {
+      case 'active':
+        return <Badge className="bg-green-100 text-green-800">Active</Badge>;
+      case 'expiring':
+        return <Badge className="bg-yellow-100 text-yellow-800">Expiring Soon</Badge>;
+      case 'inactive':
+        return <Badge className="bg-red-100 text-red-800">Inactive</Badge>;
+      case 'trial':
+        return <Badge className="bg-blue-100 text-blue-800">Trial</Badge>;
+      default:
+        return <Badge variant="secondary">{status}</Badge>;
+    }
+  };
+
+  const getPackageTypeBadge = (packageType: string | undefined) => {
+    if (!packageType) return <Badge variant="outline">Standard</Badge>;
+    
+    switch (packageType) {
+      case 'advanced':
+        return <Badge className="bg-purple-100 text-purple-800">Advanced</Badge>;
+      case 'standard':
+      default:
+        return <Badge variant="outline">Standard</Badge>;
+    }
+  };
+
+  const formatDaysUntilExpiry = (endDate: string | undefined) => {
+    if (!endDate) return 'No expiry date';
+    
+    const end = new Date(endDate);
+    const now = new Date();
+    const daysUntilExpiry = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (daysUntilExpiry < 0) {
+      return `Expired ${Math.abs(daysUntilExpiry)} days ago`;
+    } else if (daysUntilExpiry === 0) {
+      return 'Expires today';
+    } else if (daysUntilExpiry === 1) {
+      return 'Expires tomorrow';
+    } else {
+      return `Expires in ${daysUntilExpiry} days`;
     }
   };
 
@@ -127,12 +177,21 @@ export default function SchoolsPage() {
         </div>
         
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 flex-wrap gap-2">
             <Badge variant="outline">
               {filteredSchools.length} total
             </Badge>
             <Badge variant="secondary">
               {schools.filter(s => s.admin_user_id).length} with admin
+            </Badge>
+            <Badge className="bg-green-100 text-green-800">
+              {schools.filter(s => s.subscription_status === 'active').length} active
+            </Badge>
+            <Badge className="bg-yellow-100 text-yellow-800">
+              {schools.filter(s => s.subscription_status === 'expiring').length} expiring
+            </Badge>
+            <Badge className="bg-red-100 text-red-800">
+              {schools.filter(s => s.subscription_status === 'inactive').length} inactive
             </Badge>
           </div>
         </div>
@@ -153,6 +212,7 @@ export default function SchoolsPage() {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Admin Status</TableHead>
+                  <TableHead>Subscription</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -166,6 +226,30 @@ export default function SchoolsPage() {
                       ) : (
                         <span className="text-orange-600 text-sm">⚠ No Admin</span>
                       )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <Badge 
+                            variant={
+                              school.subscription_status === 'active' ? 'default' :
+                              school.subscription_status === 'expiring' ? 'secondary' :
+                              school.subscription_status === 'inactive' ? 'destructive' : 'outline'
+                            }
+                            className="text-xs"
+                          >
+                            {(school.subscription_status || 'pending').replace('_', ' ').toUpperCase()}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {(school.package_type || 'standard').toUpperCase()}
+                          </Badge>
+                        </div>
+                        {school.subscription_end && (
+                          <div className="text-xs text-muted-foreground">
+                            Expires: {new Date(school.subscription_end).toLocaleDateString()}
+                          </div>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">

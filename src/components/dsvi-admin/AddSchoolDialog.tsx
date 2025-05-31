@@ -3,6 +3,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { 
   Dialog, 
   DialogContent, 
   DialogDescription, 
@@ -23,7 +30,10 @@ export function AddSchoolDialog({ open, onOpenChange, onSchoolAdded }: AddSchool
   const [formData, setFormData] = useState({
     name: '',
     logo_url: '',
-    admin_email: ''
+    admin_email: '',
+    package_type: 'standard' as 'standard' | 'advanced',
+    subscription_start: new Date().toISOString().split('T')[0], // Today's date
+    subscription_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // One year from now
   });
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -39,7 +49,11 @@ export function AddSchoolDialog({ open, onOpenChange, onSchoolAdded }: AddSchool
         logo_url: formData.logo_url || null,
         admin_user_id: null, // Will be assigned later
         theme_settings: null,
-        contact_info: null
+        contact_info: null,
+        package_type: formData.package_type,
+        subscription_start: formData.subscription_start,
+        subscription_end: formData.subscription_end,
+        subscription_status: 'active'
       }, formData.admin_email);
 
       toast({
@@ -51,7 +65,10 @@ export function AddSchoolDialog({ open, onOpenChange, onSchoolAdded }: AddSchool
       setFormData({
         name: '',
         logo_url: '',
-        admin_email: ''
+        admin_email: '',
+        package_type: 'standard',
+        subscription_start: new Date().toISOString().split('T')[0],
+        subscription_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
       });
 
       onSchoolAdded();
@@ -127,6 +144,47 @@ export function AddSchoolDialog({ open, onOpenChange, onSchoolAdded }: AddSchool
             <p className="text-xs text-muted-foreground">
               Note: Admin users should sign up separately and can be linked to the school later.
             </p>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="package_type">Package Type</Label>
+            <Select 
+              value={formData.package_type} 
+              onValueChange={(value: 'standard' | 'advanced') => 
+                setFormData(prev => ({ ...prev, package_type: value }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select package type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="standard">Standard Package</SelectItem>
+                <SelectItem value="advanced">Advanced Package</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="subscription_start">Subscription Start</Label>
+              <Input
+                id="subscription_start"
+                type="date"
+                value={formData.subscription_start}
+                onChange={(e) => setFormData(prev => ({ ...prev, subscription_start: e.target.value }))}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="subscription_end">Subscription End</Label>
+              <Input
+                id="subscription_end"
+                type="date"
+                value={formData.subscription_end}
+                onChange={(e) => setFormData(prev => ({ ...prev, subscription_end: e.target.value }))}
+                required
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

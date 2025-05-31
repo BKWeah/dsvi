@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { GraduationCap, Menu, X } from 'lucide-react';
 import { gsap } from 'gsap';
@@ -13,6 +13,7 @@ export const Navigation: React.FC<NavigationProps> = ({ onLoginClick, heroRef })
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOverHero, setIsOverHero] = useState(true); // New state for hero intersection
+  const navigate = useNavigate();
   const navRef = useRef<HTMLElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
   const menuItemsRef = useRef<HTMLDivElement>(null);
@@ -22,7 +23,7 @@ export const Navigation: React.FC<NavigationProps> = ({ onLoginClick, heroRef })
     { label: 'Home', href: '#home' },
     { label: 'About', href: '#about' },
     { label: 'Team', href: '#team' },
-    { label: 'How It Works', href: '#how-it-works' },
+    // { label: 'How It Works', href: '#how-it-works' },
     { label: 'Packages', href: '#packages' },
     { label: 'Testimonials', href: '#testimonials' },
     { label: 'FAQ', href: '#faq' },
@@ -79,6 +80,9 @@ export const Navigation: React.FC<NavigationProps> = ({ onLoginClick, heroRef })
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
       }
+    } else if (href.startsWith('/')) {
+      // Handle route navigation
+      navigate(href);
     }
     setIsMenuOpen(false);
   };
