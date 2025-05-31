@@ -116,7 +116,7 @@
       }
     },
     "subscriptions": {
-      "enabled": true,
+      "enabled": false,
       "description": "Subscription tracking and management",
       "route": "/dsvi-admin/subscriptions",
       "priority": 4,
@@ -149,7 +149,7 @@
       }
     },
     "messaging": {
-      "enabled": true,
+      "enabled": false,
       "description": "Messaging and communication system",
       "route": "/dsvi-admin/messaging",
       "priority": 5,
