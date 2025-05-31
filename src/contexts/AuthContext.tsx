@@ -174,7 +174,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    try {
+      // Clear local storage items related to Supabase session
+      localStorage.removeItem('sb-rzfilfpjxfinxxfldzuv-auth-token');
+      localStorage.removeItem('sb-rzfilfpjxfinxxfldzuv-auth-token-refresh');
+      localStorage.removeItem('sb-rzfilfpjxfinxxfldzuv-auth-token-expires-at');
+      localStorage.removeItem('sb-rzfilfpjxfinxxfldzuv-auth-token-type');
+      localStorage.removeItem('sb-rzfilfpjxfinxxfldzuv-auth-token-value');
+
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Logout error:', error);
+      } else {
+        console.log('User logged out successfully.');
+      }
+    } catch (err) {
+      console.error('An unexpected error occurred during logout:', err);
+    }
   };
 
   const value: AuthContextType = {

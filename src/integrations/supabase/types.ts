@@ -678,6 +678,15 @@ export type Database = {
         Args: {}
         Returns: number
       }
+      upsert_user_profile: {
+        Args: {
+          p_user_id: string;
+          p_email: string;
+          p_role: string;
+          p_name: string;
+        };
+        Returns: void; // Assuming it doesn't return a specific value that's used
+      };
     }
     Enums: {
       [_ in never]: never
