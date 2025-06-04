@@ -12,7 +12,8 @@ export const TeamSection: React.FC = () => {
       department: "Leadership",
       avatar: "JG",
       icon: Briefcase,
-      description: "Originator and steward of DSVI's long-term mission, driving strategic direction, public trust, and institutional impact."
+      description: "Originator and steward of DSVI's long-term mission, driving strategic direction, public trust, and institutional impact.",
+      hasPhoto: true
     },
     {
       name: "B. K. Weah, Jr.",
@@ -157,11 +158,13 @@ export const TeamSection: React.FC = () => {
               <Card key={index} className={`border-none shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 bg-white ${member.isVacant ? 'opacity-75' : ''}`}>
                 <CardContent className="p-8 text-center">
                   <div className="relative mb-6">
-                    {member.hasPhoto && member.name === "B. K. Weah, Jr." ? (
+                    {member.hasPhoto ? (
                       <div className="w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-4 border-gradient-to-br from-blue-600 to-green-600">
                         <img 
-                          src="/updates_assets/B. K. Weah Pro.jpg" 
-                          alt="B. K. Weah, Jr."
+                          src={member.name === "B. K. Weah, Jr." ? "/updates_assets/B. K. Weah Pro.jpg" : 
+                               member.name === "John Gyawu" ? "/updates_assets/MR. JOHN GYAWU.jpg" : 
+                               ""} 
+                          alt={member.name}
                           className="w-full h-full object-cover object-top"
                           style={{ objectPosition: '50% 0%' }}
                         />
