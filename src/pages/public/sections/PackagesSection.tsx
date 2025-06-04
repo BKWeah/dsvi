@@ -12,13 +12,13 @@ interface PackageSectionProps {
 export const PackagesSection: React.FC<PackageSectionProps> = () => {
   const packages = [
     {
-      name: "Standard Package",
-      price: "$100",
-      period: "/year",
+      name: "Prime Essentials Package",
+      price: "$200",
+      period: "", // Removed /year as per new pricing
       popular: false,
       features: [
         "Professional website design",
-        "5 pages (Home, About, Programs, Contact, News)",
+        "6 pages (Home, About Us, Academics, Admissions, Faculty & Staff, Contact Us)",
         "Mobile-responsive design",
         "Basic SEO optimization",
         "Contact forms",
@@ -32,13 +32,13 @@ export const PackagesSection: React.FC<PackageSectionProps> = () => {
       buttonColor: "bg-blue-600 hover:bg-blue-700"
     },
     {
-      name: "Prime Essentials",
-      price: "$150",
-      period: "/year",
+      name: "Prime Elite Package",
+      price: "$350",
+      period: "", // Removed /year as per new pricing
       popular: true,
       features: [
-        "Everything in Standard",
-        "10 pages with custom layouts",
+        "Everything in Prime Essentials", // Refers to the new Prime Essentials
+        "Unlimited pages with custom layouts", // Updated from 10 pages
         "Advanced SEO optimization",
         "Student portal integration",
         "Event calendar",
@@ -46,32 +46,19 @@ export const PackagesSection: React.FC<PackageSectionProps> = () => {
         "5 GB storage",
         "Advanced analytics",
         "Priority support",
-        "Custom color scheme"
+        "Custom color scheme",
+        "E-learning platform integration", // Added from old Prime Elite
+        "Online admission system", // Added from old Prime Elite
+        "Payment gateway integration", // Added from old Prime Elite
+        "Multi-language support", // Added from old Prime Elite
+        "10 GB storage", // Updated from 5 GB
+        "Custom domain included", // Added from old Prime Elite
+        "24/7 premium support", // Added from old Prime Elite
+        "Monthly design updates" // Added from old Prime Elite
       ],
       icon: Star,
       color: "border-green-200",
       buttonColor: "bg-green-600 hover:bg-green-700"
-    },
-    {
-      name: "Prime Elite",
-      price: "$200",
-      period: "/year",
-      popular: false,
-      features: [
-        "Everything in Prime Essentials",
-        "Unlimited pages",
-        "E-learning platform integration",
-        "Online admission system",
-        "Payment gateway integration",
-        "Multi-language support",
-        "10 GB storage",
-        "Custom domain included",
-        "24/7 premium support",
-        "Monthly design updates"
-      ],
-      icon: Crown,
-      color: "border-purple-200",
-      buttonColor: "bg-purple-600 hover:bg-purple-700"
     }
   ];
 

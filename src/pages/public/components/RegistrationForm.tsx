@@ -134,12 +134,12 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSubmit }) 
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm mt-1"
           >
             <option value="">Select type</option>
-            <option value="public">Public School</option>
             <option value="private">Private School</option>
-            <option value="charter">Charter School</option>
+            <option value="public">Public School</option>
             <option value="vocational">Vocational School</option>
-            <option value="university">University</option>
             <option value="college">College</option>
+            <option value="university">University</option>
+            <option value="polytechnic">Polytechnic</option>
           </select>
         </div>
         <div>
