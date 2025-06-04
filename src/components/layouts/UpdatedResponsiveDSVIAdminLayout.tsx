@@ -1,8 +1,10 @@
 import React from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAdmin } from '@/lib/admin/useAdmin';
 import { useFeature } from '@/contexts/FeatureFlagContext';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { BottomAppBar } from '@/components/mobile/BottomAppBar';
 import { 
   Sidebar, 
@@ -15,11 +17,30 @@ import {
   SidebarTrigger,
   SidebarSeparator
 } from '@/components/ui/sidebar';
-import { School, LogOut, Users, BarChart3, CreditCard, MessageSquare, Settings2 } from 'lucide-react';
+import { 
+  School, 
+  LogOut, 
+  Users, 
+  BarChart3, 
+  CreditCard, 
+  MessageSquare, 
+  Settings2,
+  UserCog,
+  Crown,
+  Shield
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { PERMISSION_TYPES, RESTRICTED_PERMISSIONS } from '@/lib/admin/permissions';
 
 export function UpdatedResponsiveDSVIAdminLayout() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+  const { 
+    adminLevel, 
+    isLevel1Admin, 
+    isLevel2Admin, 
+    hasPermission, 
+    loading: adminLoading 
+  } = useAdmin();
   const navigate = useNavigate();
 
   // Feature flag checks with fallback to true (non-destructive)
@@ -45,6 +66,30 @@ export function UpdatedResponsiveDSVIAdminLayout() {
     navigate('/login');
   };
 
+  // Helper function to check if user can access a feature
+  const canAccessFeature = (permission: string, restrictedPermission?: string) => {
+    if (adminLoading) return false;
+    
+    // If it's a restricted permission, only Level 1 admins can access
+    if (restrictedPermission && !isLevel1Admin) return false;
+    
+    // Level 1 admins can access everything
+    if (isLevel1Admin) return true;
+    
+    // Level 2 admins need specific permissions
+    if (isLevel2Admin) return hasPermission(permission);
+    
+    return false;
+  };
+
+  if (adminLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Mobile Layout with Bottom App Bar */}
@@ -61,7 +106,24 @@ export function UpdatedResponsiveDSVIAdminLayout() {
           <div className="min-h-screen flex w-full">
             <Sidebar>
               <SidebarHeader className="p-4">
-                <h2 className="text-lg font-semibold">DSVI Admin</h2>
+                <div className="space-y-2">
+                  <h2 className="text-lg font-semibold">DSVI Admin</h2>
+                  <div className="flex items-center gap-2">
+                    {isLevel1Admin ? (
+                      <Badge className="bg-purple-100 text-purple-800">
+                        <Crown className="h-3 w-3 mr-1" />
+                        Level 1 (Super Admin)
+                      </Badge>
+                    ) : isLevel2Admin ? (
+                      <Badge className="bg-blue-100 text-blue-800">
+                        <Shield className="h-3 w-3 mr-1" />
+                        Level 2 (Assigned Staff)
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline">Admin</Badge>
+                    )}
+                  </div>
+                </div>
               </SidebarHeader>
               <SidebarContent>
                 <SidebarMenu>
@@ -75,7 +137,7 @@ export function UpdatedResponsiveDSVIAdminLayout() {
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   )}
-                  {isSchoolsEnabled && (
+                  {isSchoolsEnabled && canAccessFeature(PERMISSION_TYPES.CMS_ACCESS) && (
                     <SidebarMenuItem>
                       <SidebarMenuButton asChild>
                         <Link to="/dsvi-admin/schools">
@@ -85,7 +147,7 @@ export function UpdatedResponsiveDSVIAdminLayout() {
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   )}
-                  {isRequestsEnabled && (
+                  {isRequestsEnabled && canAccessFeature(PERMISSION_TYPES.CMS_ACCESS, RESTRICTED_PERMISSIONS.APPROVE_SCHOOL_REQUESTS) && (
                     <SidebarMenuItem>
                       <SidebarMenuButton asChild>
                         <Link to="/dsvi-admin/requests">
@@ -95,7 +157,7 @@ export function UpdatedResponsiveDSVIAdminLayout() {
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   )}
-                  {isSubscriptionsEnabled && (
+                  {isSubscriptionsEnabled && canAccessFeature(PERMISSION_TYPES.SUBSCRIPTION_VIEW) && (
                     <SidebarMenuItem>
                       <SidebarMenuButton asChild>
                         <Link to="/dsvi-admin/subscriptions">
@@ -105,7 +167,7 @@ export function UpdatedResponsiveDSVIAdminLayout() {
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   )}
-                  {isMessagingEnabled && (
+                  {isMessagingEnabled && canAccessFeature(PERMISSION_TYPES.MESSAGING) && (
                     <SidebarMenuItem>
                       <SidebarMenuButton asChild>
                         <Link to="/dsvi-admin/messaging">
@@ -114,6 +176,29 @@ export function UpdatedResponsiveDSVIAdminLayout() {
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
+                  )}
+                  
+                  {/* Admin Management - Level 1 Only */}
+                  {isLevel1Admin && (
+                    <>
+                      <SidebarSeparator />
+                      <SidebarMenuItem>
+                        <SidebarMenuButton asChild>
+                          <Link to="/dsvi-admin/admin-management">
+                            <UserCog className="h-4 w-4" />
+                            <span>Admin Management</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                      <SidebarMenuItem>
+                        <SidebarMenuButton asChild>
+                          <Link to="/dsvi-admin/admin-test">
+                            <Settings2 className="h-4 w-4" />
+                            <span>Test Admin System</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    </>
                   )}
                   
                   <SidebarSeparator />

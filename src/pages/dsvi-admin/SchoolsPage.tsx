@@ -2,18 +2,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useAdmin } from '@/lib/admin/useAdmin';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Plus, ExternalLink, Edit, Settings, UserPlus, Search } from 'lucide-react';
+import { Plus, ExternalLink, Edit, Settings, UserPlus, Search, Lock } from 'lucide-react';
 import { AddSchoolDialog } from '@/components/dsvi-admin/AddSchoolDialog';
 import { InviteSchoolAdminDialog } from '@/components/dsvi-admin/InviteSchoolAdminDialog';
 import { MobileCard } from '@/components/mobile/MobileCard';
 import { MobileTopBar } from '@/components/mobile/MobileTopBar';
 import { useToast } from '@/hooks/use-toast';
 import { generateSchoolHomepageUrl } from '@/lib/subdomain-utils';
+import { PERMISSION_TYPES, RESTRICTED_PERMISSIONS } from '@/lib/admin/permissions';
 
 interface School {
   id: string;
@@ -26,6 +28,15 @@ interface School {
 }
 
 export default function SchoolsPage() {
+  const { 
+    isLevel1Admin, 
+    isLevel2Admin, 
+    hasPermission, 
+    hasSchoolAccess, 
+    assignedSchools,
+    adminLevel,
+    loading: adminLoading 
+  } = useAdmin();
   const [schools, setSchools] = useState<School[]>([]);
   const [filteredSchools, setFilteredSchools] = useState<School[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,8 +46,14 @@ export default function SchoolsPage() {
   const [selectedSchool, setSelectedSchool] = useState<School | null>(null);
   const { toast } = useToast();
 
+  // Check if user has permission to access schools
+  const hasSchoolsAccess = hasPermission(PERMISSION_TYPES.CMS_ACCESS);
+  
   useEffect(() => {
-    fetchSchools();
+    // Only fetch schools when admin loading is complete AND we have a valid admin level
+    if (!adminLoading && adminLevel !== null && hasSchoolsAccess) {
+      fetchSchools();
+    }
     
     // Listen for add school dialog event from bottom app bar
     const handleOpenAddDialog = () => setShowAddDialog(true);
@@ -45,23 +62,26 @@ export default function SchoolsPage() {
     return () => {
       window.removeEventListener('openAddSchoolDialog', handleOpenAddDialog);
     };
-  }, []);
-
-  useEffect(() => {
-    const filtered = schools.filter(school =>
-      school.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredSchools(filtered);
-  }, [schools, searchQuery]);
+  }, [adminLoading, adminLevel, assignedSchools, hasSchoolsAccess]);
 
   const fetchSchools = async () => {
     try {
-      const { data, error } = await supabase
+      setLoading(true);
+      
+      let query = supabase
         .from('schools')
         .select('*')
-        .order('name');
+        .order('name', { ascending: true });
+
+      // Level 2 admins only see their assigned schools
+      if (isLevel2Admin && assignedSchools.length > 0) {
+        query = query.in('id', assignedSchools);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
+
       setSchools(data || []);
     } catch (error) {
       console.error('Error fetching schools:', error);
@@ -74,6 +94,13 @@ export default function SchoolsPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const filtered = schools.filter(school =>
+      school.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredSchools(filtered);
+  }, [schools, searchQuery]);
 
   const getSubscriptionStatusBadge = (status: string | undefined, endDate: string | undefined) => {
     if (!status) return <Badge variant="secondary">No Status</Badge>;
@@ -131,6 +158,63 @@ export default function SchoolsPage() {
     setSelectedSchool(school);
     setShowInviteDialog(true);
   };
+
+  // Show loading while admin level is being determined
+  if (adminLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">Schools Management</h1>
+            <p className="text-muted-foreground">Loading admin permissions...</p>
+          </div>
+        </div>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error if admin level couldn't be determined
+  if (adminLevel === null) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">Schools Management</h1>
+            <p className="text-muted-foreground text-red-600">Admin level could not be determined. Please contact support.</p>
+          </div>
+        </div>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-muted-foreground mb-4">Unable to access schools management.</p>
+            <p className="text-sm text-muted-foreground">If you just signed up, please try refreshing the page.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if user has permission to access schools
+  if (!hasSchoolsAccess) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">Schools Management</h1>
+            <p className="text-muted-foreground">Access denied</p>
+          </div>
+        </div>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <Lock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">You don't have permission to access schools management.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

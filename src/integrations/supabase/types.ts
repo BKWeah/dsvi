@@ -647,6 +647,151 @@ export type Database = {
           },
         ]
       }
+      admin_profiles: {
+        Row: {
+          id: string
+          user_id: string
+          admin_level: number
+          created_by: string | null
+          created_at: string
+          updated_at: string
+          is_active: boolean
+          notes: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          admin_level: number
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+          is_active?: boolean
+          notes?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          admin_level?: number
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+          is_active?: boolean
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_profiles_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_permissions: {
+        Row: {
+          id: string
+          admin_user_id: string
+          permission_type: string
+          resource_id: string | null
+          granted_by: string | null
+          created_at: string
+          expires_at: string | null
+          is_active: boolean
+        }
+        Insert: {
+          id?: string
+          admin_user_id: string
+          permission_type: string
+          resource_id?: string | null
+          granted_by?: string | null
+          created_at?: string
+          expires_at?: string | null
+          is_active?: boolean
+        }
+        Update: {
+          id?: string
+          admin_user_id?: string
+          permission_type?: string
+          resource_id?: string | null
+          granted_by?: string | null
+          created_at?: string
+          expires_at?: string | null
+          is_active?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_permissions_admin_user_id_fkey"
+            columns: ["admin_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_permissions_granted_by_fkey"
+            columns: ["granted_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_assignments: {
+        Row: {
+          id: string
+          admin_user_id: string
+          school_id: string
+          assigned_by: string | null
+          created_at: string
+          is_active: boolean
+        }
+        Insert: {
+          id?: string
+          admin_user_id: string
+          school_id: string
+          assigned_by?: string | null
+          created_at?: string
+          is_active?: boolean
+        }
+        Update: {
+          id?: string
+          admin_user_id?: string
+          school_id?: string
+          assigned_by?: string | null
+          created_at?: string
+          is_active?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_assignments_admin_user_id_fkey"
+            columns: ["admin_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_assignments_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_assignments_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -685,8 +830,57 @@ export type Database = {
           p_role: string;
           p_name: string;
         };
-        Returns: void; // Assuming it doesn't return a specific value that's used
-      };
+        Returns: void;
+      }
+      get_admin_level: {
+        Args: {
+          user_id: string;
+        };
+        Returns: number;
+      }
+      has_admin_permission: {
+        Args: {
+          user_id: string;
+          permission_type: string;
+          resource_id?: string;
+        };
+        Returns: boolean;
+      }
+      get_assigned_schools: {
+        Args: {
+          user_id: string;
+        };
+        Returns: {
+          school_id: string;
+        }[];
+      }
+      create_admin_profile: {
+        Args: {
+          target_user_id: string;
+          admin_level: number;
+          created_by_user_id: string;
+          notes?: string;
+        };
+        Returns: string;
+      }
+      grant_admin_permission: {
+        Args: {
+          target_user_id: string;
+          permission_type: string;
+          resource_id?: string;
+          granted_by_user_id?: string;
+          expires_at?: string;
+        };
+        Returns: string;
+      }
+      assign_school_to_admin: {
+        Args: {
+          target_user_id: string;
+          target_school_id: string;
+          assigned_by_user_id: string;
+        };
+        Returns: string;
+      }
     }
     Enums: {
       [_ in never]: never

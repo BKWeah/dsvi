@@ -184,12 +184,12 @@ export default function RegisterPage() {
                               <SelectValue placeholder="Select school type" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="elementary">Elementary School</SelectItem>
-                              <SelectItem value="junior_high">Junior High School</SelectItem>
-                              <SelectItem value="senior_high">Senior High School</SelectItem>
-                              <SelectItem value="combined">Combined School</SelectItem>
                               <SelectItem value="private">Private School</SelectItem>
+                              <SelectItem value="public">Public School</SelectItem>
                               <SelectItem value="vocational">Vocational School</SelectItem>
+                              <SelectItem value="college">College</SelectItem>
+                              <SelectItem value="university">University</SelectItem>
+                              <SelectItem value="polytechnic">Polytechnic</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>

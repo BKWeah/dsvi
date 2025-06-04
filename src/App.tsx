@@ -9,6 +9,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { FeatureFlagProvider } from "./contexts/FeatureFlagContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { AdminProtectedRoute } from "./components/AdminProtectedRoute";
 import { FeatureProtectedRoute } from "./components/feature-flags/FeatureProtectedRoute";
 import { UpdatedResponsiveDSVIAdminLayout } from "./components/layouts/UpdatedResponsiveDSVIAdminLayout";
 import { UpdatedResponsiveSchoolAdminLayout } from "./components/layouts/UpdatedResponsiveSchoolAdminLayout";
@@ -18,6 +19,7 @@ import { SchoolPageDisplay } from "./components/public/SchoolPageDisplay";
 import { SubdomainSchoolPageDisplay } from "./components/public/SubdomainSchoolPageDisplay";
 import { getSubdomainInfo, getCurrentSchoolSlug, isSubdomainRouting } from "./lib/subdomain-utils";
 import { SchoolRedirectHandler } from "./components/redirects/SchoolRedirectHandler";
+import { PERMISSION_TYPES, RESTRICTED_PERMISSIONS } from "./lib/admin/permissions";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -46,6 +48,9 @@ import EditPagePage from "./pages/dsvi-admin/EditPagePage";
 import SchoolSettingsPage from "./pages/dsvi-admin/SchoolSettingsPage";
 import SubscriptionTrackerPage from "./pages/dsvi-admin/SubscriptionTrackerPage";
 import MessagingPanelPage from "./pages/dsvi-admin/MessagingPanelPage";
+import AdminManagementPage from "./pages/dsvi-admin/AdminManagementPage";
+import AdminLevelTestPage from "./pages/dsvi-admin/AdminLevelTestPage";
+import Level2AdminSignupPage from "./pages/Level2AdminSignupPage";
 import SchoolAdminDashboard from "./pages/school-admin/SchoolAdminDashboard";
 import EditSchoolPagePage from "./pages/school-admin/EditSchoolPagePage";
 import SchoolBrandingPageAdmin from "./pages/school-admin/SchoolBrandingPageAdmin";
@@ -83,6 +88,7 @@ const App = () => {
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/level2-admin-signup" element={<Level2AdminSignupPage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
             
@@ -112,9 +118,9 @@ const App = () => {
             <Route 
               path="/dsvi-admin" 
               element={
-                <ProtectedRoute roles={['DSVI_ADMIN']}>
+                <AdminProtectedRoute allowedRoles={['DSVI_ADMIN']}>
                   <UpdatedResponsiveDSVIAdminLayout />
-                </ProtectedRoute>
+                </AdminProtectedRoute>
               }
             >
               <Route index element={
@@ -146,6 +152,16 @@ const App = () => {
                 <FeatureProtectedRoute feature="messaging">
                   <MessagingPanelPage />
                 </FeatureProtectedRoute>
+              } />
+              <Route path="admin-management" element={
+                <AdminProtectedRoute requireLevel1={true}>
+                  <AdminManagementPage />
+                </AdminProtectedRoute>
+              } />
+              <Route path="admin-test" element={
+                <AdminProtectedRoute allowedRoles={['DSVI_ADMIN']}>
+                  <AdminLevelTestPage />
+                </AdminProtectedRoute>
               } />
               <Route path="schools/:schoolId/content" element={
                 <FeatureProtectedRoute feature="schools">
