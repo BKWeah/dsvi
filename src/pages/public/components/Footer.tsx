@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { GraduationCap, Mail, Phone, MapPin, MessageSquare, Globe, ExternalLink } from 'lucide-react';
+import { Mail, Phone, MapPin, MessageSquare, Globe, ExternalLink } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const handleSmoothScroll = (href: string) => {
@@ -19,9 +19,7 @@ export const Footer: React.FC = () => {
           {/* Brand Section */}
           <div>
             <div className="flex items-center space-x-3 mb-6">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-green-400 rounded-lg flex items-center justify-center">
-                <GraduationCap className="h-6 w-6 text-white" />
-              </div>
+              <img src="/updates_assets/DSVI Official Logo.png" alt="DSVI Official Logo" className="h-10 w-10 object-contain" />
               <div>
                 <span className="text-xl font-bold">DSVI</span>
                 <p className="text-xs text-gray-400 -mt-1">Digital School Visibility Initiative</p>

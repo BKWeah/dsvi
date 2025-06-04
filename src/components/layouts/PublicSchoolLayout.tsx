@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
 import { FullScreenMobileMenu } from '@/components/mobile/FullScreenMobileMenu';
 import { useTheme } from '@/contexts/ThemeContext';
+import { generateSchoolUrl } from '@/lib/subdomain-utils';
 import { School } from '@/lib/types';
 
 const PAGE_TYPES = [
@@ -71,13 +72,35 @@ export function PublicSchoolLayout() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--theme-background, #ffffff)' }}>
-      <header 
-        className="shadow-sm border-b relative" 
-        style={{ 
-          backgroundColor: 'var(--theme-surface, #ffffff)',
-          borderColor: 'var(--theme-border, #e2e8f0)'
-        }}
-      >
+      <header className="sticky top-0 z-50 w-full bg-white shadow-sm border-b">
+        {/* Top contact bar - hidden on mobile */}
+        <div className="hidden md:block bg-gray-50 border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+            <div className="flex items-center justify-between text-sm text-gray-600">
+              <div className="flex items-center space-x-6">
+                {school.contact_info?.phone && (
+                  <div className="flex items-center space-x-2">
+                    <span>📞</span>
+                    <span>{school.contact_info.phone}</span>
+                  </div>
+                )}
+                {school.contact_info?.email && (
+                  <div className="flex items-center space-x-2">
+                    <span>✉️</span>
+                    <span>{school.contact_info.email}</span>
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center space-x-4">
+                <button className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">
+                  Apply Now
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Main navigation */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -105,7 +128,7 @@ export function PublicSchoolLayout() {
               {PAGE_TYPES.map((pageType) => (
                 <Link
                   key={pageType.type}
-                  to={`/s/${school.slug}/${pageType.type}`}
+                  to={generateSchoolUrl(school.slug, pageType.type)}
                   className="px-3 py-2 text-sm font-medium transition-colors hover:opacity-75"
                   style={{ 
                     color: 'var(--theme-text-secondary, #475569)',
@@ -130,54 +153,102 @@ export function PublicSchoolLayout() {
         <Outlet />
       </main>
 
-      {/* <footer className="bg-gray-50 border-t">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
-            <p>© {new Date().getFullYear()} {school.name}. Powered by DSVI.</p>
-          </div>
-        </div>
-      </footer> */}
+      {/* DSVI Standard Footer */}
+      <footer className="bg-slate-950 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* School Info */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3">
+                {school.logo_url && (
+                  <img 
+                    src={school.logo_url} 
+                    alt={`${school.name} Logo`} 
+                    className="h-8 w-auto brightness-0 invert"
+                  />
+                )}
+                <h3 className="text-lg font-bold">{school.name}</h3>
+              </div>
+              <p className="text-slate-300 text-sm leading-relaxed">
+                Empowering students to reach their full potential through quality education and character development.
+              </p>
+            </div>
 
-      {/* Footer */}
-      <footer 
-        className="mt-12 pt-8 border-t text-center"
-        style={{ 
-          backgroundColor: 'var(--theme-surface, #f8fafc)',
-          borderColor: 'var(--theme-border, #e2e8f0)',
-          color: 'var(--theme-text-secondary, #475569)'
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <p 
-              className="text-sm mb-4 md:mb-0"
-              style={{ color: 'var(--theme-text-muted, #94a3b8)' }}
-            >
-              &copy; {new Date().getFullYear()} DSVI. All rights reserved.
-            </p>
-            <nav className="flex space-x-4">
-              <a 
-                href="#" 
-                className="text-sm hover:opacity-75 transition-colors"
-                style={{ color: 'var(--theme-text-muted, #94a3b8)' }}
-              >
-                Privacy Policy
-              </a>
-              <a 
-                href="#" 
-                className="text-sm hover:opacity-75 transition-colors"
-                style={{ color: 'var(--theme-text-muted, #94a3b8)' }}
-              >
-                Terms of Service
-              </a>
-              <a 
-                href="#" 
-                className="text-sm hover:opacity-75 transition-colors"
-                style={{ color: 'var(--theme-text-muted, #94a3b8)' }}
-              >
-                Contact Us
-              </a>
-            </nav>
+            {/* Quick Links */}
+            <div>
+              <h4 className="font-semibold mb-4">Quick Links</h4>
+              <ul className="space-y-2">
+                {PAGE_TYPES.map((pageType) => (
+                  <li key={pageType.type}>
+                    <Link
+                      to={generateSchoolUrl(school.slug, pageType.type)}
+                      className="text-slate-300 hover:text-white transition-colors text-sm"
+                    >
+                      {pageType.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Contact Info */}
+            <div>
+              <h4 className="font-semibold mb-4">Contact Information</h4>
+              <div className="space-y-3">
+                {school.contact_info?.address && (
+                  <div className="flex items-start space-x-3">
+                    <span className="text-slate-400">📍</span>
+                    <span className="text-slate-300 text-sm">{school.contact_info.address}</span>
+                  </div>
+                )}
+                {school.contact_info?.phone && (
+                  <div className="flex items-center space-x-3">
+                    <span className="text-slate-400">📞</span>
+                    <span className="text-slate-300 text-sm">{school.contact_info.phone}</span>
+                  </div>
+                )}
+                {school.contact_info?.email && (
+                  <div className="flex items-center space-x-3">
+                    <span className="text-slate-400">✉️</span>
+                    <span className="text-slate-300 text-sm">{school.contact_info.email}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Social & Actions */}
+            <div>
+              <h4 className="font-semibold mb-4">Connect With Us</h4>
+              <div className="space-y-4">
+                <div className="flex space-x-3">
+                  <button className="w-8 h-8 bg-blue-600 rounded text-white text-sm">f</button>
+                  <button className="w-8 h-8 bg-pink-600 rounded text-white text-sm">i</button>
+                  <button className="w-8 h-8 bg-blue-400 rounded text-white text-sm">t</button>
+                </div>
+                <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                  Apply Now
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div className="border-t border-slate-800 mt-8 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center text-sm text-slate-400">
+              <div>
+                <p>&copy; {new Date().getFullYear()} {school.name}. All rights reserved.</p>
+              </div>
+              <div className="flex items-center space-x-1 mt-4 md:mt-0">
+                <span>Built with ❤️ by</span>
+                <a 
+                  href="https://dsvi.com" 
+                  className="text-white hover:text-blue-400 transition-colors font-medium"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  DSVI
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </footer>

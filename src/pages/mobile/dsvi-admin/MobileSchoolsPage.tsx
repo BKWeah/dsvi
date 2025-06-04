@@ -10,6 +10,7 @@ import { MobileCard } from '@/components/mobile/MobileCard';
 import { AddSchoolDialog } from '@/components/dsvi-admin/AddSchoolDialog';
 import { InviteSchoolAdminDialog } from '@/components/dsvi-admin/InviteSchoolAdminDialog';
 import { useToast } from '@/hooks/use-toast';
+import { generateSchoolHomepageUrl } from '@/lib/subdomain-utils';
 
 interface School {
   id: string;
@@ -153,7 +154,7 @@ export default function MobileSchoolsPage() {
               {
                 label: "View",
                 icon: <ExternalLink className="h-3 w-3" />,
-                onClick: () => window.open(`/s/${school.slug}/homepage`, '_blank')
+                onClick: () => window.open(generateSchoolHomepageUrl(school.slug), '_blank')
               }
             ]}
           />

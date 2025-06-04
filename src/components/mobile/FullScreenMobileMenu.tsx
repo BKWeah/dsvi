@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Home, Info, GraduationCap, UserCheck, Users, Phone } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { isSubdomainRouting, generateSchoolUrl } from '@/lib/subdomain-utils';
 
 interface FullScreenMobileMenuProps {
   schoolSlug: string;
@@ -10,14 +11,45 @@ interface FullScreenMobileMenuProps {
 
 export function FullScreenMobileMenu({ schoolSlug, currentPage }: FullScreenMobileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const isSubdomain = isSubdomainRouting();
 
   const menuItems = [
-    { slug: 'homepage', label: 'Home', icon: Home, path: `/s/${schoolSlug}` },
-    { slug: 'about-us', label: 'About Us', icon: Info, path: `/s/${schoolSlug}/about-us` },
-    { slug: 'academics', label: 'Academics', icon: GraduationCap, path: `/s/${schoolSlug}/academics` },
-    { slug: 'admissions', label: 'Admissions', icon: UserCheck, path: `/s/${schoolSlug}/admissions` },
-    { slug: 'faculty', label: 'Faculty', icon: Users, path: `/s/${schoolSlug}/faculty` },
-    { slug: 'contact', label: 'Contact', icon: Phone, path: `/s/${schoolSlug}/contact` }
+    { 
+      slug: 'homepage', 
+      label: 'Home', 
+      icon: Home, 
+      path: isSubdomain ? '/' : generateSchoolUrl(schoolSlug, 'homepage')
+    },
+    { 
+      slug: 'about-us', 
+      label: 'About Us', 
+      icon: Info, 
+      path: isSubdomain ? '/about-us' : generateSchoolUrl(schoolSlug, 'about-us')
+    },
+    { 
+      slug: 'academics', 
+      label: 'Academics', 
+      icon: GraduationCap, 
+      path: isSubdomain ? '/academics' : generateSchoolUrl(schoolSlug, 'academics')
+    },
+    { 
+      slug: 'admissions', 
+      label: 'Admissions', 
+      icon: UserCheck, 
+      path: isSubdomain ? '/admissions' : generateSchoolUrl(schoolSlug, 'admissions')
+    },
+    { 
+      slug: 'faculty', 
+      label: 'Faculty', 
+      icon: Users, 
+      path: isSubdomain ? '/faculty' : generateSchoolUrl(schoolSlug, 'faculty')
+    },
+    { 
+      slug: 'contact', 
+      label: 'Contact', 
+      icon: Phone, 
+      path: isSubdomain ? '/contact' : generateSchoolUrl(schoolSlug, 'contact')
+    }
   ];
 
   return (

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subdomain Routing Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .code-block {
+            background: #f4f4f4;
+            padding: 15px;
+            border-left: 4px solid #007acc;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .example {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            padding: 10px;
+            border-left: 4px solid #ffc107;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Subdomain Routing Implementation for DSVI Schools</h1>
+    
+    <h2>Overview</h2>
+    <p>The webapp now supports accessing schools via subdomains (e.g., <code>harvard.site.com</code>) instead of only path-based routing (e.g., <code>site.com/s/harvard</code>).</p>
+    
+    <h2>How It Works</h2>
+    
+    <h3>1. Subdomain Detection</h3>
+    <p>The application checks the Host header to determine if a request is coming from a subdomain:</p>
+    <div class="code-block">
+// Extract subdomain from hostname
+hostname: "harvard.site.com"
+subdomain: "harvard"
+domain: "site.com"
+    </div>
+    
+    <h3>2. Routing Logic</h3>
+    <p>The App component now includes conditional routing:</p>
+    <div class="code-block">
+if (subdomainInfo.isSubdomain && subdomainInfo.schoolSlug) {
+  // Use SubdomainSchoolLayout for subdomain routing
+  return subdomain school pages
+} else {
+  // Use original routing for main domain
+  return regular app routes
+}
+    </div>
+    
+    <h2>Examples</h2>
+    
+    <div class="example">
+        <h4>Subdomain Access:</h4>
+        <ul>
+            <li><code>harvard.site.com</code> → Harvard homepage</li>
+            <li><code>harvard.site.com/about-us</code> → Harvard about page</li>
+            <li><code>harvard.site.com/admissions</code> → Harvard admissions page</li>
+        </ul>
+    </div>
+    
+    <div class="example">
+        <h4>Path-based Access (still works):</h4>
+        <ul>
+            <li><code>site.com/s/harvard</code> → Harvard homepage</li>
+            <li><code>site.com/s/harvard/about-us</code> → Harvard about page</li>
+            <li><code>site.com/s/harvard/admissions</code> → Harvard admissions page</li>
+        </ul>
+    </div>
+    
+    <h2>Technical Implementation</h2>
+    
+    <h3>Key Files Created/Modified:</h3>
+    <ul>
+        <li><code>src/lib/subdomain-utils.ts</code> - Utilities for subdomain detection and URL generation</li>
+        <li><code>src/hooks/useSubdomainSchool.ts</code> - Hook for fetching school data from subdomain</li>
+        <li><code>src/components/layouts/SubdomainSchoolLayout.tsx</code> - Layout for subdomain pages</li>
+        <li><code>src/components/public/SubdomainSchoolPageDisplay.tsx</code> - Page component for subdomain routing</li>
+        <li><code>src/App.tsx</code> - Modified to include subdomain routing logic</li>
+    </ul>
+    
+    <h3>How Navigation Works:</h3>
+    <p>The <code>generateSchoolUrl()</code> function intelligently creates URLs based on context:</p>
+    <div class="code-block">
+// If user is on harvard.site.com
+generateSchoolUrl("harvard", "about-us") 
+// Returns: "/about-us" (relative URL)
+
+// If user is on site.com
+generateSchoolUrl("harvard", "about-us") 
+// Returns: "/s/harvard/about-us" (path-based URL)
+    </div>
+    
+    <div class="warning">
+        <h4>DNS Configuration Required</h4>
+        <p>For subdomain routing to work in production, you'll need to configure DNS to point wildcard subdomains (*.site.com) to your server. For development, you can test by adding entries to your hosts file or using a service like ngrok.</p>
+    </div>
+    
+    <h2>Testing the Implementation</h2>
+    
+    <h3>Development Testing:</h3>
+    <ol>
+        <li>Start the development server: <code>npm run dev</code></li>
+        <li>Edit your hosts file to add: <code>127.0.0.1 test-school.localhost</code></li>
+        <li>Visit <code>http://test-school.localhost:3000</code> (replace with actual school slug)</li>
+    </ol>
+    
+    <h3>Production Setup:</h3>
+    <ol>
+        <li>Configure DNS wildcard: <code>*.yourdomain.com</code> → your server</li>
+        <li>Update your web server (nginx/apache) to handle wildcard subdomains</li>
+        <li>Test with actual school subdomains</li>
+    </ol>
+    
+    <h2>Benefits</h2>
+    <ul>
+        <li><strong>Better branding:</strong> Schools get their own subdomain (harvard.site.com)</li>
+        <li><strong>SEO friendly:</strong> Each school has a unique domain presence</li>
+        <li><strong>Professional appearance:</strong> Cleaner URLs for marketing materials</li>
+        <li><strong>Backward compatibility:</strong> Existing path-based URLs still work</li>
+    </ul>
+</body>
+</html>

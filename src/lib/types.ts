@@ -164,6 +164,9 @@ export interface School {
   payment_status?: 'paid' | 'pending' | 'overdue';
   auto_renewal?: boolean;
   subscription_notes?: string;
+  settings?: {
+    enable_donations?: boolean;
+  } | null;
 }
 
 export interface PageContent {

@@ -9,6 +9,7 @@ import { getSchoolById } from '@/lib/database';
 import { School as SchoolType } from '@/lib/types';
 import { MobileCard } from '@/components/mobile/MobileCard';
 import { MobileTopBar } from '@/components/mobile/MobileTopBar';
+import { generateSchoolPageUrl, generateSchoolHomepageUrl } from '@/lib/subdomain-utils';
 
 export default function EnhancedSchoolAdminDashboard() {
   const { user } = useAuth();
@@ -126,7 +127,7 @@ export default function EnhancedSchoolAdminDashboard() {
                       label: "View",
                       icon: <ExternalLink className="h-3 w-3" />,
                       variant: "outline",
-                      onClick: () => window.open(`/s/${school.slug}/${page.type}`, '_blank')
+                      onClick: () => window.open(generateSchoolPageUrl(school.slug, page.type), '_blank')
                     }
                   ]}
                 >
@@ -153,7 +154,7 @@ export default function EnhancedSchoolAdminDashboard() {
             <Button 
               variant="outline" 
               className="w-full justify-start h-12"
-              onClick={() => window.open(`/s/${school.slug}`, '_blank')}
+              onClick={() => window.open(generateSchoolHomepageUrl(school.slug), '_blank')}
             >
               <ExternalLink className="h-4 w-4 mr-2" />
               View Live Website

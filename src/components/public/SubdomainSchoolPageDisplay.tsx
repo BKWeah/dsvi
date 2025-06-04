@@ -1,55 +1,51 @@
-
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import SchoolPageRenderer from '@/components/templates/SchoolPageRenderer';
-import { getSchoolBySlug, getPageContent, createDefaultSections } from '@/lib/database';
-import { School, PageContent } from '@/lib/types';
+import { useSubdomainSchool } from '@/hooks/useSubdomainSchool';
+import { getPageContent, createDefaultSections } from '@/lib/database';
+import { PageContent } from '@/lib/types';
 import { applyTheme } from '@/lib/theme-utils';
 
-export function SchoolPageDisplay() {
-  const { schoolSlug, pageType = 'homepage' } = useParams<{ schoolSlug: string; pageType?: string }>();
-  const [school, setSchool] = useState<School | null>(null);
+export function SubdomainSchoolPageDisplay() {
+  const location = useLocation();
+  const { school, loading: schoolLoading, error: schoolError } = useSubdomainSchool();
   const [pageContent, setPageContent] = useState<PageContent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (schoolSlug) {
-      fetchSchoolAndPage();
-    }
-    
-    // Cleanup theme styles when component unmounts or schoolSlug changes
-    return () => {
-      const existingStyle = document.getElementById('theme-styles');
-      if (existingStyle) {
-        existingStyle.remove();
-      }
-    };
-  }, [schoolSlug, pageType]);
+  // Get page type from URL path (remove leading slash)
+  const pageType = location.pathname === '/' ? 'homepage' : location.pathname.slice(1);
 
-  const fetchSchoolAndPage = async () => {
+  useEffect(() => {
+    if (school) {
+      fetchPageContent();
+    }
+  }, [school, pageType]);
+
+  useEffect(() => {
+    if (schoolLoading) {
+      setLoading(true);
+    } else {
+      setLoading(false);
+    }
+  }, [schoolLoading]);
+
+  const fetchPageContent = async () => {
+    if (!school) return;
+
     try {
       setLoading(true);
       setError(null);
 
-      // Get school data
-      const schoolData = await getSchoolBySlug(schoolSlug!);
-      if (!schoolData) {
-        setError('School not found');
-        return;
-      }
-
-      setSchool(schoolData.school);
-
       // Apply school theme if available
-      if (schoolData.school.theme_settings) {
-        applyTheme(schoolData.school.theme_settings, schoolData.school.custom_css || '');
+      if (school.theme_settings) {
+        applyTheme(school.theme_settings, school.custom_css || '');
       }
 
       // Get specific page content
-      const pageData = await getPageContent(schoolData.school.id, pageType || 'homepage');
+      const pageData = await getPageContent(school.id, pageType);
       
       if (!pageData) {
         // Create a default page if it doesn't exist
@@ -57,18 +53,18 @@ export function SchoolPageDisplay() {
           id: '',
           created_at: '',
           updated_at: '',
-          school_id: schoolData.school.id,
-          page_slug: pageType || 'homepage',
+          school_id: school.id,
+          page_slug: pageType,
           title: pageType === 'homepage' ? 'Welcome' : pageType?.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Page',
-          meta_description: `${pageType} page for ${schoolData.school.name}`,
-          sections: createDefaultSections(pageType || 'homepage')
+          meta_description: `${pageType} page for ${school.name}`,
+          sections: createDefaultSections(pageType)
         };
         setPageContent(defaultPage);
       } else {
         setPageContent(pageData);
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching page content:', error);
       setError('Failed to load page');
     } finally {
       setLoading(false);
@@ -88,7 +84,7 @@ export function SchoolPageDisplay() {
     );
   }
 
-  if (error || !school) {
+  if (error || schoolError || !school) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
         <Card>
@@ -97,7 +93,7 @@ export function SchoolPageDisplay() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              {error || 'The requested school could not be found.'}
+              {error || schoolError || 'The requested school could not be found.'}
             </p>
           </CardContent>
         </Card>
@@ -133,7 +129,7 @@ export function SchoolPageDisplay() {
       <SchoolPageRenderer 
         school={school} 
         pageContent={pageContent} 
-        currentPage={pageType || 'homepage'}
+        currentPage={pageType}
       />
     </>
   );

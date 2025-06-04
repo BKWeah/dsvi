@@ -13,6 +13,7 @@ import {
 import { Edit, ExternalLink, Home, Info, GraduationCap, UserCheck, Users, Phone, Palette, ChevronDown } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getSchoolById, getAssignedSchools } from '@/lib/database';
+import { generateSchoolPageUrl, generateSchoolHomepageUrl } from '@/lib/subdomain-utils';
 import { School as SchoolType } from '@/lib/types';
 import { MobileCard } from '@/components/mobile/MobileCard';
 
@@ -193,7 +194,7 @@ export default function SchoolAdminDashboard() {
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="sm">
-                  <Link to={`/s/${school.slug}/${page.type}`} target="_blank">
+                  <Link to={generateSchoolPageUrl(school.slug, page.type)} target="_blank">
                     <ExternalLink className="h-4 w-4" />
                   </Link>
                 </Button>
@@ -223,7 +224,7 @@ export default function SchoolAdminDashboard() {
                     label: "Preview",
                     icon: <ExternalLink className="h-3 w-3" />,
                     variant: "outline",
-                    onClick: () => window.open(`/s/${school.slug}/${page.type}`, '_blank')
+                    onClick: () => window.open(generateSchoolPageUrl(school.slug, page.type), '_blank')
                   }
                 ]}
               >
@@ -274,7 +275,7 @@ export default function SchoolAdminDashboard() {
           <Button 
             variant="outline" 
             className="w-full justify-start"
-            onClick={() => window.open(`/s/${school.slug}`, '_blank')}
+            onClick={() => window.open(generateSchoolHomepageUrl(school.slug), '_blank')}
           >
             <ExternalLink className="h-4 w-4 mr-2" />
             View Live Website

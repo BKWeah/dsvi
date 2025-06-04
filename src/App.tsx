@@ -13,7 +13,11 @@ import { FeatureProtectedRoute } from "./components/feature-flags/FeatureProtect
 import { UpdatedResponsiveDSVIAdminLayout } from "./components/layouts/UpdatedResponsiveDSVIAdminLayout";
 import { UpdatedResponsiveSchoolAdminLayout } from "./components/layouts/UpdatedResponsiveSchoolAdminLayout";
 import { PublicSchoolLayout } from "./components/layouts/PublicSchoolLayout";
+import { SubdomainSchoolLayout } from "./components/layouts/SubdomainSchoolLayout";
 import { SchoolPageDisplay } from "./components/public/SchoolPageDisplay";
+import { SubdomainSchoolPageDisplay } from "./components/public/SubdomainSchoolPageDisplay";
+import { getSubdomainInfo, getCurrentSchoolSlug, isSubdomainRouting } from "./lib/subdomain-utils";
+import { SchoolRedirectHandler } from "./components/redirects/SchoolRedirectHandler";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -50,17 +54,32 @@ import DeploymentManagePage from "./pages/deploy/DeploymentManagePage";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <HelmetProvider>
-      <TooltipProvider>
-        <FeatureFlagProvider>
-          <AuthProvider>
-            <ThemeProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-          <Routes>
+const App = () => {
+  // Check if we're on a school subdomain
+  const subdomainInfo = getSubdomainInfo();
+  
+  return (
+    <QueryClientProvider client={queryClient}>
+      <HelmetProvider>
+        <TooltipProvider>
+          <FeatureFlagProvider>
+            <AuthProvider>
+              <ThemeProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  {subdomainInfo.isSubdomain && subdomainInfo.schoolSlug ? (
+                    // Subdomain routing for schools
+                    <Routes>
+                      <Route path="/" element={<SubdomainSchoolLayout />}>
+                        <Route index element={<SubdomainSchoolPageDisplay />} />
+                        <Route path=":pageType" element={<SubdomainSchoolPageDisplay />} />
+                      </Route>
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  ) : (
+                    // Regular routing for main domain
+                    <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
@@ -80,6 +99,14 @@ const App = () => (
             <Route path="/todo-tracker" element={<TodoTrackerPage />} />
             <Route path="/client-approval" element={<ClientApprovalPage />} />
             <Route path="/debug-supabase" element={<DebugSupabasePage />} />
+            <Route path="/test-subdomain" element={
+              <div className="p-8">
+                <h1 className="text-2xl font-bold mb-4">Subdomain Test</h1>
+                <p>Hostname: {typeof window !== 'undefined' ? window.location.hostname : 'N/A'}</p>
+                <p>Is Subdomain: {isSubdomainRouting() ? 'Yes' : 'No'}</p>
+                <p>School Slug: {getCurrentSchoolSlug() || 'None'}</p>
+              </div>
+            } />
             
             {/* DSVI Admin Routes */}
             <Route 
@@ -164,13 +191,24 @@ const App = () => (
             
             {/* Public School Website Routes */}
             <Route path="/s/:schoolSlug" element={<PublicSchoolLayout />}>
-              <Route index element={<SchoolPageDisplay />} />
-              <Route path=":pageType" element={<SchoolPageDisplay />} />
+              <Route index element={
+                <>
+                  <SchoolRedirectHandler />
+                  <SchoolPageDisplay />
+                </>
+              } />
+              <Route path=":pageType" element={
+                <>
+                  <SchoolRedirectHandler />
+                  <SchoolPageDisplay />
+                </>
+              } />
             </Route>
             
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          )}
         </BrowserRouter>
       </ThemeProvider>
     </AuthProvider>
@@ -178,6 +216,7 @@ const App = () => (
     </TooltipProvider>
   </HelmetProvider>
 </QueryClientProvider>
-);
+  );
+};
 
 export default App;

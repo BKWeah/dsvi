@@ -13,6 +13,7 @@ import { InviteSchoolAdminDialog } from '@/components/dsvi-admin/InviteSchoolAdm
 import { MobileCard } from '@/components/mobile/MobileCard';
 import { MobileTopBar } from '@/components/mobile/MobileTopBar';
 import { useToast } from '@/hooks/use-toast';
+import { generateSchoolHomepageUrl } from '@/lib/subdomain-utils';
 
 interface School {
   id: string;
@@ -274,7 +275,7 @@ export default function SchoolsPage() {
                           Invite Admin
                         </Button>
                         <Button variant="outline" size="sm" asChild>
-                          <Link to={`/s/${school.slug}/homepage`} target="_blank">
+                          <Link to={generateSchoolHomepageUrl(school.slug)} target="_blank">
                             <ExternalLink className="h-4 w-4 mr-1" />
                             View Site
                           </Link>

@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Eye, ExternalLink } from 'lucide-react';
 import { ComprehensiveThemeSettings, School } from '@/lib/types';
+import { generateSchoolHomepageUrl } from '@/lib/subdomain-utils';
 
 interface LiveThemePreviewProps {
   school: School;
@@ -127,7 +128,7 @@ export const LiveThemePreview: React.FC<LiveThemePreviewProps> = ({
         
         <div className="mt-4 text-center">
           <Button
-            onClick={() => window.open(`/s/${school.slug}`, '_blank')}
+            onClick={() => window.open(generateSchoolHomepageUrl(school.slug), '_blank')}
             className="flex items-center gap-2"
           >
             <ExternalLink className="h-4 w-4" />

@@ -22,6 +22,7 @@ import { SchoolLogoUpload } from '@/components/ui/custom/SchoolLogoUpload';
 import { ComprehensiveBrandingTab } from '@/components/ui/custom/ComprehensiveBrandingTab';
 import { LiveThemePreview } from '@/components/ui/custom/LiveThemePreview';
 import { SchoolAssignmentManager } from '@/components/dsvi-admin/SchoolAssignmentManager';
+import { generateSchoolHomepageUrl } from '@/lib/subdomain-utils';
 
 export default function ImprovedResponsiveSchoolSettingsPage() {
   const { schoolId } = useParams<{ schoolId: string }>();
@@ -179,7 +180,7 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
   const handlePreview = () => {
     if (school?.slug) {
       // Open school's public page in a new tab for preview
-      window.open(`/s/${school.slug}`, '_blank');
+      window.open(generateSchoolHomepageUrl(school.slug), '_blank');
     } else {
       toast({
         title: "Error",

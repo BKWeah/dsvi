@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { GraduationCap, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { gsap } from 'gsap';
 
 interface NavigationProps {
@@ -123,9 +123,7 @@ export const Navigation: React.FC<NavigationProps> = ({ onLoginClick, heroRef })
           {/* Logo */}
           <div ref={logoRef}>
             <Link to="/" className="flex items-center space-x-3 group">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <GraduationCap className="h-6 w-6 text-white" />
-              </div>
+              <img src="/updates_assets/DSVI Official Logo.png" alt="DSVI Official Logo" className="h-10 w-10 object-contain group-hover:scale-110 transition-transform duration-300" />
               <div>
                 <span className={`text-xl font-black ${textColorClass}`}>DSVI</span>
                 <p className={`text-xs ${subTextColorClass} -mt-1`}>Digital School Visibility Initiative</p>

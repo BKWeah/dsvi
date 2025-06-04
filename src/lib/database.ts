@@ -290,8 +290,8 @@ export function createDefaultSections(pageSlug: string): ContentSection[] {
           title: 'Welcome to Our School',
           subtitle: 'Excellence in Education',
           ctaText: 'Learn More',
-          ctaLink: '#about',
-          imageUrl: '/placeholder-hero.jpg'
+          ctaLink: '/about',
+          imageUrl: '/api/placeholder/1920/1080'
         }
       },
       {
