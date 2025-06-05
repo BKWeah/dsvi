@@ -44,8 +44,8 @@ export default function PackagesPage() {
       color: "border-blue-500",
       buttonColor: "bg-blue-600 hover:bg-blue-700"
     },    {
-      name: "Advanced Template 1",
-      price: "$150",
+      name: "Prime Essentials Package",
+      price: "$200",
       period: "/year",
       description: "Enhanced features with modern design and advanced functionality",
       popular: false,
@@ -69,8 +69,8 @@ export default function PackagesPage() {
       buttonColor: "bg-green-600 hover:bg-green-700"
     },
     {
-      name: "Advanced Template 2",
-      price: "$200",
+      name: "Prime Elite Package",
+      price: "$350",
       period: "/year", 
       description: "Premium solution with all features and premium support",
       popular: false,
