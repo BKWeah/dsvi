@@ -75,7 +75,7 @@ export default function PackagesPage() {
       description: "Premium solution with all features and premium support",
       popular: false,
       features: [
-        "Everything in Advanced Template 1",
+        "Everything in Prime Essentials Package",
         "Custom Design Elements",
         "Multi-language Support",
         "Advanced Student Management",

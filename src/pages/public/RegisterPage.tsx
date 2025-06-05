@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Navigation } from './components/Navigation';
 import { Footer } from './components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,6 +34,10 @@ export default function RegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const heroRef = useRef<HTMLElement>(null); // Create a ref for Navigation
+
+  useEffect(() => {
+    window.scrollTo(0, 0); // Scroll to the top of the page on mount
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
 import { gsap } from 'gsap';
@@ -14,6 +14,7 @@ export const Navigation: React.FC<NavigationProps> = ({ onLoginClick, heroRef })
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOverHero, setIsOverHero] = useState(true); // New state for hero intersection
   const navigate = useNavigate();
+  const location = useLocation(); // Get current location
   const navRef = useRef<HTMLElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
   const menuItemsRef = useRef<HTMLDivElement>(null);
@@ -75,16 +76,23 @@ export const Navigation: React.FC<NavigationProps> = ({ onLoginClick, heroRef })
   }, [heroRef]); // Add heroRef to dependency array
 
   const handleSmoothScroll = (href: string) => {
+    setIsMenuOpen(false); // Close mobile menu on click
+
     if (href.startsWith('#')) {
-      const element = document.querySelector(href);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+      if (location.pathname !== '/') {
+        // If not on home page, navigate to home and then scroll
+        navigate(`/${href}`); // Navigate to home with hash
+      } else {
+        // If already on home page, just scroll
+        const element = document.querySelector(href);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
       }
     } else if (href.startsWith('/')) {
-      // Handle route navigation
+      // Handle route navigation for non-hash links
       navigate(href);
     }
-    setIsMenuOpen(false);
   };
 
   // Determine text color and background based on scroll and hero intersection
