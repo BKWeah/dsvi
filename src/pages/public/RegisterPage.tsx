@@ -57,11 +57,11 @@ export default function RegisterPage() {
 
     try {
       const receiptNumber = generateReceiptNumber();
-      const packagePrices = {
-        'standard': 100,
-        'advanced1': 150,
-        'advanced2': 200
-      };
+  const packagePrices = {
+    'standard': 100,
+    'advanced1': 200,
+    'advanced2': 350
+  };
       
       const { data, error } = await supabase
         .from('school_requests')
@@ -117,8 +117,8 @@ export default function RegisterPage() {
 
   const packageInfo = {
     standard: { name: "Standard Package", price: "$100/year" },
-    advanced1: { name: "Advanced Template 1", price: "$150/year" },
-    advanced2: { name: "Advanced Template 2", price: "$200/year" }
+    advanced1: { name: "Prime Essentials Package", price: "$200/year" },
+    advanced2: { name: "Prime Elite Package", price: "$350/year" }
   };
 
   return (

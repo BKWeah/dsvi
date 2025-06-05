@@ -1,13 +1,22 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Phone, MapPin, MessageSquare, Globe, ExternalLink } from 'lucide-react';
 
 export const Footer: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const handleSmoothScroll = (href: string) => {
     if (href.startsWith('#')) {
-      const element = document.querySelector(href);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+      if (location.pathname !== '/') {
+        // If not on home page, navigate to home and then scroll
+        navigate(`/${href}`); // Navigate to home with hash
+      } else {
+        // If already on home page, just scroll
+        const element = document.querySelector(href);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
       }
     }
   };
