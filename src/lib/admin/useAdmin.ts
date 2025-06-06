@@ -84,6 +84,53 @@ export const useAdmin = (): UseAdminReturn => {
         const level = levelData as AdminLevel;
         if (level > 0) {
           setAdminLevel(level);
+          
+          // Get admin profile
+          const { data: profileData, error: profileError } = await supabase
+            .from('admin_profiles')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('is_active', true)
+            .single();
+
+          if (profileError && profileError.code !== 'PGRST116') {
+            console.warn('Error fetching admin profile:', profileError);
+          } else {
+            setAdminProfile(profileData);
+          }
+
+          // For Level 2 admins, get permissions and assignments
+          if (level === ADMIN_LEVELS.ASSIGNED_STAFF) {
+            // Get permissions
+            const { data: permissionsData, error: permissionsError } = await supabase
+              .from('admin_permissions')
+              .select('*')
+              .eq('admin_user_id', user.id)
+              .eq('is_active', true);
+
+            if (permissionsError) {
+              console.warn('Error fetching permissions:', permissionsError);
+            } else {
+              setPermissions(permissionsData || []);
+            }
+
+            // Get school assignments
+            const { data: assignmentsData, error: assignmentsError } = await supabase
+              .from('admin_assignments')
+              .select('*')
+              .eq('admin_user_id', user.id)
+              .eq('is_active', true);
+
+            if (assignmentsError) {
+              console.warn('Error fetching assignments:', assignmentsError);
+            } else {
+              setAssignments(assignmentsData || []);
+            }
+          } else {
+            // Level 1 admin has no specific permissions/assignments
+            setPermissions([]);
+            setAssignments([]);
+          }
         } else {
           // No admin level found - could be:
           // 1. A Level 2 admin who just signed up (profile creation in progress)
@@ -92,55 +139,6 @@ export const useAdmin = (): UseAdminReturn => {
           // We no longer auto-upgrade to Level 1 to avoid conflicts with Level 2 signup
           setAdminLevel(null);
           console.log('DSVI admin found without admin level - manual admin profile creation required');
-        }
-      }
-
-      // Get admin profile if admin level exists
-      if (adminLevel && adminLevel > 0) {
-        const { data: profileData, error: profileError } = await supabase
-          .from('admin_profiles')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('is_active', true)
-          .single();
-
-        if (profileError && profileError.code !== 'PGRST116') {
-          console.warn('Error fetching admin profile:', profileError);
-        } else {
-          setAdminProfile(profileData);
-        }
-
-        // For Level 2 admins, get permissions and assignments
-        if (adminLevel === ADMIN_LEVELS.ASSIGNED_STAFF) {
-          // Get permissions
-          const { data: permissionsData, error: permissionsError } = await supabase
-            .from('admin_permissions')
-            .select('*')
-            .eq('admin_user_id', user.id)
-            .eq('is_active', true);
-
-          if (permissionsError) {
-            console.warn('Error fetching permissions:', permissionsError);
-          } else {
-            setPermissions(permissionsData || []);
-          }
-
-          // Get school assignments
-          const { data: assignmentsData, error: assignmentsError } = await supabase
-            .from('admin_assignments')
-            .select('*')
-            .eq('admin_user_id', user.id)
-            .eq('is_active', true);
-
-          if (assignmentsError) {
-            console.warn('Error fetching assignments:', assignmentsError);
-          } else {
-            setAssignments(assignmentsData || []);
-          }
-        } else {
-          // Level 1 admin has no specific permissions/assignments
-          setPermissions([]);
-          setAssignments([]);
         }
       }
     } catch (err) {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Navigation } from './components/Navigation';
 import { Footer } from './components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +15,7 @@ export default function ContactPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const heroRef = useRef<HTMLElement>(null); // Add heroRef
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,8 +34,8 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-white">
       <Navigation 
-        onRegisterClick={() => window.location.href = '/register'}
         onLoginClick={() => window.location.href = '/login'}
+        heroRef={heroRef} // Pass the heroRef
       />
       <main className="pt-20">
         <section className="py-20 bg-gradient-to-br from-blue-600 to-green-600 text-white">
@@ -53,7 +54,8 @@ export default function ContactPage() {
                     <Phone className="h-6 w-6 text-blue-600" />
                     <div>
                       <p className="font-medium">Phone/WhatsApp</p>
-                      <p className="text-gray-600">+231-XXX-XXXX</p>
+                      <p className="text-gray-600">+231-77 391 0299</p>
+                      <p className="text-gray-600">+231-55 518 2742</p>
                     </div>
                   </div>                  <div className="flex items-center gap-4">
                     <Mail className="h-6 w-6 text-green-600" />
@@ -66,7 +68,10 @@ export default function ContactPage() {
                     <MapPin className="h-6 w-6 text-purple-600" />
                     <div>
                       <p className="font-medium">Office Location</p>
-                      <p className="text-gray-600">Monrovia, Liberia</p>
+                      <p className="text-gray-600">DSVI Office</p>
+                      <p className="text-gray-600">Outland Community, Opp. LTC Compound</p>
+                      <p className="text-gray-600">Paynesville, Montserrado County</p>
+                      <p className="text-gray-600">Republic of Liberia</p>
                     </div>
                   </div>
                 </div>

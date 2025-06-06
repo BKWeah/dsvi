@@ -17,7 +17,7 @@ const PORT = process.env.FEATURE_FLAG_PORT || 3001;
 const CONFIG_PATH = path.join(__dirname, '../src/config/featureFlags.json');
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: 'http://localhost:8080' })); // Explicitly allow frontend origin
 app.use(express.json());
 
 // Helper functions

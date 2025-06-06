@@ -1,9 +1,9 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2025-05-31T14:18:20.632Z",
+  "lastUpdated": "2025-06-06T04:41:21.471Z",
   "features": {
     "dashboard": {
-      "enabled": false,
+      "enabled": true,
       "description": "Main admin dashboard with statistics and overview",
       "route": "/dsvi-admin/dashboard",
       "priority": 1,
@@ -116,7 +116,7 @@
       }
     },
     "subscriptions": {
-      "enabled": false,
+      "enabled": true,
       "description": "Subscription tracking and management",
       "route": "/dsvi-admin/subscriptions",
       "priority": 4,
@@ -149,7 +149,7 @@
       }
     },
     "messaging": {
-      "enabled": false,
+      "enabled": true,
       "description": "Messaging and communication system",
       "route": "/dsvi-admin/messaging",
       "priority": 5,
@@ -182,7 +182,7 @@
       }
     },
     "reports": {
-      "enabled": false,
+      "enabled": true,
       "description": "Reports and analytics system",
       "route": "/dsvi-admin/reports",
       "priority": 6,

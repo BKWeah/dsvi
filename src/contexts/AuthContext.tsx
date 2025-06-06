@@ -34,22 +34,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const role = user?.user_metadata?.role || null;
 
   // Helper function to fetch admin level for DSVI admins
-  const fetchAdminLevel = async (user: User) => {
+  const fetchAdminLevel = async (user: User, retryCount = 0) => {
     if (user.user_metadata?.role === 'DSVI_ADMIN') {
       try {
         const { data, error } = await supabase
           .rpc('get_admin_level', { user_id: user.id });
         
-        if (!error && data && data > 0) {
+        if (!error && data !== null && data > 0) { // Ensure data is not null and valid
           setAdminLevel(data);
         } else {
-          // No admin level found - this could be:
-          // 1. A Level 2 admin who just signed up (profile creation in progress)
-          // 2. An existing DSVI admin who needs manual upgrade
-          // 
-          // We no longer auto-upgrade to Level 1 to avoid conflicts with Level 2 signup
-          setAdminLevel(null);
-          console.log('DSVI admin found without admin level - manual admin profile creation required');
+          // Check if this is a newly activated Level 2 admin
+          const activatedAdmins = JSON.parse(localStorage.getItem('activatedLevel2Admins') || '[]');
+          const isRecentlyActivated = activatedAdmins.includes(user.email?.toLowerCase());
+          
+          if (isRecentlyActivated && retryCount < 3) {
+            // For recently activated Level 2 admins, retry a few times with delay
+            console.log(`Admin level not found yet, retrying... (attempt ${retryCount + 1}/3)`);
+            setTimeout(() => {
+              fetchAdminLevel(user, retryCount + 1);
+            }, 1000 * (retryCount + 1)); // Exponential backoff
+          } else {
+            // If retries exhausted or not recently activated, set adminLevel to null
+            setAdminLevel(null);
+            if (user.user_metadata?.role === 'DSVI_ADMIN') {
+              console.log('DSVI admin found without admin level or level could not be fetched after retries.');
+            }
+          }
         }
       } catch (error) {
         console.warn('Failed to fetch admin level:', error);
@@ -203,41 +213,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               
               console.log('🚀 Creating Level 2 admin profile...');
               
-              // Create Level 2 admin profile with retry logic
-              let profileCreated = false;
-              let retryCount = 0;
-              const maxRetries = 3;
-              
-              while (!profileCreated && retryCount < maxRetries) {
-                try {
-                  const { data: profileData, error: profileError } = await supabase.rpc('create_admin_profile', {
-                    target_user_id: data.user.id,
-                    admin_level: 2, // Level 2 admin
-                    created_by_user_id: pendingAdmin.createdBy,
-                    notes: pendingAdmin.notes || `Level 2 admin created from invitation on ${new Date().toLocaleDateString()}`
-                  });
+              // Use the new safe_create_admin_profile function for better reliability
+              const { data: profileResult, error: profileError } = await supabase.rpc('safe_create_admin_profile', {
+                p_user_id: data.user.id,
+                p_admin_level: 2, // Level 2 admin
+                p_created_by: pendingAdmin.createdBy,
+                p_notes: pendingAdmin.notes || `Level 2 admin created from invitation on ${new Date().toLocaleDateString()}`
+              }) as { data: { success: boolean } | null, error: any }; // Type assertion
 
-                  if (profileError) {
-                    console.error(`❌ Attempt ${retryCount + 1} - Failed to create Level 2 admin profile:`, profileError);
-                    retryCount++;
-                    if (retryCount < maxRetries) {
-                      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
-                    }
-                  } else {
-                    console.log('✅ Level 2 admin profile created successfully:', profileData);
-                    profileCreated = true;
-                  }
-                } catch (err) {
-                  console.error(`❌ Attempt ${retryCount + 1} - Exception creating admin profile:`, err);
-                  retryCount++;
-                  if (retryCount < maxRetries) {
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                  }
-                }
-              }
-              
-              if (!profileCreated) {
-                throw new Error('Failed to create admin profile after multiple attempts');
+              if (profileError || !profileResult?.success) {
+                console.error('❌ Failed to create Level 2 admin profile:', profileError || profileResult);
+                // Don't throw - allow the signup to succeed and handle profile creation later
+                console.warn('⚠️ Admin profile creation failed, but user signup succeeded. Profile can be created manually.');
+              } else {
+                console.log('✅ Level 2 admin profile result:', profileResult);
+                // Set admin level immediately after successful profile creation
+                setAdminLevel(2);
               }
 
               // Grant selected permissions
@@ -285,14 +276,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               
               console.log('🎉 Level 2 admin setup completed successfully');
               
-              // Verify the admin level was created
+              // Verify the admin setup is complete
               const { data: verifyData, error: verifyError } = await supabase
-                .rpc('get_admin_level', { user_id: data.user.id });
+                .rpc('verify_admin_setup', { p_user_id: data.user.id }) as { data: { success: boolean } | null, error: any }; // Type assertion
               
-              if (!verifyError && verifyData === 2) {
-                console.log('✅ Admin level verification successful: Level 2');
+              if (!verifyError && verifyData?.success) {
+                console.log('✅ Admin setup verification:', verifyData);
               } else {
-                console.error('❌ Admin level verification failed:', verifyError, 'Level:', verifyData);
+                console.error('❌ Admin setup verification failed:', verifyError || verifyData);
               }
               
               // Dispatch event to notify useAdmin hook to refresh

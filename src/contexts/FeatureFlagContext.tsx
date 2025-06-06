@@ -47,6 +47,7 @@ interface FeatureFlagContextType {
   saveConfig: () => Promise<void>;
   loadConfig: () => Promise<void>;
   resetToDefaults: () => void;
+  isLoading: boolean; // Add isLoading to the context type
 }
 
 const FeatureFlagContext = createContext<FeatureFlagContextType | undefined>(undefined);
@@ -283,6 +284,7 @@ export const FeatureFlagProvider: React.FC<FeatureFlagProviderProps> = ({ childr
     saveConfig,
     loadConfig,
     resetToDefaults,
+    isLoading, // Expose isLoading
   };
 
   return (

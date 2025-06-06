@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdmin } from '@/lib/admin/useAdmin';
+import { useAdminProfileVerification } from '@/hooks/useAdminProfileVerification';
 import { useFeature } from '@/contexts/FeatureFlagContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -42,6 +43,9 @@ export function UpdatedResponsiveDSVIAdminLayout() {
     loading: adminLoading 
   } = useAdmin();
   const navigate = useNavigate();
+  
+  // Auto-verify and fix admin profile if needed
+  useAdminProfileVerification();
 
   // Feature flag checks with fallback to true (non-destructive)
   let isDashboardEnabled = true;

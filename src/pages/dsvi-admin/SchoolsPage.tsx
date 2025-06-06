@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -35,7 +34,8 @@ export default function SchoolsPage() {
     hasSchoolAccess, 
     assignedSchools,
     adminLevel,
-    loading: adminLoading 
+    loading: adminLoading,
+    refreshAdminData
   } = useAdmin();
   const [schools, setSchools] = useState<School[]>([]);
   const [filteredSchools, setFilteredSchools] = useState<School[]>([]);
@@ -44,14 +44,33 @@ export default function SchoolsPage() {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showInviteDialog, setShowInviteDialog] = useState(false);
   const [selectedSchool, setSelectedSchool] = useState<School | null>(null);
+  const [hasAttemptedRefresh, setHasAttemptedRefresh] = useState(false);
   const { toast } = useToast();
 
   // Check if user has permission to access schools
   const hasSchoolsAccess = hasPermission(PERMISSION_TYPES.CMS_ACCESS);
   
   useEffect(() => {
-    // Only fetch schools when admin loading is complete AND we have a valid admin level
-    if (!adminLoading && adminLevel !== null && hasSchoolsAccess) {
+    // Attempt one refresh for newly signed up Level 2 admins
+    if (!adminLoading && adminLevel === null && !hasAttemptedRefresh) {
+      const activatedAdmins = JSON.parse(localStorage.getItem('activatedLevel2Admins') || '[]');
+      const userEmail = window.supabase?.auth?.getUser()?.then(({ data }) => data?.user?.email?.toLowerCase());
+      
+      userEmail?.then(email => {
+        if (email && activatedAdmins.includes(email)) {
+          console.log('Recently activated Level 2 admin detected, attempting refresh...');
+          setHasAttemptedRefresh(true);
+          setTimeout(() => {
+            refreshAdminData();
+          }, 2000);
+        }
+      });
+    }
+  }, [adminLoading, adminLevel, hasAttemptedRefresh, refreshAdminData]);
+
+  useEffect(() => {
+    // Only fetch schools when we have determined access
+    if (!adminLoading && (isLevel1Admin || (isLevel2Admin && hasSchoolsAccess))) {
       fetchSchools();
     }
     
@@ -62,7 +81,7 @@ export default function SchoolsPage() {
     return () => {
       window.removeEventListener('openAddSchoolDialog', handleOpenAddDialog);
     };
-  }, [adminLoading, adminLevel, assignedSchools, hasSchoolsAccess]);
+  }, [adminLoading, isLevel1Admin, isLevel2Admin, assignedSchools, hasSchoolsAccess]);
 
   const fetchSchools = async () => {
     try {
@@ -170,26 +189,40 @@ export default function SchoolsPage() {
           </div>
         </div>
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          </div>
         </div>
       </div>
     );
   }
 
-  // Show error if admin level couldn't be determined
-  if (adminLevel === null) {
+  // Show error only if admin level cannot be determined after attempts
+  if (adminLevel === null && hasAttemptedRefresh) {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">Schools Management</h1>
-            <p className="text-muted-foreground text-red-600">Admin level could not be determined. Please contact support.</p>
+            <p className="text-muted-foreground text-red-600">Unable to verify admin permissions.</p>
           </div>
         </div>
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <p className="text-muted-foreground mb-4">Unable to access schools management.</p>
-            <p className="text-sm text-muted-foreground">If you just signed up, please try refreshing the page.</p>
+            <p className="text-muted-foreground mb-4">
+              Your admin level could not be determined. This might happen if:
+            </p>
+            <ul className="text-sm text-muted-foreground text-left max-w-md mx-auto mb-6">
+              <li>• You just signed up and the system is still processing</li>
+              <li>• There was a temporary connection issue</li>
+              <li>• Your admin profile needs to be manually created</li>
+            </ul>
+            <Button onClick={() => window.location.reload()} variant="outline">
+              Refresh Page
+            </Button>
+            <p className="text-xs text-muted-foreground mt-4">
+              If the issue persists, please contact your administrator.
+            </p>
           </div>
         </div>
       </div>
@@ -203,27 +236,39 @@ export default function SchoolsPage() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">Schools Management</h1>
-            <p className="text-muted-foreground">Access denied</p>
+            <p className="text-muted-foreground text-red-600">You don't have permission to access schools.</p>
           </div>
         </div>
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <Lock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">You don't have permission to access schools management.</p>
+            <Lock className="h-12 w-12 text-muted-foreground mb-4 mx-auto" />
+            <p className="text-muted-foreground">Contact your Level 1 administrator for access.</p>
           </div>
         </div>
       </div>
     );
   }
 
+  // Show loading for school data
   if (loading) {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">Schools Management</h1>
-            <p className="text-muted-foreground">Loading schools...</p>
+            <p className="text-muted-foreground">
+              {isLevel2Admin 
+                ? `Managing ${assignedSchools.length} assigned school${assignedSchools.length !== 1 ? 's' : ''}`
+                : 'Manage all schools in the system'
+              }
+            </p>
           </div>
+          {isLevel1Admin && (
+            <Button onClick={() => setShowAddDialog(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add School
+            </Button>
+          )}
         </div>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -232,202 +277,213 @@ export default function SchoolsPage() {
     );
   }
 
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">Schools Management</h1>
-          <p className="text-muted-foreground">Manage all schools in the DSVI platform</p>
-        </div>
-        {/* Only show Add button on desktop */}
-        <Button 
-          onClick={() => setShowAddDialog(true)}
-          className="hidden md:flex"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add New School
-        </Button>
-      </div>
+  // Mobile view
+  const isMobile = window.innerWidth < 768;
 
-      {/* Search Section */}
-      <div className="space-y-4">
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search schools..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
+  if (isMobile) {
+    return (
+      <div className="pb-20">
+        <MobileTopBar title="Schools" />
         
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2 flex-wrap gap-2">
-            <Badge variant="outline">
-              {filteredSchools.length} total
-            </Badge>
-            <Badge variant="secondary">
-              {schools.filter(s => s.admin_user_id).length} with admin
-            </Badge>
-            <Badge className="bg-green-100 text-green-800">
-              {schools.filter(s => s.subscription_status === 'active').length} active
-            </Badge>
-            <Badge className="bg-yellow-100 text-yellow-800">
-              {schools.filter(s => s.subscription_status === 'expiring').length} expiring
-            </Badge>
-            <Badge className="bg-red-100 text-red-800">
-              {schools.filter(s => s.subscription_status === 'inactive').length} inactive
-            </Badge>
+        <div className="p-4 space-y-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search schools..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          <div className="space-y-3">
+            {filteredSchools.map((school) => (
+              <MobileCard key={school.id}>
+                <div className="p-4">
+                  <h3 className="font-semibold text-lg mb-2">{school.name}</h3>
+                  
+                  <div className="space-y-2 mb-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Status</span>
+                      {getSubscriptionStatusBadge(school.subscription_status, school.subscription_end)}
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Package</span>
+                      {getPackageTypeBadge(school.package_type)}
+                    </div>
+                    {school.subscription_end && (
+                      <p className="text-sm text-muted-foreground">
+                        {formatDaysUntilExpiry(school.subscription_end)}
+                      </p>
+                    )}
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                    >
+                      <Link to={`/dsvi-admin/schools/${school.id}/settings`}>
+                        <Settings className="h-4 w-4 mr-1" />
+                        Settings
+                      </Link>
+                    </Button>
+                    {!school.admin_user_id && isLevel1Admin && (
+                      <Button
+                        onClick={() => handleInviteAdmin(school)}
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                      >
+                        <UserPlus className="h-4 w-4 mr-1" />
+                        Invite
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </MobileCard>
+            ))}
           </div>
         </div>
+
+        {isLevel1Admin && (
+          <>
+            <AddSchoolDialog open={showAddDialog} onOpenChange={setShowAddDialog} onSchoolAdded={handleSchoolAdded} />
+            <InviteSchoolAdminDialog
+              open={showInviteDialog}
+              onOpenChange={setShowInviteDialog}
+              school={selectedSchool}
+            />
+          </>
+        )}
+      </div>
+    );
+  }
+
+  // Desktop view
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">Schools Management</h1>
+          <p className="text-muted-foreground">
+            {isLevel2Admin 
+              ? `Managing ${assignedSchools.length} assigned school${assignedSchools.length !== 1 ? 's' : ''}`
+              : 'Manage all schools in the system'
+            }
+          </p>
+        </div>
+        {isLevel1Admin && (
+          <Button onClick={() => setShowAddDialog(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add School
+          </Button>
+        )}
       </div>
 
-      {/* Desktop Table View */}
-      <div className="hidden md:block">
-        <Card>
-          <CardHeader>
-            <CardTitle>All Schools</CardTitle>
-            <CardDescription>
-              List of all schools registered in the platform
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Admin Status</TableHead>
-                  <TableHead>Subscription</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredSchools.map((school) => (
-                  <TableRow key={school.id}>
-                    <TableCell className="font-medium">{school.name}</TableCell>
-                    <TableCell>
-                      {school.admin_user_id ? (
-                        <span className="text-green-600 text-sm">✓ Admin Assigned</span>
-                      ) : (
-                        <span className="text-orange-600 text-sm">⚠ No Admin</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <Badge 
-                            variant={
-                              school.subscription_status === 'active' ? 'default' :
-                              school.subscription_status === 'expiring' ? 'secondary' :
-                              school.subscription_status === 'inactive' ? 'destructive' : 'outline'
-                            }
-                            className="text-xs"
-                          >
-                            {(school.subscription_status || 'pending').replace('_', ' ').toUpperCase()}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs">
-                            {(school.package_type || 'standard').toUpperCase()}
-                          </Badge>
-                        </div>
-                        {school.subscription_end && (
-                          <div className="text-xs text-muted-foreground">
-                            Expires: {new Date(school.subscription_end).toLocaleDateString()}
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button variant="outline" size="sm" asChild>
-                          <Link to={`/dsvi-admin/schools/${school.id}/content`}>
-                            <Edit className="h-4 w-4 mr-1" />
-                            Edit Content
-                          </Link>
-                        </Button>
-                        <Button variant="outline" size="sm" asChild>
-                          <Link to={`/dsvi-admin/schools/${school.id}/settings`}>
-                            <Settings className="h-4 w-4 mr-1" />
-                            Settings
-                          </Link>
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Schools</CardTitle>
+              <CardDescription>
+                {isLevel2Admin 
+                  ? 'Schools you have been assigned to manage'
+                  : 'All schools in the system'
+                }
+              </CardDescription>
+            </div>
+            <div className="w-64">
+              <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search schools..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-8"
+                />
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>School Name</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Package</TableHead>
+                <TableHead>Expiry</TableHead>
+                <TableHead>Admin</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredSchools.map((school) => (
+                <TableRow key={school.id}>
+                  <TableCell className="font-medium">{school.name}</TableCell>
+                  <TableCell>
+                    {getSubscriptionStatusBadge(school.subscription_status, school.subscription_end)}
+                  </TableCell>
+                  <TableCell>
+                    {getPackageTypeBadge(school.package_type)}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {formatDaysUntilExpiry(school.subscription_end)}
+                  </TableCell>
+                  <TableCell>
+                    {school.admin_user_id ? (
+                      <Badge variant="outline" className="bg-green-50">
+                        <span className="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+                        Active
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary">No Admin</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        asChild
+                        variant="outline"
+                        size="sm"
+                      >
+                        <Link to={`/dsvi-admin/schools/${school.id}/settings`}>
+                          <Settings className="h-4 w-4 mr-1" />
+                          Settings
+                        </Link>
+                      </Button>
+                      {!school.admin_user_id && isLevel1Admin && (
+                        <Button
                           onClick={() => handleInviteAdmin(school)}
+                          variant="outline"
+                          size="sm"
                         >
                           <UserPlus className="h-4 w-4 mr-1" />
                           Invite Admin
                         </Button>
-                        <Button variant="outline" size="sm" asChild>
-                          <Link to={generateSchoolHomepageUrl(school.slug)} target="_blank">
-                            <ExternalLink className="h-4 w-4 mr-1" />
-                            View Site
-                          </Link>
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      </div>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
-      {/* Mobile Card View */}
-      <div className="md:hidden space-y-3">
-        {filteredSchools.map((school) => (
-          <MobileCard
-            key={school.id}
-            title={school.name}
-            subtitle={`ID: ${school.id.slice(0, 8)}...`}
-            status={{
-              label: school.admin_user_id ? "Admin Assigned" : "No Admin",
-              variant: school.admin_user_id ? "default" : "secondary"
-            }}
-            actions={[
-              {
-                label: "Edit",
-                icon: <Edit className="h-3 w-3" />,
-                onClick: () => window.open(`/dsvi-admin/schools/${school.id}/content`, '_self')
-              },
-              {
-                label: "Settings", 
-                icon: <Settings className="h-3 w-3" />,
-                onClick: () => window.open(`/dsvi-admin/schools/${school.id}/settings`, '_self')
-              },
-              {
-                label: "Invite",
-                icon: <UserPlus className="h-3 w-3" />,
-                onClick: () => handleInviteAdmin(school)
-              }
-            ]}
+      {isLevel1Admin && (
+        <>
+          <AddSchoolDialog open={showAddDialog} onOpenChange={setShowAddDialog} onSchoolAdded={handleSchoolAdded} />
+          <InviteSchoolAdminDialog
+            open={showInviteDialog}
+            onOpenChange={setShowInviteDialog}
+            school={selectedSchool}
           />
-        ))}
-      </div>
-
-      {filteredSchools.length === 0 && !loading && (
-        <Card>
-          <CardContent className="text-center py-8">
-            <div className="text-muted-foreground">
-              <Search className="h-8 w-8 mx-auto mb-2" />
-              <p>No schools found matching your search.</p>
-            </div>
-          </CardContent>
-        </Card>
+        </>
       )}
-
-      <AddSchoolDialog 
-        open={showAddDialog} 
-        onOpenChange={setShowAddDialog}
-        onSchoolAdded={handleSchoolAdded}
-      />
-
-      <InviteSchoolAdminDialog
-        open={showInviteDialog}
-        onOpenChange={setShowInviteDialog}
-        school={selectedSchool}
-      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useFeature } from '@/contexts/FeatureFlagContext';
+import { useFeature, useFeatureFlags } from '@/contexts/FeatureFlagContext'; // Import useFeatureFlags
 
 interface FeatureProtectedRouteProps {
   feature: string;
@@ -17,57 +17,47 @@ export const FeatureProtectedRoute: React.FC<FeatureProtectedRouteProps> = ({
   children,
   fallbackRoute
 }) => {
-  let isFeatureEnabled = true;
-  let isDashboardEnabled = true;
-  let isSchoolsEnabled = true;
-  let isRequestsEnabled = true;
-  let isSubscriptionsEnabled = true;
-  let isMessagingEnabled = true;
+  const { isLoading: featureFlagsLoading, config } = useFeatureFlags();
+  const isFeatureEnabled = useFeature(feature);
+  const location = useLocation();
 
-  try {
-    isFeatureEnabled = useFeature(feature);
-    isDashboardEnabled = useFeature('dashboard');
-    isSchoolsEnabled = useFeature('schools');
-    isRequestsEnabled = useFeature('requests');
-    isSubscriptionsEnabled = useFeature('subscriptions');
-    isMessagingEnabled = useFeature('messaging');
-  } catch (error) {
-    // If feature flag system is not available, allow access (non-destructive)
-    console.warn('Feature flag system not available, allowing access to all routes');
-    return <>{children}</>;
+  // Display loading spinner while feature flags are loading
+  if (featureFlagsLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
   }
-  
+
   // If feature is enabled, show content
   if (isFeatureEnabled) {
     return <>{children}</>;
   }
 
-  // If feature is disabled, redirect to fallback or find first available route
-  const location = useLocation();
-  
-  // Don't redirect if already on the deploy page
-  if (location.pathname.includes('/deploy')) {
-    return <>{children}</>;
+  // If feature is disabled, redirect
+  const defaultRedirectRoute = config.routing.defaultRedirect;
+  const effectiveFallbackRoute = fallbackRoute || config.routing.fallbackRoute; // Use prop fallbackRoute if provided, else config fallback
+
+  // Prevent redirect loops: if we are already on the default redirect or effective fallback route,
+  // and the feature is still disabled, it means there's no valid route to go to.
+  // In this case, navigate to Unauthorized or a generic error page.
+  if (location.pathname === defaultRedirectRoute || location.pathname === effectiveFallbackRoute) {
+    return <Navigate to="/unauthorized" replace />;
   }
 
-  // Check for available routes in priority order
-  const availableRoutes = [
-    { route: '/dsvi-admin/dashboard', enabled: isDashboardEnabled },
-    { route: '/dsvi-admin/schools', enabled: isSchoolsEnabled },
-    { route: '/dsvi-admin/requests', enabled: isRequestsEnabled },
-    { route: '/dsvi-admin/subscriptions', enabled: isSubscriptionsEnabled },
-    { route: '/dsvi-admin/messaging', enabled: isMessagingEnabled }
-  ];
-
-  // Find first available route
-  for (const { route, enabled } of availableRoutes) {
-    if (enabled) {
-      return <Navigate to={route} replace />;
-    }
+  // Try to redirect to the default redirect route first
+  if (defaultRedirectRoute) {
+    return <Navigate to={defaultRedirectRoute} replace />;
   }
 
-  // If no routes are available, go to deploy page
-  return <Navigate to="/deploy" replace />;
+  // If no default redirect, try the effective fallback route
+  if (effectiveFallbackRoute) {
+    return <Navigate to={effectiveFallbackRoute} replace />;
+  }
+
+  // As a last resort, if no routes are configured, go to unauthorized
+  return <Navigate to="/unauthorized" replace />;
 };
 
 export default FeatureProtectedRoute;
