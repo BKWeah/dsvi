@@ -34,7 +34,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const role = user?.user_metadata?.role || null;
 
   // Helper function to fetch admin level for DSVI admins
-  const fetchAdminLevel = async (user: User, retryCount = 0) => {
+  const fetchAdminLevel = async (user: User) => {
     if (user.user_metadata?.role === 'DSVI_ADMIN') {
       try {
         const { data, error } = await supabase
@@ -43,22 +43,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (!error && data !== null && data > 0) { // Ensure data is not null and valid
           setAdminLevel(data);
         } else {
-          // Check if this is a newly activated Level 2 admin
-          const activatedAdmins = JSON.parse(localStorage.getItem('activatedLevel2Admins') || '[]');
-          const isRecentlyActivated = activatedAdmins.includes(user.email?.toLowerCase());
-          
-          if (isRecentlyActivated && retryCount < 3) {
-            // For recently activated Level 2 admins, retry a few times with delay
-            console.log(`Admin level not found yet, retrying... (attempt ${retryCount + 1}/3)`);
-            setTimeout(() => {
-              fetchAdminLevel(user, retryCount + 1);
-            }, 1000 * (retryCount + 1)); // Exponential backoff
-          } else {
-            // If retries exhausted or not recently activated, set adminLevel to null
-            setAdminLevel(null);
-            if (user.user_metadata?.role === 'DSVI_ADMIN') {
-              console.log('DSVI admin found without admin level or level could not be fetched after retries.');
-            }
+          setAdminLevel(null);
+          if (user.user_metadata?.role === 'DSVI_ADMIN') {
+            console.log('DSVI admin found without admin level or level could not be fetched.');
           }
         }
       } catch (error) {
@@ -267,12 +254,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               );
               localStorage.setItem('pendingLevel2Admins', JSON.stringify(updatedPending));
               
-              // Mark admin as activated for tracking purposes
-              const activatedAdmins = JSON.parse(localStorage.getItem('activatedLevel2Admins') || '[]');
-              if (!activatedAdmins.includes(email.toLowerCase())) {
-                activatedAdmins.push(email.toLowerCase());
-                localStorage.setItem('activatedLevel2Admins', JSON.stringify(activatedAdmins));
-              }
+              // Mark admin as activated for tracking purposes - REMOVED THIS LINE
+              // const activatedAdmins = JSON.parse(localStorage.getItem('activatedLevel2Admins') || '[]');
+              // if (!activatedAdmins.includes(email.toLowerCase())) {
+              //   activatedAdmins.push(email.toLowerCase());
+              //   localStorage.setItem('activatedLevel2Admins', JSON.stringify(activatedAdmins));
+              // }
               
               console.log('🎉 Level 2 admin setup completed successfully');
               
@@ -289,11 +276,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               // Dispatch event to notify useAdmin hook to refresh
               window.dispatchEvent(new CustomEvent('adminLevelChanged'));
               
-              // Also refresh the admin level in this context with increased delay
-              setTimeout(() => {
-                console.log('🔄 Refreshing admin level in AuthContext...');
-                fetchAdminLevel(data.user);
-              }, 2000); // Increased delay to ensure all operations complete
+              // Also refresh the admin level in this context with increased delay - REMOVED THIS LINE
+              // setTimeout(() => {
+              //   console.log('🔄 Refreshing admin level in AuthContext...');
+              //   fetchAdminLevel(data.user);
+              // }, 2000); // Increased delay to ensure all operations complete
             } else {
               console.log('❌ No matching invitation found for token:', metadata.inviteToken);
             }
@@ -334,7 +321,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 await supabase.rpc('assign_school_to_admin', {
                   target_user_id: data.user.id,
                   target_school_id: schoolId,
-                  assigned_by_user_id: pendingAdmin.createdBy
+                  assigned_by_user_id: pendingAdmins.createdBy
                 });
               }
 
@@ -344,22 +331,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               );
               localStorage.setItem('pendingLevel2Admins', JSON.stringify(updatedPending));
               
-              // Mark admin as activated for tracking purposes
-              const activatedAdmins = JSON.parse(localStorage.getItem('activatedLevel2Admins') || '[]');
-              if (!activatedAdmins.includes(email.toLowerCase())) {
-                activatedAdmins.push(email.toLowerCase());
-                localStorage.setItem('activatedLevel2Admins', JSON.stringify(activatedAdmins));
-              }
+              // Mark admin as activated for tracking purposes - REMOVED THIS LINE
+              // const activatedAdmins = JSON.parse(localStorage.getItem('activatedLevel2Admins') || '[]');
+              // if (!activatedAdmins.includes(email.toLowerCase())) {
+              //   activatedAdmins.push(email.toLowerCase());
+              //   localStorage.setItem('activatedLevel2Admins', JSON.stringify(activatedAdmins));
+              // }
               
               console.log('Legacy Level 2 admin profile automatically created and configured');
               
               // Dispatch event to notify useAdmin hook to refresh
               window.dispatchEvent(new CustomEvent('adminLevelChanged'));
               
-              // Also refresh the admin level in this context
-              setTimeout(() => {
-                fetchAdminLevel(data.user);
-              }, 500);
+              // Also refresh the admin level in this context - REMOVED THIS LINE
+              // setTimeout(() => {
+              //   fetchAdminLevel(data.user);
+              // }, 500);
             }
           } catch (adminError) {
             console.warn('Failed to apply legacy Level 2 admin configuration:', adminError);

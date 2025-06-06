@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdmin } from '@/lib/admin/useAdmin';
@@ -47,9 +47,42 @@ export default function SchoolsPage() {
   const [hasAttemptedRefresh, setHasAttemptedRefresh] = useState(false);
   const { toast } = useToast();
 
-  // Check if user has permission to access schools
-  const hasSchoolsAccess = hasPermission(PERMISSION_TYPES.CMS_ACCESS);
-  
+  // Check if user has permission to access schools - memoized to prevent infinite loops
+  const hasSchoolsAccess = useMemo(() => {
+    return hasPermission(PERMISSION_TYPES.CMS_ACCESS);
+  }, [hasPermission]);
+
+  const fetchSchools = useCallback(async () => {
+    try {
+      setLoading(true);
+      
+      let query = supabase
+        .from('schools')
+        .select('*')
+        .order('name', { ascending: true });
+
+      // Level 2 admins only see their assigned schools
+      if (isLevel2Admin && assignedSchools.length > 0) {
+        query = query.in('id', assignedSchools);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      setSchools(data || []);
+    } catch (error) {
+      console.error('Error fetching schools:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch schools",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [isLevel2Admin, assignedSchools, toast]);
+
   useEffect(() => {
     // Attempt one refresh for newly signed up Level 2 admins
     if (!adminLoading && adminLevel === null && !hasAttemptedRefresh) {
@@ -81,38 +114,7 @@ export default function SchoolsPage() {
     return () => {
       window.removeEventListener('openAddSchoolDialog', handleOpenAddDialog);
     };
-  }, [adminLoading, isLevel1Admin, isLevel2Admin, assignedSchools, hasSchoolsAccess]);
-
-  const fetchSchools = async () => {
-    try {
-      setLoading(true);
-      
-      let query = supabase
-        .from('schools')
-        .select('*')
-        .order('name', { ascending: true });
-
-      // Level 2 admins only see their assigned schools
-      if (isLevel2Admin && assignedSchools.length > 0) {
-        query = query.in('id', assignedSchools);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-
-      setSchools(data || []);
-    } catch (error) {
-      console.error('Error fetching schools:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch schools",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [adminLoading, isLevel1Admin, isLevel2Admin, hasSchoolsAccess, fetchSchools]);
 
   useEffect(() => {
     const filtered = schools.filter(school =>
@@ -168,10 +170,10 @@ export default function SchoolsPage() {
     }
   };
 
-  const handleSchoolAdded = () => {
+  const handleSchoolAdded = useCallback(() => {
     fetchSchools();
     setShowAddDialog(false);
-  };
+  }, [fetchSchools]);
 
   const handleInviteAdmin = (school: School) => {
     setSelectedSchool(school);

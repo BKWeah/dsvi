@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { 
@@ -170,51 +170,59 @@ export const useAdmin = (): UseAdminReturn => {
     };
   }, [user]);
 
-  const hasPermission = (permission: PermissionType | string, resourceId?: string): boolean => {
-    if (!adminLevel) return false;
+  const hasPermission = useMemo(() => {
+    return (permission: PermissionType | string, resourceId?: string): boolean => {
+      if (!adminLevel) return false;
 
-    // Level 1 admins have all permissions except for restricted ones they explicitly need to check
-    if (adminLevel === ADMIN_LEVELS.SUPER_ADMIN) {
-      return true;
-    }
+      // Level 1 admins have all permissions except for restricted ones they explicitly need to check
+      if (adminLevel === ADMIN_LEVELS.SUPER_ADMIN) {
+        return true;
+      }
 
-    // Level 2 admins cannot have restricted permissions
-    if (isRestrictedPermission(permission)) {
+      // Level 2 admins cannot have restricted permissions
+      if (isRestrictedPermission(permission)) {
+        return false;
+      }
+
+      // Level 2 admins need explicit permissions
+      if (adminLevel === ADMIN_LEVELS.ASSIGNED_STAFF) {
+        return permissions.some(p => 
+          p.permission_type === permission &&
+          (resourceId ? p.resource_id === resourceId : true) &&
+          p.is_active &&
+          (!p.expires_at || new Date(p.expires_at) > new Date())
+        );
+      }
+
       return false;
-    }
+    };
+  }, [adminLevel, permissions]);
 
-    // Level 2 admins need explicit permissions
-    if (adminLevel === ADMIN_LEVELS.ASSIGNED_STAFF) {
-      return permissions.some(p => 
-        p.permission_type === permission &&
-        (resourceId ? p.resource_id === resourceId : true) &&
-        p.is_active &&
-        (!p.expires_at || new Date(p.expires_at) > new Date())
-      );
-    }
+  const hasSchoolAccess = useMemo(() => {
+    return (schoolId: string): boolean => {
+      if (!adminLevel) return false;
 
-    return false;
-  };
+      // Level 1 admins have access to all schools
+      if (adminLevel === ADMIN_LEVELS.SUPER_ADMIN) {
+        return true;
+      }
 
-  const hasSchoolAccess = (schoolId: string): boolean => {
-    if (!adminLevel) return false;
+      // Level 2 admins only have access to assigned schools
+      if (adminLevel === ADMIN_LEVELS.ASSIGNED_STAFF) {
+        return assignments.some(a => a.school_id === schoolId && a.is_active);
+      }
 
-    // Level 1 admins have access to all schools
-    if (adminLevel === ADMIN_LEVELS.SUPER_ADMIN) {
-      return true;
-    }
-
-    // Level 2 admins only have access to assigned schools
-    if (adminLevel === ADMIN_LEVELS.ASSIGNED_STAFF) {
-      return assignments.some(a => a.school_id === schoolId && a.is_active);
-    }
-
-    return false;
-  };
+      return false;
+    };
+  }, [adminLevel, assignments]);
 
   const isLevel1Admin = adminLevel === ADMIN_LEVELS.SUPER_ADMIN;
   const isLevel2Admin = adminLevel === ADMIN_LEVELS.ASSIGNED_STAFF;
-  const assignedSchools = assignments.map(a => a.school_id);
+  
+  // Memoize assignedSchools to prevent unnecessary re-renders
+  const assignedSchools = useMemo(() => {
+    return assignments.map(a => a.school_id);
+  }, [assignments]);
 
   return {
     adminLevel,
