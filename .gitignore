@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Lock files (let Cloudflare generate its own)
+package-lock.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
