@@ -49,7 +49,7 @@ export default function Signup() {
               onClick={() => navigate('/login')}
               className="w-full"
             >
-              Go to Login
+              Go to Admin Planet
             </Button>
           </CardContent>
         </Card>

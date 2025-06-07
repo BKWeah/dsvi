@@ -155,7 +155,7 @@ export const Navigation: React.FC<NavigationProps> = ({ onLoginClick, heroRef })
           {/* Desktop Actions */}
           <div ref={actionsRef} className="hidden lg:flex items-center space-x-4">
             <Button variant="ghost" onClick={onLoginClick} className={loginButtonClass}>
-              Login
+              Admin Planet
             </Button>
             <Link to="/register">
               <Button 
@@ -192,7 +192,7 @@ export const Navigation: React.FC<NavigationProps> = ({ onLoginClick, heroRef })
               ))}
               <div className="flex flex-col space-y-2 pt-2">
                 <Button variant="outline" onClick={onLoginClick} className={`w-full ${mobileLoginButtonClass}`}>
-                  Login
+                  Admin Planet
                 </Button>
                 <Link to="/register" className="w-full">
                   <Button className="w-full bg-gradient-to-r from-blue-600 to-green-600">

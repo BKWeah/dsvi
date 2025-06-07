@@ -11,7 +11,7 @@ export default function FAQPage() {
   const faqs = [
     {
       question: "How much does a DSVI website cost?",
-      answer: "Our Standard Package starts at $100/year, with Advanced packages at $150 and $200 per year. All packages include hosting, SSL certificate, and support."
+      answer: "Our Standard Package starts at $100/year, Prime Essentials Package at $200/year, and Prime Elite Package at $350/year. All packages include hosting, SSL certificate, and support."
     },
     {
       question: "How long does it take to create our website?",

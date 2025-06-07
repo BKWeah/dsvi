@@ -325,7 +325,7 @@ export default function Level2AdminSignupPage() {
               Please contact your administrator for a new invitation.
             </p>
             <Button asChild className="w-full">
-              <Link to="/login">Back to Login</Link>
+              <Link to="/login">Back to Admin Planet</Link>
             </Button>
           </CardContent>
         </Card>

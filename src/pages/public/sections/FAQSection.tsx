@@ -18,7 +18,7 @@ export const FAQSection: React.FC = () => {
   const faqs = [
     {
       question: "How much does it cost?",
-      answer: "Our Prime Essentials Package starts at $200, which includes professional website design, 6 pages, mobile optimization, and basic support. We also offer Prime Elite Package starting at $350 with additional features like student portals and advanced analytics.",
+      answer: "Our Standard Package starts at $100/year, offering professional website design, mobile responsive layout, and basic content management. Our Prime Essentials Package starts at $200, which includes professional website design, 6 pages, mobile optimization, and basic support. We also offer Prime Elite Package starting at $350 with additional features like student portals and advanced analytics.",
       icon: DollarSign
     },
     {

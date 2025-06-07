@@ -21,7 +21,7 @@ export default function Unauthorized() {
             </p>
             <div className="flex gap-2 justify-center">
               <Button asChild variant="outline">
-                <Link to="/login">Back to Login</Link>
+                <Link to="/login">Back to Admin Planet</Link>
               </Button>
               <Button asChild>
                 <Link to="/">Home</Link>

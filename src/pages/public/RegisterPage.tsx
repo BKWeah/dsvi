@@ -188,12 +188,29 @@ export default function RegisterPage() {
                               <SelectValue placeholder="Select school type" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="private">Private School</SelectItem>
-                              <SelectItem value="public">Public School</SelectItem>
-                              <SelectItem value="vocational">Vocational School</SelectItem>
-                              <SelectItem value="college">College</SelectItem>
-                              <SelectItem value="university">University</SelectItem>
-                              <SelectItem value="polytechnic">Polytechnic</SelectItem>
+                              <div className="px-2 py-1 text-sm font-semibold text-gray-900 bg-gray-100">Public Schools</div>
+                              <SelectItem value="public-daycare">Day Care (Public)</SelectItem>
+                              <SelectItem value="public-nursery">Nursery (Public)</SelectItem>
+                              <SelectItem value="public-kindergarten">Kindergarten (Public)</SelectItem>
+                              <SelectItem value="public-elementary">Elementary / Primary School (Public)</SelectItem>
+                              <SelectItem value="public-junior-high">Junior High School (Public)</SelectItem>
+                              <SelectItem value="public-senior-high">Senior High School (Public)</SelectItem>
+                              <SelectItem value="public-vocational">Vocational / Technical School (Public)</SelectItem>
+                              <SelectItem value="public-college">College (Public)</SelectItem>
+                              <SelectItem value="public-polytechnic">Polytechnic (Public)</SelectItem>
+                              <SelectItem value="public-university">University (Public)</SelectItem>
+                              
+                              <div className="px-2 py-1 text-sm font-semibold text-gray-900 bg-gray-100 mt-2">Private Schools</div>
+                              <SelectItem value="private-daycare">Day Care (Private)</SelectItem>
+                              <SelectItem value="private-nursery">Nursery (Private)</SelectItem>
+                              <SelectItem value="private-kindergarten">Kindergarten (Private)</SelectItem>
+                              <SelectItem value="private-elementary">Elementary / Primary School (Private)</SelectItem>
+                              <SelectItem value="private-junior-high">Junior High School (Private)</SelectItem>
+                              <SelectItem value="private-senior-high">Senior High School (Private)</SelectItem>
+                              <SelectItem value="private-vocational">Vocational / Technical School (Private)</SelectItem>
+                              <SelectItem value="private-college">College (Private)</SelectItem>
+                              <SelectItem value="private-polytechnic">Polytechnic (Private)</SelectItem>
+                              <SelectItem value="private-university">University (Private)</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
