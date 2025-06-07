@@ -1,11 +1,17 @@
 import { supabase } from '@/integrations/supabase/client';
 import { EmailSettings } from './messaging-types';
+import { emailService } from './email-service';
 
 /**
  * Initialize default email settings with Brevo configuration
  */
 export async function initializeDefaultEmailSettings(): Promise<void> {
   try {
+    console.log('🔄 EMAIL INIT: Starting email system initialization...');
+    
+    // Always initialize the email service first
+    await emailService.initialize();
+    
     // Check if any email settings already exist
     const { data: existingSettings } = await supabase
       .from('email_settings')
@@ -13,15 +19,17 @@ export async function initializeDefaultEmailSettings(): Promise<void> {
       .limit(1);
 
     if (existingSettings && existingSettings.length > 0) {
-      console.log('Email settings already exist, skipping initialization');
+      console.log('✅ EMAIL INIT: Email settings already exist, email service initialized');
       return;
     }
+
+    console.log('📝 EMAIL INIT: No settings found, creating defaults...');
 
     // Get the default Brevo API key from environment
     const defaultApiKey = import.meta.env.VITE_DEFAULT_BREVO_API_KEY;
     
     if (!defaultApiKey) {
-      console.warn('No default Brevo API key found in environment variables');
+      console.warn('⚠️ EMAIL INIT: No default Brevo API key found in environment variables');
       return;
     }
 
@@ -47,13 +55,17 @@ export async function initializeDefaultEmailSettings(): Promise<void> {
       .insert(defaultSettings);
 
     if (error) {
-      console.error('Failed to initialize default email settings:', error);
+      console.error('❌ EMAIL INIT: Failed to initialize default email settings:', error);
       throw error;
     }
 
-    console.log('Default email settings initialized successfully with Brevo');
+    console.log('✅ EMAIL INIT: Default email settings created successfully');
+    
+    // Reinitialize the email service to load the new defaults
+    await emailService.initialize();
+    
   } catch (error) {
-    console.error('Error initializing email settings:', error);
+    console.error('💥 EMAIL INIT: Error initializing email settings:', error);
   }
 }
 

@@ -45,12 +45,48 @@ export function EmailSettingsDialog({ open, onOpenChange }: EmailSettingsDialogP
   const loadSettings = async () => {
     try {
       setLoading(true);
+      console.log('🔄 UI LOAD PROCESS STARTED');
+      
+      // Force a fresh reload of settings from database
+      console.log('🔄 Forcing fresh reload from database...');
+      await emailService.reloadSettings();
+      
       const currentSettings = await emailService.getSettings();
+      console.log('📖 EmailService.getSettings() returned:', currentSettings);
+      
       if (currentSettings) {
+        console.log('✅ Found existing settings, loading into form:', {
+          provider: currentSettings.provider,
+          from_email: currentSettings.from_email,
+          from_name: currentSettings.from_name,
+          is_active: currentSettings.is_active
+        });
         setSettings(currentSettings);
+      } else {
+        console.log('⚠️ No existing settings found, setting up default form values');
+        // If no settings found, set up default form values (not saved to DB)
+        const defaultApiKey = import.meta.env.VITE_DEFAULT_BREVO_API_KEY;
+        const defaultFormSettings = {
+          provider: 'brevo' as const,
+          api_key: defaultApiKey || '',
+          api_secret: null,
+          smtp_host: null,
+          smtp_port: null,
+          smtp_username: null,
+          smtp_password: null,
+          from_email: 'noreply@dsvi.org',
+          from_name: 'DSVI Team',
+          reply_to_email: 'support@dsvi.org',
+          is_active: true,
+          test_mode: false
+        };
+        console.log('📝 Setting default form values:', defaultFormSettings);
+        setSettings(defaultFormSettings);
       }
+      
+      console.log('🎉 UI LOAD PROCESS COMPLETED');
     } catch (error) {
-      console.error('Failed to load email settings:', error);
+      console.error('💥 UI Load process failed:', error);
     } finally {
       setLoading(false);
     }
@@ -59,14 +95,32 @@ export function EmailSettingsDialog({ open, onOpenChange }: EmailSettingsDialogP
   const handleSave = async () => {
     try {
       setSaving(true);
+      console.log('🔄 UI SAVE PROCESS STARTED');
+      console.log('📝 Form settings to save:', {
+        provider: settings.provider,
+        from_email: settings.from_email,
+        from_name: settings.from_name,
+        is_active: settings.is_active,
+        test_mode: settings.test_mode
+      });
+      
       await emailService.updateSettings(settings as EmailSettings);
+      
+      console.log('✅ EmailService.updateSettings() completed successfully');
+      
+      // Force reload to ensure local state is in sync with database
+      console.log('🔄 Forcing reload after save...');
+      await emailService.reloadSettings();
+      
       toast({
         title: "Success",
         description: "Email settings saved successfully",
       });
+      
+      console.log('🎉 UI SAVE PROCESS COMPLETED');
       onOpenChange(false);
     } catch (error) {
-      console.error('Failed to save settings:', error);
+      console.error('💥 UI Save process failed:', error);
       toast({
         title: "Error",
         description: "Failed to save email settings",
@@ -80,24 +134,19 @@ export function EmailSettingsDialog({ open, onOpenChange }: EmailSettingsDialogP
   const handleTest = async () => {
     try {
       setTesting(true);
-      const result = await emailService.testConnection();
-      if (result) {
-        toast({
-          title: "Success",
-          description: "Email connection test successful",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: "Email connection test failed",
-          variant: "destructive",
-        });
-      }
+      
+      // Pass current form settings to test method
+      const result = await emailService.testConnection(settings);
+      
+      toast({
+        title: "Success",
+        description: "Email connection test successful! Your configuration is working.",
+      });
     } catch (error) {
       console.error('Failed to test connection:', error);
       toast({
-        title: "Error",
-        description: "Failed to test email connection",
+        title: "Test Failed",
+        description: error instanceof Error ? error.message : "Email connection test failed",
         variant: "destructive",
       });
     } finally {
