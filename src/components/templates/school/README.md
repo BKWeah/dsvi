@@ -188,4 +188,4 @@ This template represents the culmination of our commitment to providing exceptio
 
 **Built with ❤️ by DSVI** - Empowering education through technology.
 
-For support and customization services, visit [dsvi.com](https://dsvi.com)
+For support and customization services, visit [dsvi.com](https://libdsvi.com)

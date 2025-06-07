@@ -206,7 +206,7 @@ export function SubdomainSchoolLayout() {
               <div className="flex items-center space-x-1">
                 <span>Built with ❤️ by</span>
                 <a 
-                  href="https://dsvi.com" 
+                  href="https://libdsvi.com" 
                   className="text-white hover:text-primary transition-colors font-medium"
                   target="_blank"
                   rel="noopener noreferrer"
