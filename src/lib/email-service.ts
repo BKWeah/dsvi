@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { BrevoService } from './brevo-service';
 import { 
   EmailConfig, 
   SendMessageResponse, 
@@ -83,10 +84,10 @@ export class EmailService {
             region: 'us-east-1' // Default region
           }
         };
-      case 'resend':
+      case 'brevo':
         return {
           ...baseConfig,
-          resend: {
+          brevo: {
             api_key: settings.api_key!
           }
         };
@@ -127,16 +128,49 @@ export class EmailService {
         };
       }
 
-      // Real email sending would happen here based on provider
-      // For now, simulate successful sending
-      await this.updateMessageStatus(message.id, 'sent', recipients.length);
+      // Real email sending based on provider
+      let result: SendMessageResponse;
+
+      switch (this.config.provider) {
+        case 'brevo':
+          if (this.config.brevo) {
+            const brevoService = new BrevoService({
+              api_key: this.config.brevo.api_key,
+              from_email: this.config.from_email,
+              from_name: this.config.from_name,
+              reply_to_email: this.config.reply_to_email
+            });
+            result = await brevoService.sendEmail(message, recipients);
+          } else {
+            throw new Error('Brevo configuration missing');
+          }
+          break;
+
+        case 'sendgrid':
+        case 'ses':
+        case 'resend':
+        case 'smtp':
+          // Other providers can be implemented here
+          console.log(`Provider ${this.config.provider} not fully implemented yet, simulating send`);
+          result = {
+            message_id: message.id,
+            total_recipients: recipients.length,
+            status: 'success',
+            delivery_provider: this.config.provider
+          };
+          break;
+
+        default:
+          throw new Error(`Unsupported email provider: ${this.config.provider}`);
+      }
+
+      // Update message status based on result
+      const status = result.status === 'success' ? 'sent' : 'failed';
+      const successCount = result.status === 'success' ? recipients.length : 0;
       
-      return {
-        message_id: message.id,
-        total_recipients: recipients.length,
-        status: 'success',
-        delivery_provider: this.config.provider
-      };
+      await this.updateMessageStatus(message.id, status, successCount);
+      
+      return result;
 
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -215,16 +249,32 @@ export class EmailService {
         throw new Error('No email configuration available');
       }
 
-      // For now, just validate config structure
-      const isValid = this.config.from_email && 
-                     this.config.from_name && 
-                     this.config.provider;
+      // Provider-specific connection testing
+      switch (this.config.provider) {
+        case 'brevo':
+          if (this.config.brevo) {
+            const brevoService = new BrevoService({
+              api_key: this.config.brevo.api_key,
+              from_email: this.config.from_email,
+              from_name: this.config.from_name,
+              reply_to_email: this.config.reply_to_email
+            });
+            const result = await brevoService.testConnection();
+            return result.success;
+          }
+          throw new Error('Brevo configuration missing');
 
-      if (!isValid) {
-        throw new Error('Email configuration is incomplete');
+        default:
+          // For other providers, just validate config structure
+          const isValid = this.config.from_email && 
+                         this.config.from_name && 
+                         this.config.provider;
+
+          if (!isValid) {
+            throw new Error('Email configuration is incomplete');
+          }
+          return true;
       }
-
-      return true;
     } catch (error) {
       console.error('Email connection test failed:', error);
       return false;

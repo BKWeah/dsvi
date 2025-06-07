@@ -1,4 +1,5 @@
 
+import React, { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,6 +21,7 @@ import { SubdomainSchoolPageDisplay } from "./components/public/SubdomainSchoolP
 import { getSubdomainInfo, getCurrentSchoolSlug, isSubdomainRouting } from "./lib/subdomain-utils";
 import { SchoolRedirectHandler } from "./components/redirects/SchoolRedirectHandler";
 import { PERMISSION_TYPES, RESTRICTED_PERMISSIONS } from "./lib/admin/permissions";
+import { initializeDefaultEmailSettings } from "./lib/email-init";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -62,6 +64,11 @@ const queryClient = new QueryClient();
 const App = () => {
   // Check if we're on a school subdomain
   const subdomainInfo = getSubdomainInfo();
+  
+  // Initialize email settings on app startup
+  useEffect(() => {
+    initializeDefaultEmailSettings();
+  }, []);
   
   return (
     <QueryClientProvider client={queryClient}>

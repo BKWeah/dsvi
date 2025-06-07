@@ -130,6 +130,7 @@ export function EmailSettingsDialog({ open, onOpenChange }: EmailSettingsDialogP
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="smtp">SMTP</SelectItem>
+                <SelectItem value="brevo">Brevo (Sendinblue)</SelectItem>
                 <SelectItem value="sendgrid">SendGrid</SelectItem>
                 <SelectItem value="ses">Amazon SES</SelectItem>
                 <SelectItem value="resend">Resend</SelectItem>
@@ -206,15 +207,20 @@ export function EmailSettingsDialog({ open, onOpenChange }: EmailSettingsDialogP
           )}
 
           {/* API Key Settings */}
-          {(settings.provider === 'sendgrid' || settings.provider === 'resend') && (
+          {(settings.provider === 'sendgrid' || settings.provider === 'resend' || settings.provider === 'brevo') && (
             <div className="space-y-2">
               <Label>API Key</Label>
               <Input
                 type="password"
                 value={settings.api_key || ''}
                 onChange={(e) => setSettings(prev => ({ ...prev, api_key: e.target.value }))}
-                placeholder="Enter your API key"
+                placeholder={settings.provider === 'brevo' ? 'xkeysib-...' : 'Enter your API key'}
               />
+              {settings.provider === 'brevo' && (
+                <p className="text-sm text-muted-foreground">
+                  Get your API key from Brevo Dashboard → API & Integrations → SMTP & API
+                </p>
+              )}
             </div>
           )}
 

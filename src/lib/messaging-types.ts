@@ -4,7 +4,7 @@ export type MessageStatus = 'pending' | 'sent' | 'delivered' | 'failed' | 'bounc
 export type DeliveryStatus = 'pending' | 'sent' | 'delivered' | 'failed' | 'bounced' | 'opened' | 'clicked';
 export type TemplateType = 'welcome' | 'expiry_warning' | 'expired' | 'renewal_success' | 'payment_overdue' | 'update_alert' | 'custom';
 export type RecipientType = 'school_admin' | 'dsvi_admin' | 'external';
-export type EmailProvider = 'sendgrid' | 'ses' | 'resend' | 'smtp';
+export type EmailProvider = 'sendgrid' | 'ses' | 'resend' | 'smtp' | 'brevo';
 export type TriggerType = 'subscription_expiry' | 'payment_overdue' | 'welcome' | 'renewal_success';
 
 export interface MessageTemplate {
@@ -179,6 +179,9 @@ export interface EmailConfig {
     region: string;
   };
   resend?: {
+    api_key: string;
+  };
+  brevo?: {
     api_key: string;
   };
   smtp?: {

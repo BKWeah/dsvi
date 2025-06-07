@@ -1,0 +1,14 @@
+name = "dsvi-email-worker"
+main = "email-worker.js"
+compatibility_date = "2024-01-01"
+
+[env.production]
+vars = { ENVIRONMENT = "production" }
+
+# Add your Brevo API key as a secret:
+# wrangler secret put BREVO_API_KEY
+
+# Routes configuration (adjust domain as needed)
+# routes = [
+#   { pattern = "yourdomain.com/api/brevo/*", zone_name = "yourdomain.com" }
+# ]
