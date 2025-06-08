@@ -24,7 +24,7 @@ import { TemplateManagerDialog } from '@/components/dsvi-admin/messaging/Templat
 import { MessageHistoryTable } from '@/components/dsvi-admin/messaging/MessageHistoryTable';
 import { EmailSettingsDialog } from '@/components/dsvi-admin/messaging/EmailSettingsDialog';
 import { QuickEmailSettings } from '@/components/dsvi-admin/messaging/QuickEmailSettings';
-import { BrevoTestComponent } from '@/components/dsvi-admin/messaging/BrevoTestComponent';
+import { SimpleEmailTest } from '@/components/dsvi-admin/messaging/SimpleEmailTest';
 import { MessagingSystemTest } from '@/components/dsvi-admin/messaging/MessagingSystemTest';
 import { TemplateDebugger } from '@/components/dsvi-admin/messaging/TemplateDebugger';
 
@@ -367,12 +367,12 @@ export default function MessagingPanelPage() {
             <div className="text-center">
               <h3 className="text-lg font-medium mb-2">System Test</h3>
               <p className="text-muted-foreground mb-6">
-                Test all messaging system components to ensure they are working correctly
+                Test the SMTP email system and messaging components to ensure they are working correctly
               </p>
             </div>
             
-            {/* Brevo Integration Test */}
-            <BrevoTestComponent />
+            {/* SMTP Email Test */}
+            <SimpleEmailTest />
             
             {/* General Messaging System Test */}
             <MessagingSystemTest />

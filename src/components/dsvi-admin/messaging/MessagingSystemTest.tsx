@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { messagingService } from '@/lib/messaging-service';
-import { emailService } from '@/lib/email-service';
+import { simpleEmailService } from '@/lib/simple-email-service';
 import { automatedMessagingService } from '@/lib/automated-messaging-service';
 import { CheckCircle, AlertCircle, TestTube, Mail, MessageSquare, Zap } from 'lucide-react';
 
@@ -25,15 +25,10 @@ export function MessagingSystemTest() {
   };
 
   const testEmailSettings = async () => {
-    // Test email settings functionality
-    const settings = emailService.getSettings();
-    if (!settings) {
-      throw new Error('No email settings configured');
-    }
-    
-    const testResult = await emailService.testConnection();
-    if (!testResult) {
-      throw new Error('Email connection test failed');
+    // Test the new simple email service functionality
+    const testResult = await simpleEmailService.testConnection();
+    if (!testResult.success) {
+      throw new Error(testResult.error || 'SMTP email connection test failed');
     }
   };
 
@@ -123,7 +118,7 @@ export function MessagingSystemTest() {
   };
 
   const tests = [
-    { key: 'Email Settings', icon: Mail, description: 'Email configuration and connection test' },
+    { key: 'Email Settings', icon: Mail, description: 'SMTP email configuration and connection test' },
     { key: 'Messaging Service', icon: MessageSquare, description: 'Core messaging functionality' },
     { key: 'Template System', icon: TestTube, description: 'Template creation and management' },
     { key: 'Automated Messaging', icon: Zap, description: 'Automated message processing' }
@@ -137,7 +132,7 @@ export function MessagingSystemTest() {
           Messaging System Test
         </CardTitle>
         <CardDescription>
-          Test all messaging system components to ensure they are working correctly
+          Test SMTP email service and messaging system components to ensure they are working correctly
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -178,7 +173,7 @@ export function MessagingSystemTest() {
         </Button>
         
         <div className="text-sm text-muted-foreground text-center">
-          This test verifies that all messaging system components are properly configured and functional.
+          This test verifies that the SMTP email service and messaging system components are properly configured and functional.
         </div>
       </CardContent>
     </Card>
