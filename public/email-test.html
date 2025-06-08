@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DSVI Email API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+        .test-section { background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        button { background: #0070f3; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0051cc; }
+        input, textarea { width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px; }
+        .result { background: white; padding: 15px; margin: 10px 0; border-radius: 4px; border-left: 4px solid #0070f3; }
+        .error { border-left-color: #ff0000; }
+        .success { border-left-color: #00ff00; }
+    </style>
+</head>
+<body>
+    <h1>🧪 DSVI Email API Direct Test</h1>
+    <p>This page tests your email API endpoint directly to diagnose sending issues.</p>
+
+    <div class="test-section">
+        <h3>📧 Test Email Sending</h3>
+        <div>
+            <label>Your Email Address:</label>
+            <input type="email" id="testEmail" placeholder="your@email.com" required>
+        </div>
+        <div>
+            <label>Subject:</label>
+            <input type="text" id="testSubject" value="DSVI Email API Test" required>
+        </div>
+        <div>
+            <label>Message:</label>
+            <textarea id="testMessage" rows="4" placeholder="Test message content...">
+Hello! This is a test email from the DSVI email API endpoint.
+
+If you receive this email, your email system is working correctly!
+
+Sent at: ${new Date().toISOString()}
+            </textarea>
+        </div>
+        <button onclick="testEmailAPI()">🚀 Send Test Email</button>
+        <button onclick="testConnection()">🔗 Test API Connection</button>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 Test Results</h3>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function addResult(message, isSuccess = true) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${isSuccess ? 'success' : 'error'}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong> - ${message}`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+
+        async function testConnection() {
+            addResult('🔄 Testing API endpoint connection...', true);
+            
+            try {
+                const response = await fetch('/api/email/send', {
+                    method: 'OPTIONS'
+                });
+                
+                if (response.ok) {
+                    addResult('✅ API endpoint is accessible', true);
+                } else {
+                    addResult(`❌ API endpoint returned status: ${response.status}`, false);
+                }
+            } catch (error) {
+                addResult(`❌ API endpoint error: ${error.message}`, false);
+            }
+        }
+
+        async function testEmailAPI() {
+            const email = document.getElementById('testEmail').value;
+            const subject = document.getElementById('testSubject').value;
+            const message = document.getElementById('testMessage').value;
+
+            if (!email || !email.includes('@')) {
+                addResult('❌ Please enter a valid email address', false);
+                return;
+            }
+
+            addResult('🔄 Sending test email...', true);
+
+            try {
+                const response = await fetch('/api/email/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        to: email,
+                        subject: subject,
+                        html: `
+                            <div style="font-family: Arial, sans-serif; max-width: 600px;">
+                                <h2>🧪 DSVI Email API Test</h2>
+                                <p>${message.replace(/\n/g, '<br>')}</p>
+                                <hr>
+                                <p style="color: #666; font-size: 14px;">
+                                    Sent via DSVI Email API Direct Test<br>
+                                    URL: ${window.location.href}
+                                </p>
+                            </div>
+                        `,
+                        from: {
+                            email: 'noreply@dsvi.org',
+                            name: 'DSVI API Test'
+                        }
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    addResult(`✅ Email sent successfully! Message ID: ${result.messageId || 'N/A'}`, true);
+                    addResult('📧 Check your inbox (and spam folder) for the test email', true);
+                } else {
+                    addResult(`❌ Email sending failed: ${result.error || 'Unknown error'}`, false);
+                    addResult(`📋 Response status: ${response.status}`, false);
+                    addResult(`📋 Full response: ${JSON.stringify(result, null, 2)}`, false);
+                }
+
+            } catch (error) {
+                addResult(`❌ Request failed: ${error.message}`, false);
+                addResult('💡 This might indicate the API endpoint is not available', false);
+            }
+        }
+
+        // Auto-test connection on page load
+        window.addEventListener('load', () => {
+            setTimeout(testConnection, 1000);
+        });
+    </script>
+</body>
+</html>
