@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client'; // Added supabase import
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -36,63 +36,34 @@ interface InvitationRpcResult {
   };
 }
 
+// Define the expected structure of the RPC result for create_admin_from_invitation
+interface CreateAdminRpcResult {
+  success: boolean;
+  message?: string;
+  error?: string;
+  admin_id?: string;
+}
+
 export default function Level2AdminSignupPage() {
   const [searchParams] = useSearchParams();
   const { signup } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Extract parameters from URL - support both old and new formats
+  // Extract parameters from URL
   const inviteToken = searchParams.get('token');
-  const emailHash = searchParams.get('eh'); // New secure format
-  const encodedEmail = searchParams.get('email'); // Old format (backward compatibility)
+  const emailHash = searchParams.get('eh');
   const tempPassword = searchParams.get('pwd');
   const adminName = searchParams.get('name');
 
-  // Decode the email parameter properly
-  let directEmail = '';
-  if (encodedEmail) {
-    try {
-      // First try URL decoding
-      directEmail = decodeURIComponent(encodedEmail);
-      
-      // If it looks like base64 (no @ symbol and reasonable length), try base64 decode
-      if (!directEmail.includes('@') && directEmail.length > 4) {
-        try {
-          directEmail = atob(directEmail);
-          console.log('Successfully decoded base64 email:', directEmail);
-        } catch (base64Error) {
-          console.warn('Base64 decode failed, using URL decoded version:', directEmail);
-        }
-      }
-    } catch (error) {
-      console.error('Error decoding email parameter:', error);
-      directEmail = encodedEmail; // Fallback to raw parameter
-    }
-  }
-
-  console.log('Signup page parameters:', {
+  console.log('🔄 Signup page parameters:', {
     inviteToken,
     emailHash,
-    encodedEmail,
-    directEmail,
     tempPassword,
     adminName
   });
 
-  // Add debug information about localStorage
-  try {
-    const pendingAdmins = JSON.parse(localStorage.getItem('pendingLevel2Admins') || '[]');
-    console.log('Available pending invitations:', pendingAdmins.map(admin => ({
-      email: admin.email,
-      token: admin.inviteToken,
-      emailHash: admin.emailHash
-    })));
-  } catch (e) {
-    console.log('No pending invitations found');
-  }
-
-  // Get the actual email from localStorage using the hash or direct email
+  // State variables
   const [inviteData, setInviteData] = useState<any>(null);
   const [obscuredEmail, setObscuredEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -102,69 +73,76 @@ export default function Level2AdminSignupPage() {
   const [email, setEmail] = useState('');
   const [emailConfirmed, setEmailConfirmed] = useState(false);
   const [isInvitationLoading, setIsInvitationLoading] = useState(true);
-  const [invitationErrorState, setInvitationErrorState] = useState<string | null>(null);
+  const [invitationError, setInvitationError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchInvitation = async () => {
       setIsInvitationLoading(true);
-      setInvitationErrorState(null);
+      setInvitationError(null);
       setInviteData(null);
 
       if (!inviteToken) {
-        setInvitationErrorState('Invitation token is missing from the URL.');
+        setInvitationError('Invitation token is missing from the URL.');
         setIsInvitationLoading(false);
         return;
       }
 
       try {
-        console.log('Fetching invitation from database with token:', inviteToken);
-        console.log('Fetching invitation from database with token:', inviteToken);
-        // Temporarily cast the function name to 'any' to bypass TypeScript's strict type checking for RPC function names.
-        // This is a workaround if the generated types or Supabase client's RPC method inference is not working as expected.
+        console.log('🔄 Fetching invitation from database with token:', inviteToken);
+
+        // Decode the base64 token to get the raw token for database lookup
+        let decodedToken = inviteToken;
+        try {
+          decodedToken = atob(inviteToken || '');
+          console.log('🔍 Decoded token:', decodedToken);
+        } catch (decodeError) {
+          console.log('⚠️ Token decode failed, using raw token:', inviteToken);
+          decodedToken = inviteToken || '';
+        }
+
         const { data: rpcResult, error: rpcError } = await supabase.rpc('get_invitation_by_token' as any, {
-          p_invite_token: inviteToken
+          p_invite_token: decodedToken // Use decoded token for database lookup
         });
 
         if (rpcError) {
-          console.error('Error calling get_invitation_by_token RPC:', rpcError);
-          setInvitationErrorState(`Failed to fetch invitation: ${rpcError.message}`);
+          console.error('❌ Error calling get_invitation_by_token RPC:', rpcError);
+          setInvitationError(`Failed to fetch invitation: ${rpcError.message}`);
           return;
         }
 
-        // Explicitly type rpcResult to InvitationRpcResult for type safety
         const typedRpcResult: InvitationRpcResult | null = rpcResult;
 
         if (!typedRpcResult?.success) {
-          console.warn('Invitation not found or invalid:', typedRpcResult?.message);
-          setInvitationErrorState(typedRpcResult?.message || 'Invitation not found, expired, or already used.');
+          console.warn('❌ Invitation not found or invalid:', typedRpcResult?.message);
+          setInvitationError(typedRpcResult?.message || 'Invitation not found, expired, or already used.');
           return;
         }
 
         const invitation = typedRpcResult.invitation;
-        console.log('Successfully fetched invitation:', invitation);
+        console.log('✅ Successfully fetched invitation:', invitation);
 
         setInviteData(invitation);
-        setEmail(invitation.email); // Pre-fill email from invitation
-        setPassword(tempPassword || invitation.temp_password || ''); // Use URL temp_password first, then DB temp_password
+        setEmail(invitation.email);
+        setPassword(tempPassword || invitation.temp_password || '');
 
         // Create obscured email (show first 2 chars + last domain)
         const [localPart, domain] = invitation.email.split('@');
         const obscured = `${localPart.substring(0, 2)}${'*'.repeat(Math.max(1, localPart.length - 2))}@${domain}`;
         setObscuredEmail(obscured);
-        setEmailConfirmed(true); // Email is confirmed if fetched from DB
+        setEmailConfirmed(true);
 
       } catch (error: any) {
-        console.error('Unexpected error fetching invitation:', error);
-        setInvitationErrorState(`An unexpected error occurred: ${error.message}`);
+        console.error('❌ Unexpected error fetching invitation:', error);
+        setInvitationError(`An unexpected error occurred: ${error.message}`);
       } finally {
         setIsInvitationLoading(false);
       }
     };
 
     fetchInvitation();
-  }, [inviteToken, tempPassword]); // Depend on inviteToken and tempPassword from URL
+  }, [inviteToken, tempPassword]);
 
-  // Validate email matches the invitation (only if not pre-filled and confirmed)
+  // Validate email matches the invitation
   const handleEmailChange = (value: string) => {
     setEmail(value);
     if (inviteData) {
@@ -172,7 +150,7 @@ export default function Level2AdminSignupPage() {
     }
   };
 
-  // Handle signup process
+  // Handle signup process with new consolidated admin creation
   const handleSignup = async () => {
     if (!emailConfirmed) {
       toast({
@@ -204,27 +182,74 @@ export default function Level2AdminSignupPage() {
     setIsLoading(true);
 
     try {
-      const { error } = await signup(email, password, 'DSVI_ADMIN', {
+      console.log('🔄 Starting Level 2 admin signup process...');
+
+      // Decode the invite token for database operations
+      let decodedInviteToken = inviteToken;
+      try {
+        decodedInviteToken = atob(inviteToken || '');
+        console.log('🔍 Using decoded token for signup:', decodedInviteToken);
+      } catch (decodeError) {
+        console.log('⚠️ Token decode failed, using raw token');
+        decodedInviteToken = inviteToken || '';
+      }
+
+      // Step 1: Create auth user
+      const { data: authData, error: authError } = await signup(email, password, 'DSVI_ADMIN', {
         name: inviteData?.name || adminName || email.split('@')[0],
-        inviteToken: inviteToken, // This helps identify it as a Level 2 admin signup
+        inviteToken: decodedInviteToken, // Use decoded token
+        skipAutoAdminCreation: true // Prevent automatic Level 1 admin creation
       });
 
-      if (error) {
-        throw error;
+      if (authError) {
+        console.error('❌ Auth signup error:', authError);
+        throw authError;
       }
+
+      console.log('✅ Auth user created:', authData?.user?.id);
+
+      // Step 2: Create admin record from invitation using new consolidated function
+      if (authData?.user?.id) {
+        console.log('🔄 Creating admin record from invitation...');
+
+        const { data: adminResult, error: adminError } = await supabase.rpc('create_admin_from_invitation', {
+          p_user_id: authData.user.id,
+          p_invite_token: decodedInviteToken // Use decoded token
+        });
+
+        console.log('📊 Admin creation result:', adminResult);
+
+        if (adminError) {
+          console.error('❌ Error creating admin from invitation:', adminError);
+          throw new Error(`Failed to create admin profile: ${adminError.message}`);
+        }
+
+        const typedAdminResult: CreateAdminRpcResult | null = adminResult;
+
+        if (!typedAdminResult?.success) {
+          console.error('❌ Admin creation failed:', typedAdminResult?.message);
+          throw new Error(typedAdminResult?.message || 'Failed to create admin profile');
+        }
+
+        console.log('✅ Admin record created successfully:', typedAdminResult.admin_id);
+      }
+
+      // Step 3: Dispatch admin level change event for UI updates
+      console.log('🔄 Dispatching admin level change event...');
+      window.dispatchEvent(new CustomEvent('adminLevelChanged'));
 
       toast({
         title: "Account Created Successfully!",
-        description: "You can now login with your Level 2 admin account.",
+        description: `Welcome ${inviteData?.name}! Your Level 2 admin account is ready.`,
       });
 
       // Redirect to login page
       setTimeout(() => {
-        navigate('/login');
+        navigate('/login?message=signup-success');
       }, 2000);
 
     } catch (error: any) {
-      console.error('Signup error:', error);
+      console.error('❌ Signup error:', error);
       toast({
         title: "Signup Failed",
         description: error.message || "Failed to create account. Please try again.",
@@ -235,21 +260,24 @@ export default function Level2AdminSignupPage() {
     }
   };
 
-  // Check if invitation is valid (support both formats)
-  const hasValidParams = (inviteToken || tempPassword) && (emailHash || directEmail);
-  const hasInviteData = inviteData !== null;
+  // Loading state for invitation fetch
+  if (isInvitationLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6">
+            <div className="text-center space-y-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="text-muted-foreground">Validating invitation...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
-  console.log('Invitation validation:', {
-    hasValidParams,
-    hasInviteData,
-    inviteToken: !!inviteToken,
-    tempPassword: !!tempPassword,
-    emailHash: !!emailHash,
-    directEmail: !!directEmail,
-    inviteData: !!inviteData
-  });
-
-  if (!hasValidParams || !hasInviteData) {
+  // Error state for invalid invitation
+  if (invitationError || !inviteData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <Card className="w-full max-w-md">
@@ -259,21 +287,13 @@ export default function Level2AdminSignupPage() {
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-muted-foreground">
-              This invitation link is invalid or has expired.
+              {invitationError || 'This invitation link is invalid or has expired.'}
             </p>
-            <div className="text-xs text-left bg-gray-50 p-3 rounded">
-              <p><strong>Debug Info:</strong></p>
-              <p>Has valid params: {hasValidParams ? 'Yes' : 'No'}</p>
-              <p>Has invite data: {hasInviteData ? 'Yes' : 'No'}</p>
-              <p>Token: {inviteToken ? 'Present' : 'Missing'}</p>
-              <p>Email: {directEmail ? 'Present' : 'Missing'}</p>
-              <p>Password: {tempPassword ? 'Present' : 'Missing'}</p>
-            </div>
             <p className="text-sm text-muted-foreground">
               Please contact your administrator for a new invitation.
             </p>
             <Button asChild className="w-full">
-              <Link to="/login">Back to Admin Planet</Link>
+              <Link to="/login">Back to Login</Link>
             </Button>
           </CardContent>
         </Card>
@@ -377,7 +397,9 @@ export default function Level2AdminSignupPage() {
                 <CheckCircle className="h-4 w-4" />
                 <AlertDescription>
                   <strong>Account Type:</strong> DSVI Admin (Level 2 - Assigned Staff)<br />
-                  <strong>Admin Name:</strong> {inviteData?.name || adminName || email.split('@')[0]}
+                  <strong>Admin Name:</strong> {inviteData?.name}<br />
+                  <strong>Permissions:</strong> {inviteData?.permissions?.length || 0} assigned<br />
+                  <strong>Schools:</strong> {inviteData?.school_ids?.length || 0} assigned
                 </AlertDescription>
               </Alert>
 

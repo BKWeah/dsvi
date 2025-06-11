@@ -29,15 +29,23 @@ import {
   PERMISSION_DESCRIPTIONS 
 } from '@/lib/admin/permissions';
 
+// Updated interface for consolidated admin table
 interface Level2Admin {
   id: string;
+  user_id: string;
   email: string;
   name: string;
-  created_at: string;
-  is_active: boolean;
-  notes: string | null;
+  admin_level: number;
   permissions: string[];
-  assigned_schools: string[];
+  school_ids: string[];
+  notes: string | null;
+  is_active: boolean;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+  last_login: string | null;
+  permissions_count: number;
+  schools_count: number;
 }
 
 interface School {
@@ -62,7 +70,6 @@ export function EditAdminDialog({
   onSave
 }: EditAdminDialogProps) {
   const [loading, setLoading] = useState(false);
-  const [editedAdmin, setEditedAdmin] = useState<Level2Admin | null>(null);
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
   const [selectedSchools, setSelectedSchools] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
@@ -72,15 +79,14 @@ export function EditAdminDialog({
   // Initialize form when admin changes
   useEffect(() => {
     if (admin) {
-      setEditedAdmin(admin);
-      setSelectedPermissions(admin.permissions);
-      setSelectedSchools(admin.assigned_schools);
+      setSelectedPermissions(admin.permissions || []);
+      setSelectedSchools(admin.school_ids || []);
       setNotes(admin.notes || '');
       setIsActive(admin.is_active);
     }
   }, [admin]);
 
-  if (!admin || !editedAdmin) return null;
+  if (!admin) return null;
 
   const togglePermission = (permission: string) => {
     setSelectedPermissions(prev => 
@@ -102,65 +108,34 @@ export function EditAdminDialog({
     try {
       setLoading(true);
       
-      // Update admin profile notes and status
-      const { error: profileError } = await supabase
-        .from('admin_profiles')
-        .update({
-          notes: notes || null,
-          is_active: isActive,
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', admin.id);
+      console.log('🔄 Updating admin using new consolidated table...');
+      console.log('Admin ID:', admin.user_id);
+      console.log('New permissions:', selectedPermissions);
+      console.log('New schools:', selectedSchools);
+      console.log('New notes:', notes);
+      console.log('New status:', isActive);
 
-      if (profileError) throw profileError;
+      // Use the new update function for the consolidated table
+      const { data: updateResult, error: updateError } = await supabase.rpc('update_admin', {
+        p_user_id: admin.user_id,
+        p_permissions: selectedPermissions,
+        p_school_ids: selectedSchools,
+        p_notes: notes || null,
+        p_is_active: isActive
+      });
 
-      // Update permissions - remove old ones and add new ones
-      const { error: removePermissionsError } = await supabase
-        .from('admin_permissions')
-        .update({ is_active: false })
-        .eq('admin_user_id', admin.id);
-
-      if (removePermissionsError) throw removePermissionsError;
-
-      // Add new permissions
-      if (selectedPermissions.length > 0) {
-        const permissionInserts = selectedPermissions.map(permission => ({
-          admin_user_id: admin.id,
-          permission_type: permission,
-          is_active: true,
-          created_at: new Date().toISOString()
-        }));
-
-        const { error: addPermissionsError } = await supabase
-          .from('admin_permissions')
-          .insert(permissionInserts);
-
-        if (addPermissionsError) throw addPermissionsError;
+      if (updateError) {
+        console.error('❌ Update error:', updateError);
+        throw updateError;
       }
 
-      // Update school assignments - remove old ones and add new ones
-      const { error: removeAssignmentsError } = await supabase
-        .from('admin_assignments')
-        .update({ is_active: false })
-        .eq('admin_user_id', admin.id);
+      console.log('✅ Update result:', updateResult);
 
-      if (removeAssignmentsError) throw removeAssignmentsError;
-
-      // Add new assignments
-      if (selectedSchools.length > 0) {
-        const assignmentInserts = selectedSchools.map(schoolId => ({
-          admin_user_id: admin.id,
-          school_id: schoolId,
-          is_active: true,
-          created_at: new Date().toISOString()
-        }));
-
-        const { error: addAssignmentsError } = await supabase
-          .from('admin_assignments')
-          .insert(assignmentInserts);
-
-        if (addAssignmentsError) throw addAssignmentsError;
+      if (!updateResult?.success) {
+        throw new Error(updateResult?.message || 'Failed to update admin');
       }
+
+      console.log('🎉 Admin updated successfully');
 
       toast({
         title: "Success",
@@ -171,7 +146,7 @@ export function EditAdminDialog({
       onOpenChange(false);
 
     } catch (error) {
-      console.error('Error updating admin:', error);
+      console.error('❌ Error updating admin:', error);
       toast({
         title: "Error",
         description: "Failed to update admin settings. Please try again.",
@@ -184,8 +159,8 @@ export function EditAdminDialog({
 
   const hasChanges = () => {
     return (
-      JSON.stringify(selectedPermissions.sort()) !== JSON.stringify(admin.permissions.sort()) ||
-      JSON.stringify(selectedSchools.sort()) !== JSON.stringify(admin.assigned_schools.sort()) ||
+      JSON.stringify(selectedPermissions.sort()) !== JSON.stringify((admin.permissions || []).sort()) ||
+      JSON.stringify(selectedSchools.sort()) !== JSON.stringify((admin.school_ids || []).sort()) ||
       notes !== (admin.notes || '') ||
       isActive !== admin.is_active
     );

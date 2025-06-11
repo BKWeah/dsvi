@@ -21,15 +21,23 @@ import {
   Clock
 } from 'lucide-react';
 
+// Updated interface for consolidated admin table
 interface Level2Admin {
   id: string;
+  user_id: string;
   email: string;
   name: string;
-  created_at: string;
-  is_active: boolean;
-  notes: string | null;
+  admin_level: number;
   permissions: string[];
-  assigned_schools: string[];
+  school_ids: string[];
+  notes: string | null;
+  is_active: boolean;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+  last_login: string | null;
+  permissions_count: number;
+  schools_count: number;
 }
 
 interface School {
@@ -131,10 +139,20 @@ export function ViewAdminDialog({
                         Inactive
                       </Badge>
                     )}
-                    <Badge variant="secondary">Level 2</Badge>
+                    <Badge variant="secondary">Level {admin.admin_level}</Badge>
                   </div>
                 </div>
               </div>
+
+              {admin.last_login && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">Last Login</span>
+                  </div>
+                  <p>{new Date(admin.last_login).toLocaleDateString()}</p>
+                </div>
+              )}
 
               {admin.notes && (
                 <div className="space-y-2">
@@ -193,14 +211,14 @@ export function ViewAdminDialog({
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <School className="h-4 w-4" />
-                Assigned Schools ({admin.assigned_schools.length})
+                Assigned Schools ({admin.school_ids.length})
               </CardTitle>
               <CardDescription>
                 Schools this admin can manage
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {admin.assigned_schools.length === 0 ? (
+              {admin.school_ids.length === 0 ? (
                 <div className="text-center py-8">
                   <School className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <h3 className="text-lg font-medium mb-2">No School Assignments</h3>
@@ -210,7 +228,7 @@ export function ViewAdminDialog({
                 </div>
               ) : (
                 <div className="grid grid-cols-1 gap-3">
-                  {admin.assigned_schools.map((schoolId, index) => (
+                  {admin.school_ids.map((schoolId, index) => (
                     <div 
                       key={schoolId} 
                       className="flex items-center gap-2 p-3 border rounded-lg bg-background"
@@ -247,7 +265,7 @@ export function ViewAdminDialog({
                 </div>
                 <div className="space-y-2">
                   <div className="text-2xl font-bold text-green-600">
-                    {admin.assigned_schools.length}
+                    {admin.school_ids.length}
                   </div>
                   <div className="text-sm text-muted-foreground">Schools</div>
                 </div>

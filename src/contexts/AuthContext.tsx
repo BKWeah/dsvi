@@ -33,23 +33,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const role = user?.user_metadata?.role || null;
 
-  // Helper function to fetch admin level for DSVI admins
+  // Helper function to fetch admin level for DSVI admins using new consolidated table
   const fetchAdminLevel = async (user: User) => {
     if (user.user_metadata?.role === 'DSVI_ADMIN') {
       try {
+        // Use the new function that works with consolidated table
         const { data, error } = await supabase
-          .rpc('get_admin_level', { user_id: user.id });
+          .rpc('get_admin_level_new', { p_user_id: user.id });
         
-        if (!error && data !== null && data > 0) { // Ensure data is not null and valid
+        if (!error && data !== null && data > 0) {
           setAdminLevel(data);
+          console.log('✅ Admin level fetched:', data);
         } else {
           setAdminLevel(null);
-          if (user.user_metadata?.role === 'DSVI_ADMIN') {
-            console.log('DSVI admin found without admin level or level could not be fetched.');
-          }
+          console.log('ℹ️ DSVI admin found without admin level in consolidated table');
         }
       } catch (error) {
-        console.warn('Failed to fetch admin level:', error);
+        console.warn('❌ Failed to fetch admin level:', error);
         setAdminLevel(null);
       }
     } else {
@@ -171,38 +171,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
 
         // Check if this is a Level 2 admin signup based on invite token
-        if (role === 'DSVI_ADMIN' && metadata?.inviteToken) {
+        if (role === 'DSVI_ADMIN' && metadata?.inviteToken && !metadata?.skipAutoAdminCreation) {
           try {
-            console.log('🔄 Processing Level 2 admin signup with database invitation...');
+            console.log('🔄 Processing Level 2 admin signup with consolidated admin system...');
             console.log('🔄 Invite token:', metadata.inviteToken);
             console.log('🔄 User data:', { id: data.user.id, email: data.user.email });
             
-            // Use the new database function instead of localStorage
-            const { data: signupResult, error: signupError } = await supabase.rpc('process_level2_admin_signup', {
+            // Use the new consolidated admin creation function
+            const { data: adminResult, error: adminError } = await supabase.rpc('create_admin_from_invitation', {
               p_user_id: data.user.id,
-              p_email: email,
               p_invite_token: metadata.inviteToken
             });
 
-            console.log('🔄 Database signup result:', signupResult);
-            console.log('🔄 Database signup error:', signupError);
+            console.log('📊 Admin creation result:', adminResult);
 
-            if (signupError) {
-              console.error('❌ Database Level 2 admin signup failed:', signupError);
+            if (adminError) {
+              console.error('❌ Admin creation failed:', adminError);
               console.warn('⚠️ Admin creation failed, but user signup succeeded. Check invitation token and database.');
-            } else if (!signupResult?.success) {
-              console.error('❌ Level 2 admin signup returned failure:', signupResult);
-              console.warn('⚠️ Admin creation failed:', signupResult?.message);
+            } else if (!adminResult?.success) {
+              console.error('❌ Admin creation returned failure:', adminResult?.message);
+              console.warn('⚠️ Admin creation failed:', adminResult?.message);
               
               // Log helpful debug info
-              if (signupResult?.message?.includes('Invalid invitation')) {
+              if (adminResult?.message?.includes('Invalid invitation') || adminResult?.message?.includes('not found')) {
                 console.log('🔍 Debug: Check if invitation exists, is expired, or email matches');
                 console.log('🔍 Expected email:', email);
                 console.log('🔍 Invite token:', metadata.inviteToken);
               }
             } else {
-              console.log('✅ Level 2 admin created successfully from database invitation!');
-              console.log('✅ Creation details:', signupResult);
+              console.log('✅ Level 2 admin created successfully from invitation!');
+              console.log('✅ Admin ID:', adminResult.admin_id);
               
               // Set admin level immediately after successful creation
               setAdminLevel(2);
@@ -214,12 +212,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
           } catch (adminError) {
             console.error('❌ Failed to process Level 2 admin signup:', adminError);
-            console.error('❌ Error details:', adminError);
           }
         }
-        // Remove the localStorage fallback since we're now using database
+        // For DSVI admins without invite token or with skipAutoAdminCreation
         else if (role === 'DSVI_ADMIN') {
-          console.log('🔄 DSVI_ADMIN signup without invite token - regular admin account created');
+          console.log('🔄 DSVI_ADMIN signup without invite token - checking if admin profile migration needed');
+          
+          // Try to fetch admin level to see if migration is needed
+          try {
+            const { data: existingLevel } = await supabase
+              .rpc('get_admin_level_new', { p_user_id: data.user.id });
+            
+            if (!existingLevel || existingLevel === 0) {
+              console.log('🔄 No admin level found, will be handled by useAdmin migration');
+            } else {
+              setAdminLevel(existingLevel);
+              console.log('✅ Existing admin level found:', existingLevel);
+            }
+          } catch (error) {
+            console.warn('⚠️ Could not check existing admin level:', error);
+          }
         }
                 
 

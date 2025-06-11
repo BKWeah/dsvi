@@ -64,15 +64,23 @@ interface CreateInvitationRpcResult {
   expires_at?: string;
 }
 
+// Updated interface for the new consolidated admin table
 interface Level2Admin {
   id: string;
+  user_id: string;
   email: string;
   name: string;
-  created_at: string;
-  is_active: boolean;
-  notes: string | null;
+  admin_level: number;
   permissions: string[];
-  assigned_schools: string[];
+  school_ids: string[];
+  notes: string | null;
+  is_active: boolean;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+  last_login: string | null;
+  permissions_count: number;
+  schools_count: number;
 }
 
 interface School {
@@ -112,58 +120,18 @@ export default function AdminManagementPage() {
     try {
       setLoading(true);
       
-      // Fetch Level 2 admins
-      const { data: adminsData, error: adminsError } = await supabase
-        .from('admin_profiles')
-        .select(`
-          id,
-          user_id,
-          admin_level,
-          created_at,
-          is_active,
-          notes
-        `)
-        .eq('admin_level', ADMIN_LEVELS.ASSIGNED_STAFF)
-        .eq('is_active', true);
+      console.log('🔄 Fetching Level 2 admins from new consolidated table...');
+      
+      // Fetch Level 2 admins using the new list function
+      const { data: adminsData, error: adminsError } = await supabase.rpc('list_level2_admins');
 
-      if (adminsError) throw adminsError;
+      if (adminsError) {
+        console.error('❌ Error fetching admins:', adminsError);
+        throw adminsError;
+      }
 
-      // For each admin, get their auth user info, permissions, and assignments
-      const level2AdminsWithDetails = await Promise.all(
-        (adminsData || []).map(async (adminProfile) => {
-          try {
-            // Get permissions
-            const { data: permissions } = await supabase
-              .from('admin_permissions')
-              .select('permission_type, resource_id')
-              .eq('admin_user_id', adminProfile.user_id)
-              .eq('is_active', true);
-
-            // Get school assignments
-            const { data: assignments } = await supabase
-              .from('admin_assignments')
-              .select('school_id')
-              .eq('admin_user_id', adminProfile.user_id)
-              .eq('is_active', true);
-
-            return {
-              id: adminProfile.user_id,
-              email: `user-${adminProfile.user_id.slice(0, 8)}`, // Placeholder
-              name: `Admin ${adminProfile.user_id.slice(0, 8)}`, // Placeholder
-              created_at: adminProfile.created_at,
-              is_active: adminProfile.is_active,
-              notes: adminProfile.notes,
-              permissions: permissions?.map(p => p.permission_type) || [],
-              assigned_schools: assignments?.map(a => a.school_id) || []
-            };
-          } catch (error) {
-            console.error('Error fetching admin details:', error);
-            return null;
-          }
-        })
-      );
-
-      setLevel2Admins(level2AdminsWithDetails.filter(Boolean) as Level2Admin[]);
+      console.log('✅ Fetched admins:', adminsData);
+      setLevel2Admins(adminsData || []);
 
       // Fetch schools
       const { data: schoolsData, error: schoolsError } = await supabase
@@ -171,12 +139,16 @@ export default function AdminManagementPage() {
         .select('id, name, slug')
         .order('name');
 
-      if (schoolsError) throw schoolsError;
+      if (schoolsError) {
+        console.error('❌ Error fetching schools:', schoolsError);
+        throw schoolsError;
+      }
 
+      console.log('✅ Fetched schools:', schoolsData?.length || 0);
       setSchools(schoolsData || []);
 
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('❌ Error fetching data:', error);
       toast({
         title: "Error",
         description: "Failed to fetch admin data",
@@ -198,10 +170,9 @@ export default function AdminManagementPage() {
     }
 
     try {
-      console.log('🔄 Creating Level 2 admin invitation in database...');
+      console.log('🔄 Creating Level 2 admin invitation...');
       
-      // Use the new database function instead of localStorage
-      // Temporarily cast the function name to 'any' to bypass TypeScript's strict type checking for RPC function names.
+      // Use the existing database function for creating invitations
       const { data: rpcResult, error: invitationError } = await supabase.rpc('create_admin_invitation' as any, {
         p_email: newAdminEmail,
         p_name: newAdminName,
@@ -212,12 +183,10 @@ export default function AdminManagementPage() {
         p_days_valid: 7
       });
 
-      // Explicitly type rpcResult to CreateInvitationRpcResult for type safety
       const invitationResult: CreateInvitationRpcResult | null = rpcResult;
 
       if (invitationError) {
         console.error('❌ Database invitation creation failed:', invitationError);
-        console.error('Full invitationError object:', invitationError); // Added for detailed logging
         toast({
           title: "Error",
           description: "Failed to create invitation in database",
@@ -228,7 +197,6 @@ export default function AdminManagementPage() {
 
       if (!invitationResult?.success) {
         console.error('❌ Invitation creation returned failure:', invitationResult);
-        console.error('Full invitationResult object (on failure):', invitationResult); // Added for detailed logging
         toast({
           title: "Error", 
           description: invitationResult?.message || "Failed to create invitation",
@@ -238,23 +206,12 @@ export default function AdminManagementPage() {
       }
 
       console.log('✅ Database invitation created successfully:', invitationResult);
-      console.log('Full invitationResult object (on success):', invitationResult); // Added for detailed logging
       
       // Extract values from invitation result
       const emailHash = invitationResult.email_hash;
       const inviteToken = invitationResult.invite_token;
       const tempPassword = invitationResult.temp_password;
       
-      console.log('Email hash available:', !!emailHash);
-      if (emailHash) {
-        try {
-          console.log('Decoded email hash (verification):', atob(emailHash));
-        } catch (e) {
-          console.warn('Could not decode email hash:', e);
-        }
-      }
-      
-      // Use the signup link from the database result, or generate one if needed
       const signupLink = invitationResult.signup_link || `${window.location.origin}/level2-admin-signup?token=${encodeURIComponent(inviteToken || '')}&eh=${encodeURIComponent(emailHash || '')}&pwd=${encodeURIComponent(tempPassword || '')}&name=${encodeURIComponent(newAdminName)}`;
 
       // Prepare data for success dialog
@@ -556,8 +513,11 @@ export default function AdminManagementPage() {
                           <p className="text-sm text-muted-foreground">{admin.email}</p>
                           <div className="flex items-center gap-4 text-sm text-muted-foreground">
                             <span>Created: {new Date(admin.created_at).toLocaleDateString()}</span>
-                            <span>Permissions: {admin.permissions.length}</span>
-                            <span>Schools: {admin.assigned_schools.length}</span>
+                            <span>Permissions: {admin.permissions_count || 0}</span>
+                            <span>Schools: {admin.schools_count || 0}</span>
+                            {admin.last_login && (
+                              <span>Last Login: {new Date(admin.last_login).toLocaleDateString()}</span>
+                            )}
                           </div>
                           {admin.notes && (
                             <p className="text-sm text-muted-foreground bg-muted p-2 rounded">
@@ -606,7 +566,7 @@ export default function AdminManagementPage() {
                         <div>
                           <h5 className="text-sm font-medium mb-2">Assigned Schools</h5>
                           <div className="flex flex-wrap gap-1">
-                            {admin.assigned_schools.slice(0, 2).map((schoolId) => {
+                            {admin.school_ids.slice(0, 2).map((schoolId) => {
                               const school = schools.find(s => s.id === schoolId);
                               return (
                                 <Badge key={schoolId} variant="outline" className="text-xs">
@@ -615,9 +575,9 @@ export default function AdminManagementPage() {
                                 </Badge>
                               );
                             })}
-                            {admin.assigned_schools.length > 2 && (
+                            {admin.school_ids.length > 2 && (
                               <Badge variant="outline" className="text-xs">
-                                +{admin.assigned_schools.length - 2} more
+                                +{admin.school_ids.length - 2} more
                               </Badge>
                             )}
                           </div>

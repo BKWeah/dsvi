@@ -3,57 +3,54 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   AdminLevel, 
-  PermissionType, 
-  AdminProfile, 
-  AdminPermission, 
-  AdminAssignment,
+  PermissionType,
   ADMIN_LEVELS,
   RESTRICTED_PERMISSIONS,
   isRestrictedPermission 
 } from './permissions';
 
+// New consolidated admin interface (using dsvi_admin table)
+interface DsviAdmin {
+  id: string;
+  user_id: string;
+  email: string;
+  name: string;
+  admin_level: number;
+  permissions: string[];
+  school_ids: string[];
+  notes: string | null;
+  is_active: boolean;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+  last_login: string | null;
+}
+
 interface UseAdminReturn {
   adminLevel: AdminLevel | null;
-  adminProfile: AdminProfile | null;
-  permissions: AdminPermission[];
-  assignments: AdminAssignment[];
+  adminData: DsviAdmin | null;
   loading: boolean;
   error: string | null;
-  hasPermission: (permission: PermissionType | string, resourceId?: string) => boolean;
+  hasPermission: (permission: PermissionType | string, schoolId?: string) => boolean;
   hasSchoolAccess: (schoolId: string) => boolean;
   isLevel1Admin: boolean;
   isLevel2Admin: boolean;
   assignedSchools: string[];
+  permissions: string[];
   refreshAdminData: () => Promise<void>;
 }
 
 export const useAdmin = (): UseAdminReturn => {
   const { user } = useAuth();
   const [adminLevel, setAdminLevel] = useState<AdminLevel | null>(null);
-  const [adminProfile, setAdminProfile] = useState<AdminProfile | null>(null);
-  const [permissions, setPermissions] = useState<AdminPermission[]>([]);
-  const [assignments, setAssignments] = useState<AdminAssignment[]>([]);
+  const [adminData, setAdminData] = useState<DsviAdmin | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Helper function to check for pending invitations
-  const checkForPendingInvitation = (email: string): boolean => {
-    try {
-      const pendingAdmins = JSON.parse(localStorage.getItem('pendingLevel2Admins') || '[]');
-      return pendingAdmins.some((admin: any) => 
-        admin.email.toLowerCase() === email.toLowerCase()
-      );
-    } catch {
-      return false;
-    }
-  };
 
   const fetchAdminData = async () => {
     if (!user) {
       setAdminLevel(null);
-      setAdminProfile(null);
-      setPermissions([]);
-      setAssignments([]);
+      setAdminData(null);
       setLoading(false);
       return;
     }
@@ -61,9 +58,7 @@ export const useAdmin = (): UseAdminReturn => {
     // Only process DSVI admins
     if (user.user_metadata?.role !== 'DSVI_ADMIN') {
       setAdminLevel(null);
-      setAdminProfile(null);
-      setPermissions([]);
-      setAssignments([]);
+      setAdminData(null);
       setLoading(false);
       return;
     }
@@ -72,80 +67,71 @@ export const useAdmin = (): UseAdminReturn => {
       setLoading(true);
       setError(null);
 
-      // Get admin level
+      console.log('🔄 Fetching admin data using consolidated dsvi_admin table for user:', user.id);
+
+      // Get admin level using the new consolidated function
       const { data: levelData, error: levelError } = await supabase
-        .rpc('get_admin_level', { user_id: user.id });
+        .rpc('get_admin_level_new', { p_user_id: user.id });
 
       if (levelError) {
-        console.warn('Error fetching admin level:', levelError);
-        // Don't auto-upgrade to avoid conflicts with Level 2 admin signup
-        setAdminLevel(null);
-      } else {
-        const level = levelData as AdminLevel;
-        if (level > 0) {
-          setAdminLevel(level);
+        console.warn('❌ Error fetching admin level:', levelError);
+        
+        // If no admin level found, try to create Level 1 admin for backward compatibility
+        if (user.user_metadata?.role === 'DSVI_ADMIN') {
+          console.log('🔄 DSVI admin without level detected, attempting auto-migration...');
           
-          // Get admin profile
-          const { data: profileData, error: profileError } = await supabase
-            .from('admin_profiles')
-            .select('*')
-            .eq('user_id', user.id)
-            .eq('is_active', true)
-            .single();
+          const { error: migrationError } = await supabase.rpc('upsert_user_profile', {
+            p_user_id: user.id,
+            p_email: user.email || '',
+            p_role: 'DSVI_ADMIN',
+            p_name: user.user_metadata?.name || user.email?.split('@')[0] || 'Admin'
+          });
 
-          if (profileError && profileError.code !== 'PGRST116') {
-            console.warn('Error fetching admin profile:', profileError);
-          } else {
-            setAdminProfile(profileData);
-          }
+          if (!migrationError) {
+            console.log('✅ Auto-migration completed, retrying fetch...');
+            // Retry fetch after migration
+            const { data: retryLevelData, error: retryLevelError } = await supabase
+              .rpc('get_admin_level_new', { p_user_id: user.id });
 
-          // For Level 2 admins, get permissions and assignments
-          if (level === ADMIN_LEVELS.ASSIGNED_STAFF) {
-            // Get permissions
-            const { data: permissionsData, error: permissionsError } = await supabase
-              .from('admin_permissions')
-              .select('*')
-              .eq('admin_user_id', user.id)
-              .eq('is_active', true);
-
-            if (permissionsError) {
-              console.warn('Error fetching permissions:', permissionsError);
-            } else {
-              setPermissions(permissionsData || []);
+            if (!retryLevelError && retryLevelData > 0) {
+              setAdminLevel(retryLevelData);
+              console.log('✅ Admin level fetched after migration:', retryLevelData);
             }
-
-            // Get school assignments
-            const { data: assignmentsData, error: assignmentsError } = await supabase
-              .from('admin_assignments')
-              .select('*')
-              .eq('admin_user_id', user.id)
-              .eq('is_active', true);
-
-            if (assignmentsError) {
-              console.warn('Error fetching assignments:', assignmentsError);
-            } else {
-              setAssignments(assignmentsData || []);
-            }
-          } else {
-            // Level 1 admin has no specific permissions/assignments
-            setPermissions([]);
-            setAssignments([]);
           }
-        } else {
-          // No admin level found - could be:
-          // 1. A Level 2 admin who just signed up (profile creation in progress)
-          // 2. An existing DSVI admin who needs manual upgrade
-          // 
-          // We no longer auto-upgrade to Level 1 to avoid conflicts with Level 2 signup
-          setAdminLevel(null);
-          console.log('DSVI admin found without admin level - manual admin profile creation required');
         }
+      } else if (levelData > 0) {
+        setAdminLevel(levelData);
+        console.log('✅ Admin level fetched:', levelData);
       }
+
+      // Get complete admin profile using the new consolidated function
+      const { data: adminProfileData, error: profileError } = await supabase
+        .rpc('get_admin_by_user_id', { p_user_id: user.id });
+
+      if (!profileError && adminProfileData && adminProfileData.length > 0) {
+        const adminProfile = adminProfileData[0] as DsviAdmin;
+        setAdminData(adminProfile);
+        console.log('✅ Admin profile fetched from consolidated table:', adminProfile);
+        
+        // Update last login timestamp
+        const { error: updateError } = await supabase
+          .from('dsvi_admins')
+          .update({ last_login: new Date().toISOString() })
+          .eq('user_id', user.id);
+          
+        if (updateError) {
+          console.warn('⚠️ Could not update last login timestamp:', updateError);
+        }
+      } else {
+        console.warn('⚠️ Admin profile not found in consolidated table:', profileError);
+        setAdminData(null);
+      }
+
     } catch (err) {
-      console.error('Error fetching admin data:', err);
+      console.error('❌ Error fetching admin data:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
-      // Don't default to Level 1 on error - let admin profile be explicitly created
       setAdminLevel(null);
+      setAdminData(null);
     } finally {
       setLoading(false);
     }
@@ -154,15 +140,14 @@ export const useAdmin = (): UseAdminReturn => {
   useEffect(() => {
     fetchAdminData();
     
-    // Also listen for admin level changes (e.g., when Level 2 admin is created)
+    // Listen for admin level changes
     const handleAdminLevelChange = () => {
-      console.log('Admin level change detected, refreshing admin data...');
+      console.log('🔄 Admin level change detected, refreshing admin data...');
       setTimeout(() => {
         fetchAdminData();
-      }, 1000); // Small delay to ensure database operations complete
+      }, 1000);
     };
 
-    // Listen for custom event that AuthContext can dispatch
     window.addEventListener('adminLevelChanged', handleAdminLevelChange);
     
     return () => {
@@ -171,10 +156,10 @@ export const useAdmin = (): UseAdminReturn => {
   }, [user]);
 
   const hasPermission = useMemo(() => {
-    return (permission: PermissionType | string, resourceId?: string): boolean => {
-      if (!adminLevel) return false;
+    return (permission: PermissionType | string, schoolId?: string): boolean => {
+      if (!adminLevel || !adminData) return false;
 
-      // Level 1 admins have all permissions except for restricted ones they explicitly need to check
+      // Level 1 admins have all permissions
       if (adminLevel === ADMIN_LEVELS.SUPER_ADMIN) {
         return true;
       }
@@ -186,21 +171,23 @@ export const useAdmin = (): UseAdminReturn => {
 
       // Level 2 admins need explicit permissions
       if (adminLevel === ADMIN_LEVELS.ASSIGNED_STAFF) {
-        return permissions.some(p => 
-          p.permission_type === permission &&
-          (resourceId ? p.resource_id === resourceId : true) &&
-          p.is_active &&
-          (!p.expires_at || new Date(p.expires_at) > new Date())
-        );
+        const hasPermission = adminData.permissions.includes(permission);
+        
+        // If permission exists and school-specific check is needed
+        if (hasPermission && schoolId) {
+          return adminData.school_ids.includes(schoolId);
+        }
+        
+        return hasPermission;
       }
 
       return false;
     };
-  }, [adminLevel, permissions]);
+  }, [adminLevel, adminData]);
 
   const hasSchoolAccess = useMemo(() => {
     return (schoolId: string): boolean => {
-      if (!adminLevel) return false;
+      if (!adminLevel || !adminData) return false;
 
       // Level 1 admins have access to all schools
       if (adminLevel === ADMIN_LEVELS.SUPER_ADMIN) {
@@ -209,26 +196,28 @@ export const useAdmin = (): UseAdminReturn => {
 
       // Level 2 admins only have access to assigned schools
       if (adminLevel === ADMIN_LEVELS.ASSIGNED_STAFF) {
-        return assignments.some(a => a.school_id === schoolId && a.is_active);
+        return adminData.school_ids.includes(schoolId);
       }
 
       return false;
     };
-  }, [adminLevel, assignments]);
+  }, [adminLevel, adminData]);
 
   const isLevel1Admin = adminLevel === ADMIN_LEVELS.SUPER_ADMIN;
   const isLevel2Admin = adminLevel === ADMIN_LEVELS.ASSIGNED_STAFF;
   
-  // Memoize assignedSchools to prevent unnecessary re-renders
+  // Memoize assignedSchools and permissions to prevent unnecessary re-renders
   const assignedSchools = useMemo(() => {
-    return assignments.map(a => a.school_id);
-  }, [assignments]);
+    return adminData?.school_ids || [];
+  }, [adminData]);
+
+  const permissionsList = useMemo(() => {
+    return adminData?.permissions || [];
+  }, [adminData]);
 
   return {
     adminLevel,
-    adminProfile,
-    permissions,
-    assignments,
+    adminData,
     loading,
     error,
     hasPermission,
@@ -236,6 +225,7 @@ export const useAdmin = (): UseAdminReturn => {
     isLevel1Admin,
     isLevel2Admin,
     assignedSchools,
+    permissions: permissionsList,
     refreshAdminData: fetchAdminData,
   };
 };

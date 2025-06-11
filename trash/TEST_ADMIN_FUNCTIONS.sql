@@ -1,46 +1,78 @@
--- Test Admin Level System Functions
--- This script tests the admin level functions to ensure they're working correctly
+-- Test all Level 2 Admin functions manually
+-- Run this in Supabase SQL Editor to verify functions work
 
--- Test 1: Check current DSVI admin users and their admin levels
+-- 1. First, verify all functions exist
 SELECT 
-    au.id as user_id,
-    au.email,
-    au.raw_user_meta_data->>'role' as role,
-    COALESCE(ap.admin_level, 0) as admin_level,
-    ap.created_at as profile_created_at,
-    ap.notes
-FROM auth.users au
-LEFT JOIN admin_profiles ap ON au.id = ap.user_id
-WHERE au.raw_user_meta_data->>'role' = 'DSVI_ADMIN'
-ORDER BY au.email;
+    routine_name,
+    routine_type
+FROM information_schema.routines 
+WHERE routine_schema = 'public'
+AND routine_name LIKE '%admin%'
+ORDER BY routine_name;
 
--- Test 2: Check admin permissions table
-SELECT 
-    ap.admin_user_id,
-    au.email,
-    ap.permission_type,
-    ap.resource_id,
-    ap.is_active,
-    ap.created_at
-FROM admin_permissions ap
-JOIN auth.users au ON ap.admin_user_id = au.id
-ORDER BY au.email, ap.permission_type;
+-- 2. Test the safe_create_admin_profile function
+SELECT safe_create_admin_profile(
+    '12345678-1234-1234-1234-123456789012'::UUID,  -- dummy user_id
+    2,  -- admin level 2
+    '12345678-1234-1234-1234-123456789012'::UUID,  -- dummy created_by
+    'Test admin profile creation'
+) as profile_result;
 
--- Test 3: Check admin assignments table
-SELECT 
-    aa.admin_user_id,
-    au.email,
-    aa.school_id,
-    s.name as school_name,
-    aa.is_active,
-    aa.created_at
-FROM admin_assignments aa
-JOIN auth.users au ON aa.admin_user_id = au.id
-LEFT JOIN schools s ON aa.school_id = s.id
-ORDER BY au.email, s.name;
+-- 3. Test the grant_admin_permission function
+SELECT grant_admin_permission(
+    '12345678-1234-1234-1234-123456789012'::UUID,  -- dummy user_id
+    'manage_schools',  -- permission type
+    NULL,  -- resource_id
+    '12345678-1234-1234-1234-123456789012'::UUID   -- granted_by
+) as permission_result;
 
--- Test 4: Function to check admin level for specific user
--- Usage: SELECT get_admin_level('your-user-id-here'::UUID);
+-- 4. Test the verify_admin_setup function
+SELECT verify_admin_setup(
+    '12345678-1234-1234-1234-123456789012'::UUID  -- dummy user_id
+) as verification_result;
 
--- Test 5: Function to check permissions for specific user
--- Usage: SELECT has_admin_permission('your-user-id-here'::UUID, 'CMS_ACCESS');
+-- 5. Check if user_profiles table accepts inserts
+INSERT INTO user_profiles (user_id, email, role, name) 
+VALUES (
+    '12345678-1234-1234-1234-123456789012'::UUID,
+    'test@example.com',
+    'DSVI_ADMIN',
+    'Test User'
+) 
+ON CONFLICT (user_id) DO NOTHING;
+
+-- 6. Verify the insert worked
+SELECT * FROM user_profiles WHERE email = 'test@example.com';
+
+-- 7. Test the comprehensive function with dummy data
+SELECT create_level2_admin_complete(
+    '87654321-4321-4321-4321-210987654321'::UUID,  -- different dummy user_id
+    'test2@example.com',
+    'Test Admin 2',
+    '12345678-1234-1234-1234-123456789012'::UUID,  -- created_by
+    ARRAY['manage_schools', 'view_reports']::TEXT[],  -- permissions
+    ARRAY[]::UUID[],  -- no schools for test
+    'Complete test of Level 2 admin creation'
+) as complete_result;
+
+-- 8. Check what was created
+SELECT 'user_profiles:' as table_name, count(*) as count FROM user_profiles
+UNION ALL
+SELECT 'admin_profiles:', count(*) FROM admin_profiles
+UNION ALL  
+SELECT 'admin_permissions:', count(*) FROM admin_permissions
+UNION ALL
+SELECT 'admin_assignments:', count(*) FROM admin_assignments;
+
+-- 9. View the actual data created
+SELECT 'USER PROFILES:' as section;
+SELECT * FROM user_profiles;
+
+SELECT 'ADMIN PROFILES:' as section;
+SELECT * FROM admin_profiles;
+
+SELECT 'ADMIN PERMISSIONS:' as section;
+SELECT * FROM admin_permissions;
+
+SELECT 'ADMIN ASSIGNMENTS:' as section;
+SELECT * FROM admin_assignments;

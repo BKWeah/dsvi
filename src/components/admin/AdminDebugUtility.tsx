@@ -18,13 +18,17 @@ export function AdminDebugUtility() {
     
     setLoading(true);
     try {
-      // Get raw admin level from database
+      // Get admin level using new consolidated function
       const { data: levelData, error: levelError } = await supabase
-        .rpc('get_admin_level', { user_id: user.id });
+        .rpc('get_admin_level_new', { p_user_id: user.id });
       
-      // Get admin profile
+      // Get admin profile using new consolidated function
       const { data: profileData, error: profileError } = await supabase
-        .from('admin_profiles')
+        .rpc('get_admin_by_user_id', { p_user_id: user.id });
+
+      // Get admin data directly from consolidated table
+      const { data: directData, error: directError } = await supabase
+        .from('dsvi_admins')
         .select('*')
         .eq('user_id', user.id)
         .single();
@@ -35,6 +39,7 @@ export function AdminDebugUtility() {
         role: user.user_metadata?.role,
         dbAdminLevel: { data: levelData, error: levelError },
         dbProfile: { data: profileData, error: profileError },
+        directConsolidatedData: { data: directData, error: directError },
         hookAdminLevel: adminLevel,
         timestamp: new Date().toISOString()
       });
@@ -47,7 +52,7 @@ export function AdminDebugUtility() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Admin Debug Utility</CardTitle>
+        <CardTitle>Admin Debug Utility (Consolidated dsvi_admin Table)</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex gap-2">

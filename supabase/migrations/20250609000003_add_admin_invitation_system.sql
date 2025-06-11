@@ -35,6 +35,7 @@ CREATE INDEX IF NOT EXISTS idx_pending_invitations_used ON pending_admin_invitat
 ALTER TABLE pending_admin_invitations ENABLE ROW LEVEL SECURITY;
 
 -- RLS policies
+DROP POLICY IF EXISTS "dsvi_admins_can_manage_invitations" ON pending_admin_invitations;
 CREATE POLICY "dsvi_admins_can_manage_invitations" ON pending_admin_invitations
 FOR ALL USING (
   auth.role() = 'authenticated' AND 
@@ -42,6 +43,7 @@ FOR ALL USING (
 );
 
 -- Public can read their own invitation (for signup validation)
+DROP POLICY IF EXISTS "public_can_read_own_invitation" ON pending_admin_invitations;
 CREATE POLICY "public_can_read_own_invitation" ON pending_admin_invitations
 FOR SELECT USING (
   invite_token IS NOT NULL AND
