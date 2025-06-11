@@ -36,9 +36,9 @@ export const useAdminProfileVerification = () => {
         try {
           // First verify current status
           const { data: verifyData } = await supabase
-            .rpc('verify_admin_setup', { p_user_id: user.id });
+            .rpc('get_admin_by_user_id', { p_user_id: user.id });
 
-          if (verifyData?.has_profile && verifyData?.admin_level === 2) {
+          if (verifyData && verifyData.length > 0 && verifyData[0].admin_level === 2) {
             console.log('✅ Level 2 admin profile already exists');
             await refreshAdminData();
             return;
@@ -50,34 +50,28 @@ export const useAdminProfileVerification = () => {
           );
 
           if (pendingAdmin) {
-            // Create the admin profile
-            const { data: profileResult } = await supabase.rpc('safe_create_admin_profile', {
-              p_user_id: user.id,
-              p_admin_level: 2,
-              p_created_by: pendingAdmin.createdBy,
-              p_notes: `Level 2 admin profile created post-signup on ${new Date().toLocaleDateString()}`
-            });
+            // Create the admin profile directly in dsvi_admins table
+            const { data: createResult, error: createError } = await supabase
+              .from('dsvi_admins')
+              .insert({
+                user_id: user.id,
+                email: user.email || '',
+                name: user.user_metadata?.name || user.email?.split('@')[0] || 'Admin',
+                admin_level: 2,
+                permissions: pendingAdmin.permissions || [],
+                school_ids: pendingAdmin.schools || [],
+                notes: `Level 2 admin profile created post-signup on ${new Date().toLocaleDateString()}`,
+                created_by: pendingAdmin.createdBy,
+                signup_completed_at: new Date().toISOString()
+              });
 
-            if (profileResult?.success) {
+            if (createError) {
+              console.error('❌ Error creating admin profile:', createError);
+              throw createError;
+            }
+
+            if (createResult) {
               console.log('✅ Level 2 admin profile created successfully');
-
-              // Grant permissions
-              for (const permission of pendingAdmin.permissions || []) {
-                await supabase.rpc('grant_admin_permission', {
-                  target_user_id: user.id,
-                  permission_type: permission,
-                  granted_by_user_id: pendingAdmin.createdBy
-                });
-              }
-
-              // Assign schools
-              for (const schoolId of pendingAdmin.schools || []) {
-                await supabase.rpc('assign_school_to_admin', {
-                  target_user_id: user.id,
-                  target_school_id: schoolId,
-                  assigned_by_user_id: pendingAdmin.createdBy
-                });
-              }
 
               // Remove from pending and add to activated
               const updatedPending = pendingAdmins.filter((admin: any) => 

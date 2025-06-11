@@ -40,12 +40,12 @@ export const migrateExistingAdmins = async () => {
  */
 export const initializeAdminProfile = async (userId: string) => {
   try {
-    // Create Level 1 admin profile for the current user
-    const { data, error } = await supabase.rpc('create_admin_profile', {
-      target_user_id: userId,
-      admin_level: 1, // Level 1 (Super Admin)
-      created_by_user_id: userId, // Self-created for existing admins
-      notes: 'Migrated from existing DSVI admin user'
+    // Create Level 1 admin profile for the current user using new consolidated function
+    const { error } = await supabase.rpc('upsert_user_profile', {
+      p_user_id: userId,
+      p_email: '', // Will be populated from auth
+      p_role: 'DSVI_ADMIN',
+      p_name: '' // Will be populated from auth
     });
 
     if (error) throw error;
@@ -53,7 +53,6 @@ export const initializeAdminProfile = async (userId: string) => {
     console.log('Admin profile initialized successfully');
     return {
       success: true,
-      profileId: data,
       message: 'Successfully initialized as Level 1 (Super Admin)'
     };
 
@@ -75,7 +74,7 @@ export const needsAdminProfileInit = async (userId: string, userRole: string) =>
 
   try {
     const { data: adminLevel, error } = await supabase
-      .rpc('get_admin_level', { user_id: userId });
+      .rpc('get_admin_level_new', { p_user_id: userId });
 
     if (error) throw error;
 

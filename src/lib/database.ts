@@ -319,7 +319,73 @@ export function createDefaultSections(pageSlug: string): ContentSection[] {
 
 
 // ===============================================================================
-// PHASE 1: ADMIN ASSIGNMENTS & SUBSCRIPTIONS
+// NEW DSVI ADMIN FUNCTIONS (using dsvi_admins table)
+// ===============================================================================
+
+// Get schools assigned to DSVI admin using new consolidated table
+export async function getDsviAdminAssignedSchools(userId: string): Promise<School[]> {
+  try {
+    const { data: assignedSchoolIds, error } = await supabase
+      .rpc('get_assigned_schools_new', { p_user_id: userId });
+
+    if (error) {
+      console.error('Error getting assigned schools:', error);
+      return [];
+    }
+
+    if (!assignedSchoolIds || assignedSchoolIds.length === 0) {
+      return [];
+    }
+
+    // Get school details for assigned schools
+    const { data: schools, error: schoolsError } = await supabase
+      .from('schools')
+      .select('*')
+      .in('id', assignedSchoolIds)
+      .order('name');
+
+    if (schoolsError) {
+      console.error('Error fetching school details:', schoolsError);
+      return [];
+    }
+
+    return schools || [];
+  } catch (error) {
+    console.error('Error in getDsviAdminAssignedSchools:', error);
+    return [];
+  }
+}
+
+// Check if DSVI admin has specific permission for a school
+export async function checkDsviAdminPermission(
+  userId: string, 
+  permission: string, 
+  schoolId?: string
+): Promise<boolean> {
+  try {
+    const { data: hasPermission, error } = await supabase
+      .rpc('has_admin_permission_new', { 
+        p_user_id: userId, 
+        p_permission_type: permission,
+        p_school_id: schoolId 
+      });
+
+    if (error) {
+      console.error('Error checking admin permission:', error);
+      return false;
+    }
+
+    return hasPermission || false;
+  } catch (error) {
+    console.error('Error in checkDsviAdminPermission:', error);
+    return false;
+  }
+}
+
+// ===============================================================================
+// DEPRECATED ADMIN FUNCTIONS (OLD MULTI-TABLE APPROACH)
+// These functions are kept for backward compatibility with SCHOOL_ADMIN role
+// but should NOT be used for DSVI_ADMIN role - use dsvi_admin functions instead
 // ===============================================================================
 
 // Admin School Assignments
@@ -396,6 +462,8 @@ export async function removeSchoolAssignment(assignmentId: string, removedBy: st
   }
 }
 
+// DEPRECATED: Use getDsviAdminAssignedSchools for DSVI admins instead
+// This function is kept for SCHOOL_ADMIN role compatibility only
 export async function getAssignedSchools(adminId: string): Promise<School[]> {
   const { data, error } = await supabase
     .from('admin_school_assignments')
@@ -613,7 +681,7 @@ export async function updateSchoolWithSubscription(
   return updatedSchool as School;
 }
 
-// Check if user has access to school
+// Check if user has access to school using new dsvi_admin system
 export async function hasSchoolAccess(userId: string, schoolId: string): Promise<boolean> {
   const { data: user } = await supabase.auth.getUser();
   if (!user.user) return false;
@@ -621,7 +689,36 @@ export async function hasSchoolAccess(userId: string, schoolId: string): Promise
   const userRole = user.user.user_metadata?.role;
 
   // DSVI Admins have access to all schools
-  if (userRole === 'DSVI_ADMIN') return true;
+  if (userRole === 'DSVI_ADMIN') {
+    // Check admin level using new function
+    const { data: adminLevel, error } = await supabase
+      .rpc('get_admin_level_new', { p_user_id: userId });
+    
+    if (error) {
+      console.warn('Error checking admin level:', error);
+      return false;
+    }
+
+    // Level 1 admins have access to all schools
+    if (adminLevel === 1) return true;
+
+    // Level 2 admins need to check school assignment
+    if (adminLevel === 2) {
+      const { data: hasAccess, error: accessError } = await supabase
+        .rpc('has_admin_permission_new', { 
+          p_user_id: userId, 
+          p_permission_type: 'cms_access',
+          p_school_id: schoolId 
+        });
+      
+      if (accessError) {
+        console.warn('Error checking school access:', accessError);
+        return false;
+      }
+      
+      return hasAccess || false;
+    }
+  }
 
   // School Admins need to check assignments
   if (userRole === 'SCHOOL_ADMIN') {
@@ -634,7 +731,8 @@ export async function hasSchoolAccess(userId: string, schoolId: string): Promise
 
     if (school?.admin_user_id === userId) return true;
 
-    // Check assignments
+    // Note: admin_school_assignments is still used for SCHOOL_ADMIN role
+    // This is different from DSVI_ADMIN which uses dsvi_admins table
     const { data: assignment } = await supabase
       .from('admin_school_assignments')
       .select('id')

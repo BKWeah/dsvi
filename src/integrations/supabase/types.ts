@@ -647,145 +647,69 @@ export type Database = {
           },
         ]
       }
-      admin_profiles: {
+      dsvi_admins: {
         Row: {
           id: string
           user_id: string
+          email: string
+          name: string
           admin_level: number
+          permissions: string[] | null
+          school_ids: string[] | null
+          notes: string | null
+          is_active: boolean | null
           created_by: string | null
           created_at: string
           updated_at: string
-          is_active: boolean
-          notes: string | null
+          last_login: string | null
+          invite_token: string | null
+          signup_completed_at: string | null
         }
         Insert: {
           id?: string
           user_id: string
-          admin_level: number
+          email: string
+          name: string
+          admin_level?: number
+          permissions?: string[] | null
+          school_ids?: string[] | null
+          notes?: string | null
+          is_active?: boolean | null
           created_by?: string | null
           created_at?: string
           updated_at?: string
-          is_active?: boolean
-          notes?: string | null
+          last_login?: string | null
+          invite_token?: string | null
+          signup_completed_at?: string | null
         }
         Update: {
           id?: string
           user_id?: string
+          email?: string
+          name?: string
           admin_level?: number
+          permissions?: string[] | null
+          school_ids?: string[] | null
+          notes?: string | null
+          is_active?: boolean | null
           created_by?: string | null
           created_at?: string
           updated_at?: string
-          is_active?: boolean
-          notes?: string | null
+          last_login?: string | null
+          invite_token?: string | null
+          signup_completed_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "admin_profiles_user_id_fkey"
+            foreignKeyName: "dsvi_admins_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "admin_profiles_created_by_fkey"
+            foreignKeyName: "dsvi_admins_created_by_fkey"
             columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      admin_permissions: {
-        Row: {
-          id: string
-          admin_user_id: string
-          permission_type: string
-          resource_id: string | null
-          granted_by: string | null
-          created_at: string
-          expires_at: string | null
-          is_active: boolean
-        }
-        Insert: {
-          id?: string
-          admin_user_id: string
-          permission_type: string
-          resource_id?: string | null
-          granted_by?: string | null
-          created_at?: string
-          expires_at?: string | null
-          is_active?: boolean
-        }
-        Update: {
-          id?: string
-          admin_user_id?: string
-          permission_type?: string
-          resource_id?: string | null
-          granted_by?: string | null
-          created_at?: string
-          expires_at?: string | null
-          is_active?: boolean
-        }
-        Relationships: [
-          {
-            foreignKeyName: "admin_permissions_admin_user_id_fkey"
-            columns: ["admin_user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "admin_permissions_granted_by_fkey"
-            columns: ["granted_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      admin_assignments: {
-        Row: {
-          id: string
-          admin_user_id: string
-          school_id: string
-          assigned_by: string | null
-          created_at: string
-          is_active: boolean
-        }
-        Insert: {
-          id?: string
-          admin_user_id: string
-          school_id: string
-          assigned_by?: string | null
-          created_at?: string
-          is_active?: boolean
-        }
-        Update: {
-          id?: string
-          admin_user_id?: string
-          school_id?: string
-          assigned_by?: string | null
-          created_at?: string
-          is_active?: boolean
-        }
-        Relationships: [
-          {
-            foreignKeyName: "admin_assignments_admin_user_id_fkey"
-            columns: ["admin_user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "admin_assignments_school_id_fkey"
-            columns: ["school_id"]
-            isOneToOne: false
-            referencedRelation: "schools"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "admin_assignments_assigned_by_fkey"
-            columns: ["assigned_by"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
@@ -832,54 +756,88 @@ export type Database = {
         };
         Returns: void;
       }
-      get_admin_level: {
+      get_admin_level_new: {
         Args: {
-          user_id: string;
+          p_user_id: string;
         };
         Returns: number;
       }
-      has_admin_permission: {
+      has_admin_permission_new: {
         Args: {
-          user_id: string;
-          permission_type: string;
-          resource_id?: string;
+          p_user_id: string;
+          p_permission_type: string;
+          p_school_id?: string;
         };
         Returns: boolean;
       }
-      get_assigned_schools: {
+      get_assigned_schools_new: {
         Args: {
-          user_id: string;
+          p_user_id: string;
+        };
+        Returns: string[];
+      }
+      get_admin_by_user_id: {
+        Args: {
+          p_user_id: string;
         };
         Returns: {
-          school_id: string;
+          id: string;
+          user_id: string;
+          email: string;
+          name: string;
+          admin_level: number;
+          permissions: string[];
+          school_ids: string[];
+          notes: string;
+          is_active: boolean;
+          created_by: string;
+          created_at: string;
+          updated_at: string;
+          last_login: string;
         }[];
       }
-      create_admin_profile: {
+      create_admin_from_invitation: {
         Args: {
-          target_user_id: string;
+          p_user_id: string;
+          p_invite_token: string;
+        };
+        Returns: Json;
+      }
+      list_level2_admins: {
+        Args: {};
+        Returns: {
+          id: string;
+          user_id: string;
+          email: string;
+          name: string;
           admin_level: number;
-          created_by_user_id: string;
-          notes?: string;
-        };
-        Returns: string;
+          permissions: string[];
+          school_ids: string[];
+          notes: string;
+          is_active: boolean;
+          created_by: string;
+          created_at: string;
+          updated_at: string;
+          last_login: string;
+          permissions_count: number;
+          schools_count: number;
+        }[];
       }
-      grant_admin_permission: {
+      update_admin: {
         Args: {
-          target_user_id: string;
-          permission_type: string;
-          resource_id?: string;
-          granted_by_user_id?: string;
-          expires_at?: string;
+          p_user_id: string;
+          p_permissions?: string[];
+          p_school_ids?: string[];
+          p_notes?: string;
+          p_is_active?: boolean;
         };
-        Returns: string;
+        Returns: Json;
       }
-      assign_school_to_admin: {
+      update_admin_last_login: {
         Args: {
-          target_user_id: string;
-          target_school_id: string;
-          assigned_by_user_id: string;
+          p_user_id: string;
         };
-        Returns: string;
+        Returns: void;
       }
     }
     Enums: {
