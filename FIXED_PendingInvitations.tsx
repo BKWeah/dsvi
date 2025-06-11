@@ -24,7 +24,7 @@ interface PendingInvitation {
   name: string;
   notes: string;
   permissions: string[];
-  schools: string[];
+  schools: string[] | UUID[];
   tempPassword: string;
   inviteToken: string;
   emailHash?: string;
@@ -120,13 +120,11 @@ export function PendingInvitations({ onRefresh }: PendingInvitationsProps) {
   };
 
   const checkActivatedAdmins = () => {
-    // Check which admins have been activated (this is a simplified check)
     const activated = JSON.parse(localStorage.getItem('activatedLevel2Admins') || '[]');
     setActivatedAdmins(activated);
   };
 
   const generateSignupLink = (invite: PendingInvitation): string => {
-    // Use the stored signup link or generate with email hash for security
     if (invite.signupLink) {
       return invite.signupLink;
     }
@@ -155,26 +153,6 @@ export function PendingInvitations({ onRefresh }: PendingInvitationsProps) {
         variant: "destructive",
       });
     }
-  };
-
-  const sendEmail = (invite: PendingInvitation) => {
-    const subject = encodeURIComponent('DSVI Admin Account Invitation');
-    const body = encodeURIComponent(`Hi ${invite.name},
-
-You've been invited to join as a Level 2 (Assigned Staff) administrator.
-
-Click here to set up your account:
-${invite.signupLink || generateSignupLink(invite)}
-
-Temporary password: ${invite.tempPassword}
-Expires: ${new Date(invite.expiresAt).toLocaleDateString()}
-
-Please confirm your email address during signup for security.
-
-Best regards,
-DSVI Admin Team`);
-
-    window.location.href = `mailto:${invite.email}?subject=${subject}&body=${body}`;
   };
 
   const deleteInvitation = async (invite: PendingInvitation) => {
@@ -212,6 +190,26 @@ DSVI Admin Team`);
         variant: "destructive",
       });
     }
+  };
+
+  const sendEmail = (invite: PendingInvitation) => {
+    const subject = encodeURIComponent('DSVI Admin Account Invitation');
+    const body = encodeURIComponent(`Hi ${invite.name},
+
+You've been invited to join as a Level 2 (Assigned Staff) administrator.
+
+Click here to set up your account:
+${invite.signupLink || generateSignupLink(invite)}
+
+Temporary password: ${invite.tempPassword}
+Expires: ${new Date(invite.expiresAt).toLocaleDateString()}
+
+Please confirm your email address during signup for security.
+
+Best regards,
+DSVI Admin Team`);
+
+    window.location.href = `mailto:${invite.email}?subject=${subject}&body=${body}`;
   };
 
   const getInvitationStatus = (invite: PendingInvitation) => {
@@ -279,15 +277,15 @@ DSVI Admin Team`);
               <Clock className="h-5 w-5" />
               Pending Invitations ({pendingInvitations.length})
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="flex items-center gap-2">
               {usingLocalStorage ? (
                 <>
-                  <HardDrive className="h-4 w-4 mr-2 inline" />
+                  <HardDrive className="h-4 w-4" />
                   Reading from localStorage (database unavailable)
                 </>
               ) : (
                 <>
-                  <Database className="h-4 w-4 mr-2 inline" />
+                  <Database className="h-4 w-4" />
                   Reading from database
                 </>
               )}
@@ -352,14 +350,14 @@ DSVI Admin Team`);
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => copyToClipboard(invite.signupLink || '', 'Signup link')}
+                            onClick={() => copyToClipboard(invite.signupLink || generateSignupLink(invite), 'Signup link')}
                           >
                             <Copy className="h-4 w-4" />
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => window.open(invite.signupLink, '_blank')}
+                            onClick={() => window.open(invite.signupLink || generateSignupLink(invite), '_blank')}
                           >
                             <ExternalLink className="h-4 w-4" />
                           </Button>
@@ -383,7 +381,6 @@ DSVI Admin Team`);
                     </div>
                   </div>
 
-                  {/* Quick Actions for Pending Invitations */}
                   {statusInfo.status === 'pending' && (
                     <div className="mt-3 p-3 bg-muted rounded border-l-4 border-l-blue-200">
                       <div className="flex items-center justify-between">
@@ -396,7 +393,7 @@ DSVI Admin Team`);
                         <div className="flex gap-2">
                           <Button
                             size="sm"
-                            onClick={() => copyToClipboard(invite.signupLink || '', 'Signup link')}
+                            onClick={() => copyToClipboard(invite.signupLink || generateSignupLink(invite), 'Signup link')}
                           >
                             <Copy className="h-4 w-4 mr-1" />
                             Copy Link

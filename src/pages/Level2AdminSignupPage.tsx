@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client'; // Added supabase import
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,32 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, CheckCircle, AlertCircle, UserPlus } from 'lucide-react';
+
+// Define the expected structure of the RPC result for get_invitation_by_token
+interface InvitationRpcResult {
+  success: boolean;
+  message?: string;
+  error?: string;
+  invitation?: {
+    id: string;
+    email: string;
+    name: string;
+    invite_token: string;
+    email_hash: string;
+    temp_password: string;
+    admin_level: number;
+    permissions: string[] | null;
+    school_ids: string[] | null;
+    notes: string | null;
+    created_by: string;
+    created_at: string;
+    expires_at: string;
+    is_used: boolean;
+    used_at: string | null;
+    used_by: string | null;
+    signup_link: string | null;
+  };
+}
 
 export default function Level2AdminSignupPage() {
   const [searchParams] = useSearchParams();
@@ -68,155 +95,76 @@ export default function Level2AdminSignupPage() {
   // Get the actual email from localStorage using the hash or direct email
   const [inviteData, setInviteData] = useState<any>(null);
   const [obscuredEmail, setObscuredEmail] = useState('');
-  const [isLegacyInvite, setIsLegacyInvite] = useState(false);
-
-  // Form state
-  const [email, setEmail] = useState('');
-  const [emailConfirmed, setEmailConfirmed] = useState(false);
-  const [password, setPassword] = useState(tempPassword || '');
+  const [isLoading, setIsLoading] = useState(false);
+  const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [step, setStep] = useState(1);
+  const [email, setEmail] = useState('');
+  const [emailConfirmed, setEmailConfirmed] = useState(false);
+  const [isInvitationLoading, setIsInvitationLoading] = useState(true);
+  const [invitationErrorState, setInvitationErrorState] = useState<string | null>(null);
 
   useEffect(() => {
-    // Handle new secure format with email hash
-    if (inviteToken && emailHash && !directEmail) {
-      try {
-        console.log('Processing secure invitation format with emailHash:', emailHash);
-        const pendingAdmins = JSON.parse(localStorage.getItem('pendingLevel2Admins') || '[]');
-        
-        // Find invitation by token first (more reliable)
-        let invite = pendingAdmins.find((admin: any) => 
-          admin.inviteToken === inviteToken
-        );
-        
-        // If not found by token, try to match by email hash
-        if (!invite) {
-          invite = pendingAdmins.find((admin: any) => 
-            admin.emailHash === emailHash
-          );
-        }
-        
-        // If still not found, try to decode the email hash and match by email
-        if (!invite && emailHash) {
-          try {
-            // The emailHash is base64 encoded, try to decode it
-            const decodedEmail = atob(emailHash);
-            console.log('Decoded email from hash:', decodedEmail);
-            
-            invite = pendingAdmins.find((admin: any) => 
-              admin.email.toLowerCase() === decodedEmail.toLowerCase()
-            );
-            
-            if (invite) {
-              console.log('Found invitation by decoded email');
-            }
-          } catch (decodeError) {
-            console.warn('Failed to decode email hash:', decodeError);
-          }
-        }
-        
-        if (invite) {
-          setInviteData(invite);
-          // Create obscured email (show first 2 chars + last domain)
-          const email = invite.email;
-          const [localPart, domain] = email.split('@');
-          const obscured = `${localPart.substring(0, 2)}${'*'.repeat(Math.max(1, localPart.length - 2))}@${domain}`;
-          setObscuredEmail(obscured);
-          setIsLegacyInvite(false);
-          console.log('Successfully loaded secure invitation');
-        } else {
-          console.warn('No matching invitation found for emailHash:', emailHash);
-          
-          // Fallback: Create temporary invitation from URL parameters if they're valid
-          if (inviteToken && emailHash && tempPassword && adminName) {
-            try {
-              const decodedEmail = atob(emailHash);
-              if (decodedEmail && decodedEmail.includes('@')) {
-                console.log('Creating temporary invitation from valid URL parameters');
-                const tempInvite = {
-                  email: decodedEmail,
-                  name: adminName,
-                  inviteToken: inviteToken,
-                  tempPassword: tempPassword,
-                  permissions: [], // Will be applied by AuthContext during signup
-                  schools: [], // Will be applied by AuthContext during signup
-                  notes: 'Temporary invitation created from valid URL parameters',
-                  createdAt: new Date().toISOString(),
-                  isTemporary: true
-                };
-                
-                setInviteData(tempInvite);
-                const [localPart, domain] = decodedEmail.split('@');
-                const obscured = `${localPart.substring(0, 2)}${'*'.repeat(Math.max(1, localPart.length - 2))}@${domain}`;
-                setObscuredEmail(obscured);
-                setIsLegacyInvite(false);
-                console.log('Successfully created temporary invitation');
-              }
-            } catch (decodeError) {
-              console.error('Failed to create temporary invitation:', decodeError);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error looking up secure invitation:', error);
+    const fetchInvitation = async () => {
+      setIsInvitationLoading(true);
+      setInvitationErrorState(null);
+      setInviteData(null);
+
+      if (!inviteToken) {
+        setInvitationErrorState('Invitation token is missing from the URL.');
+        setIsInvitationLoading(false);
+        return;
       }
-    }
-    // Handle legacy format with direct email (backward compatibility)
-    else if (directEmail && tempPassword) {
+
       try {
-        console.log('Processing legacy invitation format with email:', directEmail);
-        const pendingAdmins = JSON.parse(localStorage.getItem('pendingLevel2Admins') || '[]');
-        
-        // Look for invitation by email (try exact match first, then case-insensitive)
-        let invite = pendingAdmins.find((admin: any) => 
-          admin.email === directEmail || admin.email.toLowerCase() === directEmail.toLowerCase()
-        );
-        
-        // If still not found and we have an invite token, try to match by token
-        if (!invite && inviteToken) {
-          invite = pendingAdmins.find((admin: any) => 
-            admin.inviteToken === inviteToken
-          );
-          console.log('Tried matching by token:', invite ? 'Found' : 'Not found');
+        console.log('Fetching invitation from database with token:', inviteToken);
+        console.log('Fetching invitation from database with token:', inviteToken);
+        // Temporarily cast the function name to 'any' to bypass TypeScript's strict type checking for RPC function names.
+        // This is a workaround if the generated types or Supabase client's RPC method inference is not working as expected.
+        const { data: rpcResult, error: rpcError } = await supabase.rpc('get_invitation_by_token' as any, {
+          p_invite_token: inviteToken
+        });
+
+        if (rpcError) {
+          console.error('Error calling get_invitation_by_token RPC:', rpcError);
+          setInvitationErrorState(`Failed to fetch invitation: ${rpcError.message}`);
+          return;
         }
-        
-        // If not found in pending, create a temporary invite data for legacy support
-        if (!invite) {
-          console.log('No pending invitation found, creating temporary invite data');
-          invite = {
-            email: directEmail,
-            name: adminName || directEmail.split('@')[0],
-            inviteToken: inviteToken || 'legacy',
-            tempPassword: tempPassword,
-            permissions: [],
-            schools: [],
-            notes: 'Legacy invitation format - automatically created'
-          };
-        } else {
-          console.log('Found matching invitation in localStorage');
+
+        // Explicitly type rpcResult to InvitationRpcResult for type safety
+        const typedRpcResult: InvitationRpcResult | null = rpcResult;
+
+        if (!typedRpcResult?.success) {
+          console.warn('Invitation not found or invalid:', typedRpcResult?.message);
+          setInvitationErrorState(typedRpcResult?.message || 'Invitation not found, expired, or already used.');
+          return;
         }
-        
-        setInviteData(invite);
+
+        const invitation = typedRpcResult.invitation;
+        console.log('Successfully fetched invitation:', invitation);
+
+        setInviteData(invitation);
+        setEmail(invitation.email); // Pre-fill email from invitation
+        setPassword(tempPassword || invitation.temp_password || ''); // Use URL temp_password first, then DB temp_password
+
         // Create obscured email (show first 2 chars + last domain)
-        const [localPart, domain] = directEmail.split('@');
+        const [localPart, domain] = invitation.email.split('@');
         const obscured = `${localPart.substring(0, 2)}${'*'.repeat(Math.max(1, localPart.length - 2))}@${domain}`;
         setObscuredEmail(obscured);
-        setIsLegacyInvite(true);
-      } catch (error) {
-        console.error('Error processing legacy invitation:', error);
+        setEmailConfirmed(true); // Email is confirmed if fetched from DB
+
+      } catch (error: any) {
+        console.error('Unexpected error fetching invitation:', error);
+        setInvitationErrorState(`An unexpected error occurred: ${error.message}`);
+      } finally {
+        setIsInvitationLoading(false);
       }
-    }
+    };
 
-    // Auto-fill password if provided
-    if (tempPassword) {
-      setPassword(tempPassword);
-      setConfirmPassword(tempPassword);
-    }
-  }, [inviteToken, emailHash, directEmail, tempPassword, adminName]);
+    fetchInvitation();
+  }, [inviteToken, tempPassword]); // Depend on inviteToken and tempPassword from URL
 
-  // Validate email matches the invitation
+  // Validate email matches the invitation (only if not pre-filled and confirmed)
   const handleEmailChange = (value: string) => {
     setEmail(value);
     if (inviteData) {

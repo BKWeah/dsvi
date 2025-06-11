@@ -173,185 +173,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Check if this is a Level 2 admin signup based on invite token
         if (role === 'DSVI_ADMIN' && metadata?.inviteToken) {
           try {
-            console.log('🔄 Processing Level 2 admin signup with invite token:', metadata.inviteToken);
-            const pendingAdmins = JSON.parse(localStorage.getItem('pendingLevel2Admins') || '[]');
-            const pendingAdmin = pendingAdmins.find((admin: any) => 
-              admin.inviteToken === metadata.inviteToken
-            );
+            console.log('🔄 Processing Level 2 admin signup with database invitation...');
+            console.log('🔄 Invite token:', metadata.inviteToken);
+            console.log('🔄 User data:', { id: data.user.id, email: data.user.email });
             
-            if (pendingAdmin) {
-              console.log('✅ Found matching Level 2 admin invitation:', pendingAdmin);
-              
-              // Verify the email matches the invitation (security check)
-              if (pendingAdmin.email.toLowerCase() !== email.toLowerCase()) {
-                console.warn('❌ Email mismatch in Level 2 admin signup');
-                return { error };
-              }
-              
-              // Check if invitation hasn't expired
-              const now = new Date();
-              const expiresAt = new Date(pendingAdmin.expiresAt);
-              
-              if (now > expiresAt) {
-                console.warn('❌ Invitation has expired');
-                // Don't create Level 2 admin profile, but allow signup as regular DSVI admin
-                return { error };
-              }
-              
-              console.log('🚀 Creating Level 2 admin profile...');
-              
-              // Use the new safe_create_admin_profile function for better reliability
-              const { data: profileResult, error: profileError } = await supabase.rpc('safe_create_admin_profile', {
-                p_user_id: data.user.id,
-                p_admin_level: 2, // Level 2 admin
-                p_created_by: pendingAdmin.createdBy,
-                p_notes: pendingAdmin.notes || `Level 2 admin created from invitation on ${new Date().toLocaleDateString()}`
-              }) as { data: { success: boolean } | null, error: any }; // Type assertion
+            // Use the new database function instead of localStorage
+            const { data: signupResult, error: signupError } = await supabase.rpc('process_level2_admin_signup', {
+              p_user_id: data.user.id,
+              p_email: email,
+              p_invite_token: metadata.inviteToken
+            });
 
-              if (profileError || !profileResult?.success) {
-                console.error('❌ Failed to create Level 2 admin profile:', profileError || profileResult);
-                // Don't throw - allow the signup to succeed and handle profile creation later
-                console.warn('⚠️ Admin profile creation failed, but user signup succeeded. Profile can be created manually.');
-              } else {
-                console.log('✅ Level 2 admin profile result:', profileResult);
-                // Set admin level immediately after successful profile creation
-                setAdminLevel(2);
-              }
+            console.log('🔄 Database signup result:', signupResult);
+            console.log('🔄 Database signup error:', signupError);
 
-              // Grant selected permissions
-              for (const permission of pendingAdmin.permissions || []) {
-                const { error: permError } = await supabase.rpc('grant_admin_permission', {
-                  target_user_id: data.user.id,
-                  permission_type: permission,
-                  granted_by_user_id: pendingAdmin.createdBy
-                });
-                
-                if (permError) {
-                  console.warn('⚠️ Failed to grant permission:', permission, permError);
-                } else {
-                  console.log('✅ Granted permission:', permission);
-                }
-              }
-
-              // Assign to selected schools
-              for (const schoolId of pendingAdmin.schools || []) {
-                const { error: assignError } = await supabase.rpc('assign_school_to_admin', {
-                  target_user_id: data.user.id,
-                  target_school_id: schoolId,
-                  assigned_by_user_id: pendingAdmin.createdBy
-                });
-                
-                if (assignError) {
-                  console.warn('⚠️ Failed to assign school:', schoolId, assignError);
-                } else {
-                  console.log('✅ Assigned to school:', schoolId);
-                }
-              }
-
-              // Remove from pending list (mark as used)
-              const updatedPending = pendingAdmins.filter((admin: any) => 
-                admin.inviteToken !== metadata.inviteToken
-              );
-              localStorage.setItem('pendingLevel2Admins', JSON.stringify(updatedPending));
+            if (signupError) {
+              console.error('❌ Database Level 2 admin signup failed:', signupError);
+              console.warn('⚠️ Admin creation failed, but user signup succeeded. Check invitation token and database.');
+            } else if (!signupResult?.success) {
+              console.error('❌ Level 2 admin signup returned failure:', signupResult);
+              console.warn('⚠️ Admin creation failed:', signupResult?.message);
               
-              // Mark admin as activated for tracking purposes - REMOVED THIS LINE
-              // const activatedAdmins = JSON.parse(localStorage.getItem('activatedLevel2Admins') || '[]');
-              // if (!activatedAdmins.includes(email.toLowerCase())) {
-              //   activatedAdmins.push(email.toLowerCase());
-              //   localStorage.setItem('activatedLevel2Admins', JSON.stringify(activatedAdmins));
-              // }
+              // Log helpful debug info
+              if (signupResult?.message?.includes('Invalid invitation')) {
+                console.log('🔍 Debug: Check if invitation exists, is expired, or email matches');
+                console.log('🔍 Expected email:', email);
+                console.log('🔍 Invite token:', metadata.inviteToken);
+              }
+            } else {
+              console.log('✅ Level 2 admin created successfully from database invitation!');
+              console.log('✅ Creation details:', signupResult);
+              
+              // Set admin level immediately after successful creation
+              setAdminLevel(2);
               
               console.log('🎉 Level 2 admin setup completed successfully');
               
-              // Verify the admin setup is complete
-              const { data: verifyData, error: verifyError } = await supabase
-                .rpc('verify_admin_setup', { p_user_id: data.user.id }) as { data: { success: boolean } | null, error: any }; // Type assertion
-              
-              if (!verifyError && verifyData?.success) {
-                console.log('✅ Admin setup verification:', verifyData);
-              } else {
-                console.error('❌ Admin setup verification failed:', verifyError || verifyData);
-              }
-              
               // Dispatch event to notify useAdmin hook to refresh
               window.dispatchEvent(new CustomEvent('adminLevelChanged'));
-              
-              // Also refresh the admin level in this context with increased delay - REMOVED THIS LINE
-              // setTimeout(() => {
-              //   console.log('🔄 Refreshing admin level in AuthContext...');
-              //   fetchAdminLevel(data.user);
-              // }, 2000); // Increased delay to ensure all operations complete
-            } else {
-              console.log('❌ No matching invitation found for token:', metadata.inviteToken);
             }
           } catch (adminError) {
-            console.error('❌ Failed to apply Level 2 admin configuration:', adminError);
+            console.error('❌ Failed to process Level 2 admin signup:', adminError);
+            console.error('❌ Error details:', adminError);
           }
         }
-        // Fallback: Check for pending admin by email only (backward compatibility)
+        // Remove the localStorage fallback since we're now using database
         else if (role === 'DSVI_ADMIN') {
-          try {
-            const pendingAdmins = JSON.parse(localStorage.getItem('pendingLevel2Admins') || '[]');
-            const pendingAdmin = pendingAdmins.find((admin: any) => 
-              admin.email.toLowerCase() === email.toLowerCase() && !admin.inviteToken
-            );
-            
-            if (pendingAdmin) {
-              console.log('Found legacy pending Level 2 admin configuration, applying...');
-              
-              // Create Level 2 admin profile
-              await supabase.rpc('create_admin_profile', {
-                target_user_id: data.user.id,
-                admin_level: 2, // Level 2 admin
-                created_by_user_id: pendingAdmin.createdBy,
-                notes: pendingAdmin.notes || `Level 2 admin created from invitation on ${new Date().toLocaleDateString()}`
-              });
-
-              // Grant selected permissions
-              for (const permission of pendingAdmin.permissions || []) {
-                await supabase.rpc('grant_admin_permission', {
-                  target_user_id: data.user.id,
-                  permission_type: permission,
-                  granted_by_user_id: pendingAdmin.createdBy
-                });
-              }
-
-              // Assign to selected schools
-              for (const schoolId of pendingAdmin.schools || []) {
-                await supabase.rpc('assign_school_to_admin', {
-                  target_user_id: data.user.id,
-                  target_school_id: schoolId,
-                  assigned_by_user_id: pendingAdmins.createdBy
-                });
-              }
-
-              // Remove from pending list
-              const updatedPending = pendingAdmins.filter((admin: any) => 
-                admin.email.toLowerCase() !== email.toLowerCase()
-              );
-              localStorage.setItem('pendingLevel2Admins', JSON.stringify(updatedPending));
-              
-              // Mark admin as activated for tracking purposes - REMOVED THIS LINE
-              // const activatedAdmins = JSON.parse(localStorage.getItem('activatedLevel2Admins') || '[]');
-              // if (!activatedAdmins.includes(email.toLowerCase())) {
-              //   activatedAdmins.push(email.toLowerCase());
-              //   localStorage.setItem('activatedLevel2Admins', JSON.stringify(activatedAdmins));
-              // }
-              
-              console.log('Legacy Level 2 admin profile automatically created and configured');
-              
-              // Dispatch event to notify useAdmin hook to refresh
-              window.dispatchEvent(new CustomEvent('adminLevelChanged'));
-              
-              // Also refresh the admin level in this context - REMOVED THIS LINE
-              // setTimeout(() => {
-              //   fetchAdminLevel(data.user);
-              // }, 500);
-            }
-          } catch (adminError) {
-            console.warn('Failed to apply legacy Level 2 admin configuration:', adminError);
-          }
+          console.log('🔄 DSVI_ADMIN signup without invite token - regular admin account created');
         }
+                
+
       } catch (syncError) {
         console.warn('Failed to sync user profile during signup:', syncError);
         // Don't fail signup for this

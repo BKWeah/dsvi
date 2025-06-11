@@ -47,6 +47,21 @@ import {
   AdminProfile 
 } from '@/lib/admin/permissions';
 
+// Define the expected structure of the RPC result for create_admin_invitation
+interface CreateInvitationRpcResult {
+  success: boolean;
+  message?: string;
+  error?: string;
+  invitation_id?: string;
+  email?: string;
+  name?: string;
+  invite_token?: string;
+  email_hash?: string;
+  temp_password?: string;
+  signup_link?: string;
+  expires_at?: string;
+}
+
 interface Level2Admin {
   id: string;
   email: string;
@@ -178,79 +193,65 @@ export default function AdminManagementPage() {
       return;
     }
 
-    // Check for duplicate email invitations
     try {
-      const existingPending = JSON.parse(localStorage.getItem('pendingLevel2Admins') || '[]');
-      const duplicateInvite = existingPending.find((invite: any) => 
-        invite.email.toLowerCase() === newAdminEmail.toLowerCase()
-      );
+      console.log('🔄 Creating Level 2 admin invitation in database...');
       
-      if (duplicateInvite) {
+      // Use the new database function instead of localStorage
+      // Temporarily cast the function name to 'any' to bypass TypeScript's strict type checking for RPC function names.
+      const { data: rpcResult, error: invitationError } = await supabase.rpc('create_admin_invitation' as any, {
+        p_email: newAdminEmail,
+        p_name: newAdminName,
+        p_created_by: user?.id,
+        p_permissions: selectedPermissions,
+        p_school_ids: selectedSchools,
+        p_notes: newAdminNotes,
+        p_days_valid: 7
+      });
+
+      // Explicitly type rpcResult to CreateInvitationRpcResult for type safety
+      const invitationResult: CreateInvitationRpcResult | null = rpcResult;
+
+      if (invitationError) {
+        console.error('❌ Database invitation creation failed:', invitationError);
+        console.error('Full invitationError object:', invitationError); // Added for detailed logging
         toast({
-          title: "Duplicate Invitation",
-          description: `An invitation for ${newAdminEmail} already exists. Delete the existing one first if you want to create a new invitation.`,
+          title: "Error",
+          description: "Failed to create invitation in database",
           variant: "destructive",
         });
         return;
       }
 
-      // Check if email already has an active Level 2 admin account
-      const activatedAdmins = JSON.parse(localStorage.getItem('activatedLevel2Admins') || '[]');
-      if (activatedAdmins.includes(newAdminEmail.toLowerCase())) {
+      if (!invitationResult?.success) {
+        console.error('❌ Invitation creation returned failure:', invitationResult);
+        console.error('Full invitationResult object (on failure):', invitationResult); // Added for detailed logging
         toast({
-          title: "Account Exists",
-          description: `${newAdminEmail} already has an active Level 2 admin account.`,
+          title: "Error", 
+          description: invitationResult?.message || "Failed to create invitation",
           variant: "destructive",
         });
         return;
       }
-    } catch (error) {
-      console.error('Error checking for duplicates:', error);
-    }
 
-    try {
-      // Generate secure invitation data
-      const tempPassword = `TempPass${Math.random().toString(36).slice(-8)}`;
-      const inviteToken = `invite_${Date.now()}_${Math.random().toString(36).slice(-8)}`;
-      const currentTimestamp = new Date().toISOString();
+      console.log('✅ Database invitation created successfully:', invitationResult);
+      console.log('Full invitationResult object (on success):', invitationResult); // Added for detailed logging
       
-      // Create email hash for URL (use full base64, don't truncate)
-      console.log('Original email for encoding:', newAdminEmail);
-      const emailHash = btoa(newAdminEmail);
-      console.log('Encoded email hash:', emailHash);
-      console.log('Decoded email hash (verification):', atob(emailHash));
+      // Extract values from invitation result
+      const emailHash = invitationResult.email_hash;
+      const inviteToken = invitationResult.invite_token;
+      const tempPassword = invitationResult.temp_password;
       
-      // Generate the signup link with email hash
-      const baseUrl = window.location.origin;
-      const signupLink = `${baseUrl}/level2-admin-signup?token=${encodeURIComponent(inviteToken)}&eh=${emailHash}&pwd=${encodeURIComponent(tempPassword)}&name=${encodeURIComponent(newAdminName)}`;
-
-      // Store the pending admin configuration with invite token
-      const pendingAdminData = {
-        email: newAdminEmail,
-        name: newAdminName,
-        notes: newAdminNotes,
-        permissions: selectedPermissions,
-        schools: selectedSchools,
-        tempPassword: tempPassword,
-        inviteToken: inviteToken,
-        emailHash: emailHash,
-        signupLink: signupLink,
-        createdBy: user?.id,
-        createdAt: currentTimestamp,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days expiry
-      };
-
-      // Store in localStorage for now (in production, you'd store this in a pending_admins table)
-      const existingPending = JSON.parse(localStorage.getItem('pendingLevel2Admins') || '[]');
-      existingPending.push(pendingAdminData);
-      localStorage.setItem('pendingLevel2Admins', JSON.stringify(existingPending));
-
-      console.log('Level 2 Admin Invitation Created and Stored:', pendingAdminData);
-      console.log('Updated localStorage pendingLevel2Admins:', existingPending);
-
-      // Verify storage worked
-      const verifyStorage = JSON.parse(localStorage.getItem('pendingLevel2Admins') || '[]');
-      console.log('Verification - localStorage now contains:', verifyStorage.length, 'invitations');
+      console.log('Email hash available:', !!emailHash);
+      if (emailHash) {
+        try {
+          console.log('Decoded email hash (verification):', atob(emailHash));
+        } catch (e) {
+          console.warn('Could not decode email hash:', e);
+        }
+      }
+      
+      // Use the signup link from the database result, or generate one if needed
+      const signupLink = invitationResult.signup_link || `${window.location.origin}/level2-admin-signup?token=${encodeURIComponent(inviteToken || '')}&eh=${encodeURIComponent(emailHash || '')}&pwd=${encodeURIComponent(tempPassword || '')}&name=${encodeURIComponent(newAdminName)}`;
 
       // Prepare data for success dialog
       setLastInvitationData({
@@ -260,7 +261,8 @@ export default function AdminManagementPage() {
         permissions: selectedPermissions,
         schools: selectedSchools,
         tempPassword: tempPassword,
-        expiresAt: pendingAdminData.expiresAt
+        expiresAt: invitationResult.expires_at,
+        inviteToken: inviteToken
       });
 
       // Reset form
@@ -279,12 +281,12 @@ export default function AdminManagementPage() {
         await navigator.clipboard.writeText(signupLink);
         toast({
           title: "Invitation Created!",
-          description: "Signup link copied to clipboard automatically",
+          description: "Signup link copied to clipboard and stored in database",
         });
       } catch (clipboardError) {
         toast({
           title: "Invitation Created!",
-          description: "Use the dialog to copy and send the signup link",
+          description: "Invitation stored in database - use the dialog to copy the signup link",
         });
       }
 
@@ -292,7 +294,7 @@ export default function AdminManagementPage() {
       fetchData();
 
     } catch (error) {
-      console.error('Error creating admin invitation:', error);
+      console.error('❌ Error creating database invitation:', error);
       toast({
         title: "Error",
         description: "Failed to create Level 2 admin invitation",
