@@ -27,6 +27,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { InvitationSuccessDialog } from '@/components/dsvi-admin/InvitationSuccessDialog';
 import { PendingInvitations } from '@/components/dsvi-admin/PendingInvitations';
+import { ViewAdminDialog } from '@/components/dsvi-admin/ViewAdminDialog';
+import { EditAdminDialog } from '@/components/dsvi-admin/EditAdminDialog';
 import { AdminMigrationUtility } from '@/components/admin/AdminMigrationUtility';
 import { AdminDebugUtility } from '@/components/admin/AdminDebugUtility';
 import { 
@@ -87,6 +89,8 @@ export default function AdminManagementPage() {
   const [loading, setLoading] = useState(true);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [showViewDialog, setShowViewDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState<Level2Admin | null>(null);
   const [lastInvitationData, setLastInvitationData] = useState<any>(null);
   const { toast } = useToast();
@@ -319,6 +323,25 @@ export default function AdminManagementPage() {
     );
   };
 
+  const handleViewAdmin = (admin: Level2Admin) => {
+    setSelectedAdmin(admin);
+    setShowViewDialog(true);
+  };
+
+  const handleEditAdmin = (admin: Level2Admin) => {
+    setSelectedAdmin(admin);
+    setShowEditDialog(true);
+  };
+
+  const handleEditFromView = () => {
+    setShowViewDialog(false);
+    setShowEditDialog(true);
+  };
+
+  const handleSaveEdit = () => {
+    fetchData(); // Refresh the data
+  };
+
   if (adminLoading || loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -543,11 +566,19 @@ export default function AdminManagementPage() {
                           )}
                         </div>
                         <div className="flex items-center gap-2">
-                          <Button size="sm" variant="outline">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleViewAdmin(admin)}
+                          >
                             <Eye className="h-4 w-4 mr-1" />
                             View
                           </Button>
-                          <Button size="sm" variant="outline">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleEditAdmin(admin)}
+                          >
                             <Settings className="h-4 w-4 mr-1" />
                             Edit
                           </Button>
@@ -609,6 +640,24 @@ export default function AdminManagementPage() {
 
       {/* Admin Debug Utility */}
       <AdminDebugUtility />
+
+      {/* View Admin Dialog */}
+      <ViewAdminDialog
+        open={showViewDialog}
+        onOpenChange={setShowViewDialog}
+        admin={selectedAdmin}
+        schools={schools}
+        onEdit={handleEditFromView}
+      />
+
+      {/* Edit Admin Dialog */}
+      <EditAdminDialog
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        admin={selectedAdmin}
+        schools={schools}
+        onSave={handleSaveEdit}
+      />
 
       {/* Invitation Success Dialog */}
       {lastInvitationData && (
