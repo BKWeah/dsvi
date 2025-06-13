@@ -172,7 +172,7 @@ export default function AdminManagementPage() {
     try {
       console.log('🔄 Creating Level 2 admin invitation...');
       
-      // Use the existing database function for creating invitations
+      // Use the existing database function for creating invitations with dynamic base URL
       const { data: rpcResult, error: invitationError } = await supabase.rpc('create_admin_invitation' as any, {
         p_email: newAdminEmail,
         p_name: newAdminName,
@@ -180,7 +180,8 @@ export default function AdminManagementPage() {
         p_permissions: selectedPermissions,
         p_school_ids: selectedSchools,
         p_notes: newAdminNotes,
-        p_days_valid: 7
+        p_days_valid: 7,
+        p_base_url: window.location.origin  // Pass current domain instead of hardcoded localhost
       });
 
       const invitationResult: CreateInvitationRpcResult | null = rpcResult;

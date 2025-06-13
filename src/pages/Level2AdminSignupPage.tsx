@@ -194,53 +194,147 @@ export default function Level2AdminSignupPage() {
         decodedInviteToken = inviteToken || '';
       }
 
-      // Step 1: Create auth user
-      const { data: authData, error: authError } = await signup(email, password, 'DSVI_ADMIN', {
+      // Step 1: Create auth user (handle existing users)
+      let authData, authError;
+      
+      const signupResult = await signup(email, password, 'DSVI_ADMIN', {
         name: inviteData?.name || adminName || email.split('@')[0],
         inviteToken: decodedInviteToken, // Use decoded token
         skipAutoAdminCreation: true // Prevent automatic Level 1 admin creation
       });
+      
+      authData = signupResult.data;
+      authError = signupResult.error;
 
-      if (authError) {
+      // Check if user already exists - this might be OK if admin record gets created via AuthContext
+      if (authError && authError.message?.includes('User already registered')) {
+        console.log('ℹ️ User already exists - checking if admin record was created...');
+        
+        // Wait a moment for AuthContext to process
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Check if admin record was created by AuthContext
+        const { data: currentUser } = await supabase.auth.getUser();
+        if (currentUser?.user) {
+          console.log('✅ User is authenticated, checking admin record...');
+          
+          // Check if admin record exists
+          const { data: adminCheck } = await supabase
+            .from('dsvi_admins')
+            .select('id, admin_level')
+            .eq('user_id', currentUser.user.id)
+            .single();
+            
+          if (adminCheck && adminCheck.admin_level === 2) {
+            console.log('✅ Level 2 admin record found - signup completed via AuthContext!');
+            
+            toast({
+              title: "Account Ready!",
+              description: `Welcome ${inviteData?.name}! Your Level 2 admin account is ready.`,
+            });
+            
+            // Dispatch event and redirect
+            window.dispatchEvent(new CustomEvent('adminLevelChanged'));
+            setTimeout(() => {
+              navigate('/login?message=signup-success');
+            }, 2000);
+            return; // Exit early - everything is done!
+          }
+        }
+        
+        // If we get here, try to sign in the existing user manually
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password,
+        });
+        
+        if (signInError || !signInData.user) {
+          throw new Error('User already exists but cannot authenticate. Please check your password.');
+        }
+        
+        console.log('✅ Manually authenticated existing user:', signInData.user.id);
+        authData = signInData;
+        authError = null;
+      } else if (authError) {
         console.error('❌ Auth signup error:', authError);
         throw authError;
       }
 
-      console.log('✅ Auth user created:', authData?.user?.id);
+      console.log('✅ Auth user ready:', authData?.user?.id);
 
-      // Step 2: Create admin record from invitation using new consolidated function
-      if (authData?.user?.id) {
-        console.log('🔄 Creating admin record from invitation...');
-
-        const { data: adminResult, error: adminError } = await supabase.rpc('create_admin_from_invitation', {
-          p_user_id: authData.user.id,
-          p_invite_token: decodedInviteToken // Use decoded token
-        });
-
-        console.log('📊 Admin creation result:', adminResult);
-
-        if (adminError) {
-          console.error('❌ Error creating admin from invitation:', adminError);
-          throw new Error(`Failed to create admin profile: ${adminError.message}`);
+      // Verify we have a valid user (if not, it might have been handled by AuthContext)
+      if (!authData?.user?.id) {
+        console.log('⚠️ No user ID from signup - checking if user is already authenticated...');
+        
+        const { data: currentUser } = await supabase.auth.getUser();
+        if (currentUser?.user) {
+          console.log('✅ User is already authenticated:', currentUser.user.id);
+          authData = { user: currentUser.user };
+        } else {
+          console.error('❌ No authenticated user found');
+          throw new Error('Authentication failed - no user found');
         }
-
-        const typedAdminResult: CreateAdminRpcResult | null = adminResult;
-
-        if (!typedAdminResult?.success) {
-          console.error('❌ Admin creation failed:', typedAdminResult?.message);
-          throw new Error(typedAdminResult?.message || 'Failed to create admin profile');
-        }
-
-        console.log('✅ Admin record created successfully:', typedAdminResult.admin_id);
       }
 
-      // Step 3: Dispatch admin level change event for UI updates
+      // Step 2: Check if admin record was already created by AuthContext
+      console.log('🔄 Checking if Level 2 admin record already exists...');
+      
+      const { data: existingAdmin } = await supabase
+        .from('dsvi_admins')
+        .select('id, admin_level, invite_token')
+        .eq('user_id', authData.user.id)
+        .single();
+        
+      if (existingAdmin && existingAdmin.admin_level === 2) {
+        console.log('✅ Level 2 admin record already exists - created by AuthContext!');
+        console.log('✅ Admin ID:', existingAdmin.id);
+        
+        toast({
+          title: "Account Ready!",
+          description: `Welcome ${inviteData?.name}! Your Level 2 admin account is ready.`,
+        });
+        
+        // Dispatch event and redirect
+        window.dispatchEvent(new CustomEvent('adminLevelChanged'));
+        setTimeout(() => {
+          navigate('/login?message=signup-success');
+        }, 2000);
+        return; // Exit - everything is already done!
+      }
+
+      // Step 3: If no admin record exists, create it directly
+      console.log('🔄 No existing admin record found - creating Level 2 admin record DIRECTLY...');
+
+      const { data: adminResult, error: adminError } = await supabase.rpc('signup_level2_admin_directly', {
+        p_user_id: authData.user.id,
+        p_email: email,  // Use actual email entered by user
+        p_name: inviteData?.name || adminName || email.split('@')[0],
+        p_invite_token: decodedInviteToken
+      });
+
+      console.log('📊 Admin creation result:', adminResult);
+
+      if (adminError) {
+        console.error('❌ Error creating admin from invitation:', adminError);
+        throw new Error(`Failed to create admin profile: ${adminError.message}`);
+      }
+
+      const typedAdminResult: CreateAdminRpcResult | null = adminResult;
+
+      if (!typedAdminResult?.success) {
+        console.error('❌ Admin creation failed:', typedAdminResult?.message);
+        throw new Error(typedAdminResult?.message || 'Failed to create admin profile');
+      }
+
+      console.log('✅ Admin record created successfully:', typedAdminResult.admin_id);
+
+      // Step 4: Dispatch admin level change event for UI updates
       console.log('🔄 Dispatching admin level change event...');
       window.dispatchEvent(new CustomEvent('adminLevelChanged'));
 
       toast({
-        title: "Account Created Successfully!",
-        description: `Welcome ${inviteData?.name}! Your Level 2 admin account is ready.`,
+        title: "Account Ready!",
+        description: `Welcome ${inviteData?.name}! Your Level 2 admin account has been set up successfully.`,
       });
 
       // Redirect to login page

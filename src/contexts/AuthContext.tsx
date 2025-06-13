@@ -163,23 +163,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const name = metadata?.name || data.user.email;
         
-        await supabase.rpc('upsert_user_profile', {
+        const upsertParams: any = {
           p_user_id: data.user.id,
           p_email: data.user.email,
           p_role: role,
-          p_name: name
-        });
+          p_name: name,
+          p_skip_admin_creation: true  // Always skip auto-creation, handle Level 2 separately
+        };
+        
+        await supabase.rpc('upsert_user_profile', upsertParams);
 
         // Check if this is a Level 2 admin signup based on invite token
-        if (role === 'DSVI_ADMIN' && metadata?.inviteToken && !metadata?.skipAutoAdminCreation) {
+        if (role === 'DSVI_ADMIN' && metadata?.inviteToken) {
           try {
-            console.log('🔄 Processing Level 2 admin signup with consolidated admin system...');
+            console.log('🔄 Processing Level 2 admin signup with DIRECT approach...');
             console.log('🔄 Invite token:', metadata.inviteToken);
             console.log('🔄 User data:', { id: data.user.id, email: data.user.email });
             
-            // Use the new consolidated admin creation function
-            const { data: adminResult, error: adminError } = await supabase.rpc('create_admin_from_invitation', {
+            // Use the new DIRECT admin creation function (no conflicts, no race conditions)
+            const { data: adminResult, error: adminError } = await supabase.rpc('signup_level2_admin_directly', {
               p_user_id: data.user.id,
+              p_email: data.user.email,
+              p_name: name,
               p_invite_token: metadata.inviteToken
             });
 
