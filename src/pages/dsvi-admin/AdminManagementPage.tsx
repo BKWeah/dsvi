@@ -597,10 +597,10 @@ export default function AdminManagementPage() {
       <PendingInvitations onRefresh={fetchData} />
 
       {/* Admin Migration Utility */}
-      <AdminMigrationUtility />
+      {/* <AdminMigrationUtility /> */}
 
       {/* Admin Debug Utility */}
-      <AdminDebugUtility />
+      {/* <AdminDebugUtility /> */}
 
       {/* View Admin Dialog */}
       <ViewAdminDialog

@@ -194,14 +194,14 @@ export function UpdatedResponsiveDSVIAdminLayout() {
                           </Link>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
-                      <SidebarMenuItem>
+                      {/* <SidebarMenuItem>
                         <SidebarMenuButton asChild>
                           <Link to="/dsvi-admin/admin-test">
                             <Settings2 className="h-4 w-4" />
                             <span>Test Admin System</span>
                           </Link>
                         </SidebarMenuButton>
-                      </SidebarMenuItem>
+                      </SidebarMenuItem> */}
                     </>
                   )}
                   
