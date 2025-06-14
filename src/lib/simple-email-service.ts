@@ -22,7 +22,8 @@ export class SimpleEmailService {
   }): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
       console.log('📧 SimpleEmailService.sendEmail called with:', {
-        to: Array.isArray(to) ? `${to.length} recipients` : to,
+        to: Array.isArray(to) ? to : [to],
+        toCount: Array.isArray(to) ? to.length : 1,
         subject: subject.substring(0, 50) + '...',
         hasFrom: !!from
       });

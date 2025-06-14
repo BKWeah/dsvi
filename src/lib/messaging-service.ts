@@ -332,19 +332,23 @@ export class MessagingService {
    */
   async sendMessage(request: CreateMessageRequest): Promise<SendMessageResponse> {
     try {
-      console.log('📧 Simplified sendMessage called');
+      console.log('📧 Simplified sendMessage called with:', request);
       const { data: currentUser } = await supabase.auth.getUser();
       if (!currentUser.user) throw new Error('Not authenticated');
 
       // Build recipient email list
       let emailRecipients: Array<{ email: string; name?: string }> = [];
 
-      // Add external emails
+      // Add external emails directly
       if (request.recipients.external_emails) {
-        emailRecipients.push(...request.recipients.external_emails.map(e => ({
-          email: e.email,
-          name: e.name || undefined
-        })));
+        for (const external of request.recipients.external_emails) {
+          if (external.email && external.email.trim()) {
+            emailRecipients.push({
+              email: external.email.trim(),
+              name: external.name || undefined
+            });
+          }
+        }
       }
 
       // Handle school recipients - get their admin emails
@@ -353,6 +357,8 @@ export class MessagingService {
         let schoolsToMessage = request.recipients.all_schools 
           ? accessibleSchools 
           : accessibleSchools.filter(s => request.recipients.school_ids?.includes(s.id));
+
+        console.log('📧 Schools to message:', schoolsToMessage);
 
         // Get admin emails for these schools
         for (const school of schoolsToMessage) {
@@ -370,12 +376,16 @@ export class MessagingService {
                 .eq('id', schoolData.admin_user_id)
                 .single();
 
-              if (adminProfile?.email) {
+              if (adminProfile?.email && adminProfile.email.trim()) {
                 emailRecipients.push({
-                  email: adminProfile.email,
-                  name: schoolData.name
+                  email: adminProfile.email.trim(),
+                  name: schoolData.name || school.name
                 });
+              } else {
+                console.warn(`No email found for admin of school ${school.name}`);
               }
+            } else {
+              console.warn(`No admin_user_id found for school ${school.name}`);
             }
           } catch (error) {
             console.warn(`Failed to get email for school ${school.name}:`, error);
@@ -383,17 +393,42 @@ export class MessagingService {
         }
       }
 
+      console.log('📧 Final email recipients:', emailRecipients);
+
       if (emailRecipients.length === 0) {
-        throw new Error('No valid email recipients found');
+        throw new Error('No valid email recipients found. Please check that selected schools have admin emails configured and external emails are valid.');
       }
 
-      console.log('📧 Sending to recipients:', emailRecipients);
+      // Resolve template variables if any
+      let finalSubject = request.subject;
+      let finalBody = request.body;
 
-      // STEP 1: Send email directly using the same service that works in tests
+      // Basic template variable resolution (you can make this more sophisticated)
+      const currentDate = new Date().toLocaleDateString();
+      const replacements = {
+        '{{update_type}}': 'System Update',
+        '{{update_details}}': 'Please check your admin dashboard for the latest updates.',
+        '{{school_name}}': 'Your School',
+        '{{admin_name}}': 'Administrator',
+        '{{date}}': currentDate
+      };
+
+      Object.entries(replacements).forEach(([placeholder, value]) => {
+        finalSubject = finalSubject.replace(new RegExp(placeholder.replace(/[{}]/g, '\\$&'), 'g'), value);
+        finalBody = finalBody.replace(new RegExp(placeholder.replace(/[{}]/g, '\\$&'), 'g'), value);
+      });
+
+      console.log('📧 Sending email with resolved content:', {
+        subject: finalSubject,
+        bodyLength: finalBody.length,
+        recipientCount: emailRecipients.length
+      });
+
+      // Send email directly using the same service that works in tests
       const emailResult = await simpleEmailService.sendEmail({
         to: emailRecipients,
-        subject: request.subject,
-        html: request.body,
+        subject: finalSubject,
+        html: finalBody,
         from: {
           email: 'onboarding@libdsvi.com',
           name: 'DSVI Team'
@@ -406,13 +441,13 @@ export class MessagingService {
         throw new Error(emailResult.error || 'Email sending failed');
       }
 
-      // STEP 2: Save to database AFTER successful email sending
+      // Save to database AFTER successful email sending
       const { data: messageData, error: messageError } = await supabase
         .from('messages')
         .insert({
           sender_id: currentUser.user.id,
-          subject: request.subject,
-          body: request.body,
+          subject: finalSubject,
+          body: finalBody,
           message_type: 'email',
           template_id: request.template_id || null,
           status: 'sent',
