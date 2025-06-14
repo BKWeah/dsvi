@@ -1,13 +1,20 @@
 import { supabase } from '@/integrations/supabase/client';
-import { emailService } from './email-service';
-import {
-  Message,
-  MessageTemplate,
+import { simpleEmailService } from './simple-email-service';
+import { 
+  EmailConfig, 
+  SendMessageResponse, 
+  Message, 
   MessageRecipient,
+  EmailProvider,
+  EmailSettings,
+  AutomatedMessaging,
+  TriggerType
+} from './messaging-types';
+import {
+  MessageTemplate,
   CreateMessageRequest,
   CreateTemplateRequest,
   UpdateTemplateRequest,
-  SendMessageResponse,
   TemplateVariables,
   DEFAULT_TEMPLATE_VARIABLES,
   MessagingStats,
@@ -22,7 +29,7 @@ import {
 } from './messaging-types';
 
 /**
- * Messaging Service - Core messaging functionality
+ * Messaging Service - Simplified
  */
 export class MessagingService {
   /**
@@ -87,6 +94,7 @@ export class MessagingService {
       variables: (data.variables || []) as string[] // Ensure variables is an array of strings
     };
   }
+
   /**
    * Update message template
    */
@@ -152,6 +160,7 @@ export class MessagingService {
       };
     }
   }
+
   /**
    * Get message history with filters
    */
@@ -240,6 +249,7 @@ export class MessagingService {
       delivery_status: recipient.delivery_status as DeliveryStatus,
     })) || [];
   }
+
   /**
    * Get schools that the current user can message (Level-based restrictions)
    */
@@ -315,158 +325,148 @@ export class MessagingService {
       throw error;
     }
   }
+
   /**
-   * Send message with level-based restrictions
+   * Send message - SIMPLIFIED VERSION
+   * Send email first, then save to database
    */
   async sendMessage(request: CreateMessageRequest): Promise<SendMessageResponse> {
     try {
+      console.log('📧 Simplified sendMessage called');
       const { data: currentUser } = await supabase.auth.getUser();
       if (!currentUser.user) throw new Error('Not authenticated');
 
-      const userRole = currentUser.user.user_metadata?.role;
+      // Build recipient email list
+      let emailRecipients: Array<{ email: string; name?: string }> = [];
 
-      // Get accessible schools for this user
-      const accessibleSchools = await this.getAccessibleSchools();
-      const accessibleSchoolIds = accessibleSchools.map(s => s.id);
+      // Add external emails
+      if (request.recipients.external_emails) {
+        emailRecipients.push(...request.recipients.external_emails.map(e => ({
+          email: e.email,
+          name: e.name || undefined
+        })));
+      }
 
-      // Validate school access for Level 2 admins
-      if (userRole === 'SCHOOL_ADMIN' && request.recipients.school_ids) {
-        const requestedSchoolIds = request.recipients.school_ids;
-        const unauthorizedSchools = requestedSchoolIds.filter(id => !accessibleSchoolIds.includes(id));
-        
-        if (unauthorizedSchools.length > 0) {
-          throw new Error('Access denied: You can only message schools assigned to you');
+      // Handle school recipients - get their admin emails
+      if (request.recipients.school_ids || request.recipients.all_schools) {
+        const accessibleSchools = await this.getAccessibleSchools();
+        let schoolsToMessage = request.recipients.all_schools 
+          ? accessibleSchools 
+          : accessibleSchools.filter(s => request.recipients.school_ids?.includes(s.id));
+
+        // Get admin emails for these schools
+        for (const school of schoolsToMessage) {
+          try {
+            const { data: schoolData } = await supabase
+              .from('schools')
+              .select('admin_user_id, name')
+              .eq('id', school.id)
+              .single();
+
+            if (schoolData?.admin_user_id) {
+              const { data: adminProfile } = await supabase
+                .from('profiles')
+                .select('email')
+                .eq('id', schoolData.admin_user_id)
+                .single();
+
+              if (adminProfile?.email) {
+                emailRecipients.push({
+                  email: adminProfile.email,
+                  name: schoolData.name
+                });
+              }
+            }
+          } catch (error) {
+            console.warn(`Failed to get email for school ${school.name}:`, error);
+          }
         }
       }
 
-      // Block "all schools" for Level 2 admins
-      if (userRole === 'SCHOOL_ADMIN' && request.recipients.all_schools) {
-        throw new Error('Access denied: Level 2 admins cannot message all schools');
+      if (emailRecipients.length === 0) {
+        throw new Error('No valid email recipients found');
       }
 
-      // Create message record
+      console.log('📧 Sending to recipients:', emailRecipients);
+
+      // STEP 1: Send email directly using the same service that works in tests
+      const emailResult = await simpleEmailService.sendEmail({
+        to: emailRecipients,
+        subject: request.subject,
+        html: request.body,
+        from: {
+          email: 'onboarding@libdsvi.com',
+          name: 'DSVI Team'
+        }
+      });
+
+      console.log('📧 Email result:', emailResult);
+
+      if (!emailResult.success) {
+        throw new Error(emailResult.error || 'Email sending failed');
+      }
+
+      // STEP 2: Save to database AFTER successful email sending
       const { data: messageData, error: messageError } = await supabase
         .from('messages')
         .insert({
           sender_id: currentUser.user.id,
           subject: request.subject,
           body: request.body,
-          message_type: request.message_type || 'email',
-          template_id: request.template_id,
-          scheduled_at: request.scheduled_at,
-          total_recipients: 0 // Will be updated after recipients are added
+          message_type: 'email',
+          template_id: request.template_id || null,
+          status: 'sent',
+          sent_at: new Date().toISOString(),
+          delivery_provider: 'resend',
+          delivery_id: emailResult.messageId,
+          total_recipients: emailRecipients.length,
+          successful_deliveries: emailRecipients.length,
+          failed_deliveries: 0
         })
         .select()
         .single();
 
-      if (messageError) throw messageError;
-
-      // Add recipients
-      const recipients: Array<{
-        message_id: string;
-        school_id?: string;
-        recipient_email: string;
-        recipient_name?: string;
-        recipient_type: 'school_admin' | 'dsvi_admin' | 'external';
-      }> = [];
-
-      // Handle external emails
-      if (request.recipients.external_emails) {
-        for (const external of request.recipients.external_emails) {
-          recipients.push({
-            message_id: messageData.id,
-            recipient_email: external.email,
-            recipient_name: external.name,
-            recipient_type: 'external'
-          });
-        }
+      if (messageError) {
+        console.warn('Failed to save message to database:', messageError);
+        // Don't throw here since email was sent successfully
       }
 
-      // Handle school recipients
-      let schoolIdsToMessage: string[] = [];
-      if (request.recipients.all_schools) {
-        const allSchools = await this.getAccessibleSchools();
-        schoolIdsToMessage = allSchools.map(s => s.id);
-      } else if (request.recipients.school_ids) {
-        schoolIdsToMessage = request.recipients.school_ids;
-      }
+      // Save recipients to database
+      if (messageData) {
+        const recipientRecords = emailRecipients.map(recipient => ({
+          message_id: messageData.id,
+          recipient_email: recipient.email,
+          recipient_name: recipient.name || null,
+          recipient_type: 'external' as const,
+          delivery_status: 'sent' as const,
+          sent_at: new Date().toISOString()
+        }));
 
-      if (schoolIdsToMessage.length > 0) {
-        // For school recipients, we only store the school_id here.
-        // The actual admin email will be resolved by the Cloudflare Function.
-        for (const schoolId of schoolIdsToMessage) {
-          recipients.push({
-            message_id: messageData.id,
-            school_id: schoolId,
-            recipient_email: '', // Will be resolved by Cloudflare Function
-            recipient_name: '', // Will be resolved by Cloudflare Function
-            recipient_type: 'school_admin'
-          });
-        }
-      }
-
-      // Insert recipients
-      if (recipients.length > 0) {
-        const { error: recipientsError } = await supabase
+        const { error: recipientError } = await supabase
           .from('message_recipients')
-          .insert(recipients);
+          .insert(recipientRecords);
 
-        if (recipientsError) throw recipientsError;
-
-        // Update message with recipient count
-        await supabase
-          .from('messages')
-          .update({ total_recipients: recipients.length })
-          .eq('id', messageData.id);
+        if (recipientError) {
+          console.warn('Failed to save recipients to database:', recipientError);
+        }
       }
 
-      // Now actually send the emails
-      console.log(`📧 Starting email sending process for message ${messageData.id} with ${recipients.length} recipients`);
-      
-      // Initialize email service
-      await emailService.initialize();
-      
-      // Get full recipient details for email sending
-      const recipientDetails = await this.getMessageRecipients(messageData.id);
-      
-      // Send emails using the email service
-      const emailResult = await emailService.sendMessage(messageData, recipientDetails);
-      
-      if (emailResult) {
-        console.log(`📧 Email sending completed successfully for message ${messageData.id}`);
-        return {
-          message_id: messageData.id,
-          total_recipients: recipients.length,
-          status: 'success',
-          delivery_provider: emailResult.delivery_provider || 'email',
-          delivery_id: emailResult.delivery_id
-        };
-      } else {
-        console.error(`📧 Email sending failed for message ${messageData.id}`);
-        
-        // Update message status to failed
-        await supabase
-          .from('messages')
-          .update({
-            status: 'failed',
-            error_message: 'Email sending failed'
-          })
-          .eq('id', messageData.id);
-        
-        return {
-          message_id: messageData.id,
-          total_recipients: recipients.length,
-          status: 'failed',
-          delivery_provider: 'email',
-          errors: ['Email sending failed']
-        };
-      }
+      console.log('📧 Message sent and saved successfully!');
+
+      return {
+        message_id: messageData?.id || 'unknown',
+        total_recipients: emailRecipients.length,
+        status: 'success',
+        delivery_provider: 'resend',
+        delivery_id: emailResult.messageId
+      };
 
     } catch (error) {
-      console.error('Failed to send message:', error);
+      console.error('📧 Failed to send message:', error);
       throw error;
     }
   }
+
   /**
    * Create default templates if none exist
    */

@@ -142,7 +142,7 @@ export function ComposeMessageDialog({
   }, [open]); // Only depend on 'open' to avoid loops
 
   const handleTemplateSelect = (templateId: string) => {
-    console.log('Template selection triggered with ID:', templateId);
+    console.log('Template selection triggered with ID:', templateId, 'Type:', typeof templateId);
     
     if (!templateId || templateId === 'none') {
       // Clear template selection
@@ -151,11 +151,14 @@ export function ComposeMessageDialog({
       return;
     }
     
-    const template = templates.find(t => t.id === templateId);
+    // Ensure templateId is a string
+    const safeTemplateId = String(templateId).trim();
+    
+    const template = templates.find(t => t.id === safeTemplateId);
     console.log('Found template:', template);
     
     if (template) {
-      setSelectedTemplate(templateId);
+      setSelectedTemplate(safeTemplateId);
       setSubject(template.subject);
       setBody(template.body);
       
@@ -165,7 +168,7 @@ export function ComposeMessageDialog({
         description: `Template "${template.name}" has been applied`,
       });
     } else {
-      console.error('Template not found for ID:', templateId);
+      console.error('Template not found for ID:', safeTemplateId);
       console.error('Available template IDs:', templates.map(t => t.id));
       toast({
         title: "Error",
@@ -238,10 +241,15 @@ export function ComposeMessageDialog({
         .filter(email => email.length > 0)
         .map(email => ({ email, name: null }));
 
+      // Ensure template_id is a proper string or undefined
+      const templateId = selectedTemplate && selectedTemplate !== 'none' && selectedTemplate.trim() !== '' 
+        ? selectedTemplate.trim() 
+        : undefined;
+
       const request: CreateMessageRequest = {
         subject: subject.trim(),
         body: body.trim(),
-        template_id: selectedTemplate || undefined,
+        template_id: templateId,
         recipients: {
           school_ids: selectAllSchools ? undefined : selectedSchools,
           all_schools: selectAllSchools,
@@ -250,6 +258,8 @@ export function ComposeMessageDialog({
       };
 
       console.log('Sending message with request:', request);
+      console.log('Template ID type:', typeof request.template_id, 'Value:', request.template_id);
+      
       await messagingService.sendMessage(request);
       
       console.log('Message sent successfully');
