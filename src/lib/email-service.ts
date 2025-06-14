@@ -115,7 +115,7 @@ export class EmailService {
         smtp_port: null,
         smtp_username: null,
         smtp_password: null,
-        from_email: 'noreply@dsvi.org',
+        from_email: 'onboarding@libdsvi.com',
         from_name: 'DSVI Team',
         reply_to_email: 'support@dsvi.org',
         is_active: true,
@@ -146,7 +146,7 @@ export class EmailService {
       const defaultSettings = {
         provider: 'brevo' as const,
         api_key: defaultApiKey,
-        from_email: 'noreply@dsvi.org',
+        from_email: 'onboarding@libdsvi.com',
         from_name: 'DSVI Team',
         reply_to_email: 'support@dsvi.org'
       };
@@ -289,7 +289,7 @@ export class EmailService {
         subject: message.subject,
         html: message.body,
         from: {
-          email: 'noreply@dsvi.org',
+          email: 'onboarding@libdsvi.com',
           name: 'DSVI Team'
         }
       });

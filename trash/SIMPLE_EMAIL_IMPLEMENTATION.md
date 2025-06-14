@@ -42,7 +42,7 @@ const result = await simpleEmailService.sendEmail({
   subject: 'Welcome to DSVI',
   html: '<h1>Welcome!</h1><p>Thank you for joining us.</p>',
   from: {
-    email: 'noreply@dsvi.org',
+    email: 'onboarding@libdsvi.com',
     name: 'DSVI Team'
   }
 });

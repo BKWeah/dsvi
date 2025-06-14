@@ -31,7 +31,7 @@ export class SimpleEmailService {
           subject,
           html,
           from: from || {
-            email: 'noreply@dsvi.org',
+            email: 'onboarding@libdsvi.com',
             name: 'DSVI Team'
           }
         })

@@ -11,7 +11,7 @@ import { Save, RefreshCw, Eye, TestTube } from 'lucide-react';
 
 export function EmailSettingsTracer() {
   const [fromName, setFromName] = useState('DSVI Team');
-  const [fromEmail, setFromEmail] = useState('noreply@dsvi.org');
+  const [fromEmail, setFromEmail] = useState('onboarding@libdsvi.com');
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
   const [traceLog, setTraceLog] = useState<string[]>([]);
@@ -168,7 +168,7 @@ export function EmailSettingsTracer() {
             <Input
               value={fromEmail}
               onChange={(e) => setFromEmail(e.target.value)}
-              placeholder="noreply@dsvi.org"
+              placeholder="onboarding@libdsvi.com"
             />
           </div>
         </div>

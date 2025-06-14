@@ -148,13 +148,15 @@ export default function SubscriptionTrackerPage() {
 
   const handleRenewSubscription = async (school: School) => {
     try {
-      const currentEnd = new Date(school.subscription_end);
-      const newEnd = new Date(currentEnd);
-      newEnd.setFullYear(currentEnd.getFullYear() + 1);
+      const today = new Date();
+      const newStart = today.toISOString().split('T')[0];
+      const newEnd = new Date(today);
+      newEnd.setFullYear(today.getFullYear() + 1);
 
       const { error } = await supabase
         .from('schools')
         .update({
+          subscription_start: newStart,
           subscription_end: newEnd.toISOString().split('T')[0],
           subscription_status: 'active'
         })
@@ -355,11 +357,15 @@ export default function SubscriptionTrackerPage() {
                 </p>
               </div>
               <div>
+                <Label>New Start Date</Label>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {new Date().toLocaleDateString()}
+                </p>
+              </div>
+              <div>
                 <Label>New End Date</Label>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {new Date(new Date(selectedSchool.subscription_end).getFullYear() + 1, 
-                            new Date(selectedSchool.subscription_end).getMonth(), 
-                            new Date(selectedSchool.subscription_end).getDate()).toLocaleDateString()}
+                  {new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toLocaleDateString()}
                 </p>
               </div>
             </div>

@@ -74,7 +74,7 @@ export function EmailSettingsDialog({ open, onOpenChange }: EmailSettingsDialogP
           smtp_port: null,
           smtp_username: null,
           smtp_password: null,
-          from_email: 'noreply@dsvi.org',
+          from_email: 'onboarding@libdsvi.com',
           from_name: 'DSVI Team',
           reply_to_email: 'support@dsvi.org',
           is_active: true,
@@ -195,7 +195,7 @@ export function EmailSettingsDialog({ open, onOpenChange }: EmailSettingsDialogP
                 type="email"
                 value={settings.from_email}
                 onChange={(e) => setSettings(prev => ({ ...prev, from_email: e.target.value }))}
-                placeholder="noreply@dsvi.org"
+                placeholder="onboarding@libdsvi.com"
               />
             </div>
             <div className="space-y-2">

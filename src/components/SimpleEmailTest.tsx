@@ -26,7 +26,7 @@ export function SimpleEmailTest() {
       // Create Brevo service instance
       const brevoService = new BrevoService({
         api_key: apiKey,
-        from_email: 'noreply@dsvi.org',
+        from_email: 'onboarding@libdsvi.com',
         from_name: 'DSVI Team'
       });
 

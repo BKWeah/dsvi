@@ -87,7 +87,7 @@ export default function SchoolsPage() {
     // Attempt one refresh for newly signed up Level 2 admins
     if (!adminLoading && adminLevel === null && !hasAttemptedRefresh) {
       const activatedAdmins = JSON.parse(localStorage.getItem('activatedLevel2Admins') || '[]');
-      const userEmail = window.supabase?.auth?.getUser()?.then(({ data }) => data?.user?.email?.toLowerCase());
+      const userEmail = supabase?.auth?.getUser()?.then(({ data }) => data?.user?.email?.toLowerCase());
       
       userEmail?.then(email => {
         if (email && activatedAdmins.includes(email)) {
@@ -300,7 +300,7 @@ export default function SchoolsPage() {
 
           <div className="space-y-3">
             {filteredSchools.map((school) => (
-              <MobileCard key={school.id}>
+              <MobileCard key={school.id} title={school.name}>
                 <div className="p-4">
                   <h3 className="font-semibold text-lg mb-2">{school.name}</h3>
                   
@@ -327,9 +327,20 @@ export default function SchoolsPage() {
                       size="sm"
                       className="w-full"
                     >
-                      <Link to={`/dsvi-admin/schools/${school.id}/settings`}>
-                        <Settings className="h-4 w-4 mr-1" />
-                        Settings
+                        <Link to={`/dsvi-admin/schools/${school.id}/content`}>
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit Page
+                        </Link>
+                    </Button>
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                    >
+                      <Link to={`/dsvi-admin/schools/${school.id}/content`}>
+                        <Edit className="h-4 w-4 mr-1" />
+                        Edit Page
                       </Link>
                     </Button>
                     {!school.admin_user_id && isLevel1Admin && (
@@ -447,6 +458,16 @@ export default function SchoolsPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
+                      <Button
+                        asChild
+                        variant="outline"
+                        size="sm"
+                      >
+                        <Link to={`/dsvi-admin/schools/${school.id}/content`}>
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit Page
+                        </Link>
+                      </Button>
                       <Button
                         asChild
                         variant="outline"

@@ -41,7 +41,7 @@
 
 #### **Email Settings**
 - **Provider**: Brevo (Sendinblue)
-- **From Email**: `noreply@dsvi.org`
+- **From Email**: `onboarding@libdsvi.com`
 - **From Name**: `DSVI Team`
 - **Reply-To**: `support@dsvi.org`
 

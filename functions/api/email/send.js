@@ -1,7 +1,9 @@
 /**
- * Cloudflare Pages Function for sending emails via Brevo SMTP
- * Simple, reliable implementation using native fetch and SMTP
+ * Cloudflare Pages Function for sending emails via Resend
+ * Simple, reliable implementation using native fetch and Resend API
  */
+
+import { Resend } from 'resend';
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -29,64 +31,42 @@ export async function onRequestPost(context) {
       });
     }
 
-    // Get SMTP credentials from environment or use defaults
-    const smtpConfig = {
-      host: 'smtp-relay.brevo.com',
-      port: 587,
-      username: env.BREVO_SMTP_USERNAME || '[REDACTED_USERNAME]',
-      password: env.BREVO_SMTP_PASSWORD || '[REDACTED_SECRET]',
-      from_email: from?.email || 'noreply@dsvi.org',
-      from_name: from?.name || 'DSVI Team'
-    };
+    // Initialize Resend with API key from environment
+    const resendApiKey = env.RESEND_API_KEY;
+    if (!resendApiKey) {
+      throw new Error('RESEND_API_KEY not configured in environment');
+    }
+    const resend = new Resend(resendApiKey);
 
-    // Create email using Brevo's Send API (simpler than SMTP)
+    // Prepare email data for Resend
     const emailData = {
-      sender: {
-        name: smtpConfig.from_name,
-        email: smtpConfig.from_email
-      },
-      to: Array.isArray(to) ? to : [{ email: to }],
+      from: from?.email || 'onboarding@libdsvi.com', // Resend requires a verified sender domain
+      to: Array.isArray(to) ? to.map(recipient => recipient.email) : [to], // Resend 'to' expects an array of strings
       subject: subject,
-      htmlContent: html,
-      tags: ['dsvi-email']
+      html: html,
+      tags: [{ name: 'category', value: 'dsvi-email' }] // Resend tags format
     };
 
-    // Send via Brevo API
-    const brevoApiKey = env.BREVO_API_KEY;
-    if (!brevoApiKey) {
-      throw new Error('BREVO_API_KEY not configured in environment');
-    }
+    // Send via Resend API
+    const { data, error } = await resend.emails.send(emailData);
 
-    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-      method: 'POST',
-      headers: {
-        'accept': 'application/json',
-        'content-type': 'application/json',
-        'api-key': brevoApiKey
-      },
-      body: JSON.stringify(emailData)
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Brevo API Error:', errorText);
+    if (error) {
+      console.error('Resend API Error:', error);
       
-      return new Response(JSON.stringify({
-        success: false,
-        error: `Email sending failed: ${response.status} ${response.statusText}`,
-        details: errorText
-      }), {
-        status: 500,
-        headers: corsHeaders
-      });
+    return new Response(JSON.stringify({
+      success: false,
+      error: `Email sending failed: ${error.message}`,
+      details: error
+    }), {
+      status: 500,
+      headers: corsHeaders
+    });
     }
-
-    const result = await response.json();
     
     return new Response(JSON.stringify({
       success: true,
-      messageId: result.messageId,
-      provider: 'brevo-smtp'
+      messageId: data.id,
+      provider: 'resend'
     }), {
       status: 200,
       headers: corsHeaders

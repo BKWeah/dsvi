@@ -90,7 +90,7 @@ await emailService.testConnection();
 import { BrevoService } from '/src/lib/brevo-service.ts';
 const brevo = new BrevoService({
   api_key: 'your-api-key',
-  from_email: 'noreply@dsvi.org',
+  from_email: 'onboarding@libdsvi.com',
   from_name: 'DSVI Team'
 });
 await brevo.testConnection();

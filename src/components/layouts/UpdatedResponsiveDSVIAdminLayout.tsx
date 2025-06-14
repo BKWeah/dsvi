@@ -102,6 +102,7 @@ export function UpdatedResponsiveDSVIAdminLayout() {
           <Outlet />
         </main>
         <BottomAppBar userRole="DSVI_ADMIN" />
+        
       </div>
 
       {/* Desktop Layout with Sidebar */}
@@ -127,6 +128,11 @@ export function UpdatedResponsiveDSVIAdminLayout() {
                       <Badge variant="outline">Admin</Badge>
                     )}
                   </div>
+                  {user?.email && (
+                    <Badge variant="secondary" className="text-gray-600">
+                      {user.email}
+                    </Badge>
+                  )}
                 </div>
               </SidebarHeader>
               <SidebarContent>

@@ -17,7 +17,7 @@ export function QuickEmailFix() {
       const testSettings = {
         provider: 'brevo' as const,
         api_key: import.meta.env.VITE_DEFAULT_BREVO_API_KEY,
-        from_email: 'noreply@dsvi.org',
+        from_email: 'onboarding@libdsvi.com',
         from_name: 'DSVI Team',
         reply_to_email: 'support@dsvi.org',
         is_active: true,
@@ -69,7 +69,7 @@ export function QuickEmailFix() {
         smtp_port: null,
         smtp_username: null,
         smtp_password: null,
-        from_email: 'noreply@dsvi.org',
+        from_email: 'onboarding@libdsvi.com',
         from_name: 'DSVI Team',
         reply_to_email: 'support@dsvi.org',
         is_active: true,

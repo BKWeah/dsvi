@@ -41,7 +41,7 @@ export async function initializeDefaultEmailSettings(): Promise<void> {
       smtp_port: null,
       smtp_username: null,
       smtp_password: null,
-      from_email: 'noreply@dsvi.org',
+      from_email: 'onboarding@libdsvi.com',
       from_name: 'DSVI Team',
       reply_to_email: 'support@dsvi.org',
       is_active: true,
@@ -88,7 +88,7 @@ export async function updateBrevoApiKey(newApiKey: string): Promise<boolean> {
       .insert({
         provider: 'brevo',
         api_key: newApiKey,
-        from_email: 'noreply@dsvi.org',
+        from_email: 'onboarding@libdsvi.com',
         from_name: 'DSVI Team',
         reply_to_email: 'support@dsvi.org',
         is_active: true,

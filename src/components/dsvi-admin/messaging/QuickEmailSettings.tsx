@@ -14,7 +14,7 @@ export function QuickEmailSettings() {
   const [settings, setSettings] = useState<Partial<EmailSettings>>({
     provider: 'brevo',
     api_key: import.meta.env.VITE_DEFAULT_BREVO_API_KEY || '',
-    from_email: 'noreply@dsvi.org',
+    from_email: 'onboarding@libdsvi.com',
     from_name: 'DSVI Team',
     is_active: false
   });
@@ -197,7 +197,7 @@ export function QuickEmailSettings() {
               type="email"
               value={settings.from_email}
               onChange={(e) => setSettings(prev => ({ ...prev, from_email: e.target.value }))}
-              placeholder="noreply@dsvi.org"
+              placeholder="onboarding@libdsvi.com"
             />
           </div>
           <div className="space-y-2">

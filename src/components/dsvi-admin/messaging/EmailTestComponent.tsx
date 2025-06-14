@@ -73,7 +73,7 @@ export function EmailTestComponent() {
         try {
           const brevoService = new BrevoService({
             api_key: import.meta.env.VITE_DEFAULT_BREVO_API_KEY,
-            from_email: 'noreply@dsvi.org',
+            from_email: 'onboarding@libdsvi.com',
             from_name: 'DSVI Team'
           });
           
@@ -141,7 +141,7 @@ export function EmailTestComponent() {
     try {
       const brevoService = new BrevoService({
         api_key: import.meta.env.VITE_DEFAULT_BREVO_API_KEY!,
-        from_email: 'noreply@dsvi.org',
+        from_email: 'onboarding@libdsvi.com',
         from_name: 'DSVI Team'
       });
 

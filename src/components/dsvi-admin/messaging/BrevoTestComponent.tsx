@@ -30,7 +30,7 @@ export function BrevoTestComponent() {
       setTesting(true);
       const brevoService = new BrevoService({
         api_key: apiKey,
-        from_email: 'noreply@dsvi.org',
+        from_email: 'onboarding@libdsvi.com',
         from_name: 'DSVI Test',
         reply_to_email: 'support@dsvi.org'
       });
@@ -76,7 +76,7 @@ export function BrevoTestComponent() {
       setSending(true);
       const brevoService = new BrevoService({
         api_key: apiKey,
-        from_email: 'noreply@dsvi.org', 
+        from_email: 'onboarding@libdsvi.com', 
         from_name: 'DSVI Test',
         reply_to_email: 'support@dsvi.org'
       });
