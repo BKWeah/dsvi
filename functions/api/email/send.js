@@ -51,12 +51,92 @@ export async function onRequestPost(context) {
 
     // Parse request body
     const { to, subject, html, from } = await request.json();
-    
-    // Validate required fields
-    if (!to || !subject || !html) {
+
+    // Resolve recipient emails for Resend
+    const resendRecipients = [];
+    const schoolIdsToResolve = new Set();
+
+    // First, collect all school_ids that need resolution
+    if (Array.isArray(to)) {
+      for (const recipient of to) {
+        if (recipient.recipient_type === 'school_admin' && recipient.school_id) {
+          schoolIdsToResolve.add(recipient.school_id);
+        }
+      }
+    }
+
+    const schoolAdminEmailsMap = new Map();
+    if (schoolIdsToResolve.size > 0) {
+      // Fetch schools with their admin_user_id
+      const { data: schoolsData, error: schoolsError } = await supabase
+        .from('schools')
+        .select('id, name, admin_user_id')
+        .in('id', Array.from(schoolIdsToResolve));
+
+      if (schoolsError) {
+        console.error('Error fetching schools for email resolution:', schoolsError);
+        throw new Error('Failed to resolve school admin emails.');
+      }
+
+      const adminUserIds = schoolsData.map(s => s.admin_user_id).filter(Boolean);
+
+      if (adminUserIds.length > 0) {
+        // Fetch profiles (emails) for these admin_user_ids
+        // Assuming 'profiles' table is public and has 'id' and 'email' columns
+        const { data: adminProfiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, email')
+          .in('id', adminUserIds);
+
+        if (profilesError) {
+          console.error('Error fetching admin profiles:', profilesError);
+          throw profilesError;
+        }
+
+        const userEmailMap = new Map(adminProfiles.map(p => [p.id, p.email]));
+
+        for (const school of schoolsData) {
+          if (school.admin_user_id && userEmailMap.has(school.admin_user_id)) {
+            schoolAdminEmailsMap.set(school.id, {
+              email: userEmailMap.get(school.admin_user_id),
+              name: school.name
+            });
+          }
+        }
+      }
+    }
+
+    // Now, build the final resendRecipients array
+    if (Array.isArray(to)) {
+      for (const recipient of to) {
+        if (recipient.recipient_type === 'external') {
+          if (recipient.recipient_email) { // Ensure email is not null
+            resendRecipients.push({
+              email: recipient.recipient_email,
+              name: recipient.recipient_name || undefined
+            });
+          }
+        } else if (recipient.recipient_type === 'school_admin' && recipient.school_id) {
+          const resolved = schoolAdminEmailsMap.get(recipient.school_id);
+          if (resolved?.email) {
+            resendRecipients.push({
+              email: resolved.email,
+              name: resolved.name || undefined
+            });
+          } else {
+            console.warn(`Could not resolve email for school admin: ${recipient.school_id}`);
+          }
+        }
+      }
+    } else if (typeof to === 'string') { // Handle single string 'to' (e.g., from test email)
+      resendRecipients.push({ email: to, name: undefined });
+    }
+
+    // Validate required fields after resolution
+    if (resendRecipients.length === 0 || !subject || !html) {
       return new Response(JSON.stringify({
         success: false,
-        error: 'Missing required fields: to, subject, html'
+        error: 'Missing required fields or no valid recipients after resolution.'
       }), {
         status: 400,
         headers: corsHeaders
@@ -65,8 +145,8 @@ export async function onRequestPost(context) {
 
     // Prepare email data for Resend
     const emailData = {
-      from: from?.email || emailSettings.from_email, // Use from_email from database settings as fallback
-      to: Array.isArray(to) ? to.map(recipient => recipient.email) : [to],
+      from: from?.email || emailSettings.from_email,
+      to: resendRecipients.map(r => r.email), // Removed non-null assertion
       subject: subject,
       html: html,
       tags: [{ name: 'category', value: 'dsvi-email' }]

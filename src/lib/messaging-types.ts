@@ -54,7 +54,7 @@ export interface MessageRecipient {
   id: string;
   message_id: string;
   school_id: string | null;
-  recipient_email: string;
+  recipient_email: string | null; // Allow null for emails that need resolution
   recipient_name: string | null;
   recipient_type: RecipientType;
   delivery_status: DeliveryStatus;

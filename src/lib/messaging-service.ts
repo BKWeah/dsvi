@@ -382,6 +382,29 @@ export class MessagingService {
         }
       }
 
+      // Handle school recipients
+      let schoolIdsToMessage: string[] = [];
+      if (request.recipients.all_schools) {
+        const allSchools = await this.getAccessibleSchools();
+        schoolIdsToMessage = allSchools.map(s => s.id);
+      } else if (request.recipients.school_ids) {
+        schoolIdsToMessage = request.recipients.school_ids;
+      }
+
+      if (schoolIdsToMessage.length > 0) {
+        // For school recipients, we only store the school_id here.
+        // The actual admin email will be resolved by the Cloudflare Function.
+        for (const schoolId of schoolIdsToMessage) {
+          recipients.push({
+            message_id: messageData.id,
+            school_id: schoolId,
+            recipient_email: '', // Will be resolved by Cloudflare Function
+            recipient_name: '', // Will be resolved by Cloudflare Function
+            recipient_type: 'school_admin'
+          });
+        }
+      }
+
       // Insert recipients
       if (recipients.length > 0) {
         const { error: recipientsError } = await supabase

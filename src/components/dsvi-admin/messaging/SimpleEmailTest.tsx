@@ -59,7 +59,7 @@ export function SimpleEmailTest() {
           Simple Email Test
         </CardTitle>
         <CardDescription>
-          Test the new simplified email implementation using Brevo SMTP
+          Test the new simplified email implementation using Resend SMTP
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

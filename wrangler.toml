@@ -6,6 +6,9 @@ compatibility_flags = ["nodejs_compat"]
 BREVO_API_KEY = "YOUR_BREVO_API_KEY_HERE"
 BREVO_SMTP_USERNAME = "YOUR_SMTP_USERNAME_HERE"
 BREVO_SMTP_PASSWORD = "YOUR_SMTP_PASSWORD_HERE"
+VITE_SUPABASE_URL = "https://rzfilfpjxfinnxfldzv.supabase.co"
+VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJzdXBhYmFzZSIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzE4MjY2NDQyLCJleHAiOjIzMDYxMzgyNDJ9.PMio3jZ0aHmWf2sIsIn1iZ1I6I6Z1sZnpbZhn4Zmxker"
+VITE_DEFAULT_RESEND_API_KEY = "re_6ayikHHF_JhrAdn6hK4iEPKCThk9vquJq"
 
 [[pages]]
 functions = "functions"

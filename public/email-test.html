@@ -97,17 +97,17 @@ Sent at: ${new Date().toISOString()}
                         subject: subject,
                         html: `
                             <div style="font-family: Arial, sans-serif; max-width: 600px;">
-                                <h2>🧪 DSVI Email API Test</h2>
+                                <h2>🧪 DSVI Email API Test (Resend)</h2>
                                 <p>${message.replace(/\n/g, '<br>')}</p>
                                 <hr>
                                 <p style="color: #666; font-size: 14px;">
-                                    Sent via DSVI Email API Direct Test<br>
+                                    Sent via DSVI Email API Direct Test (Resend)<br>
                                     URL: ${window.location.href}
                                 </p>
                             </div>
                         `,
                         from: {
-                            email: 'onboarding@libdsvi.com',
+                            email: 'onboarding@libdsvi.com', // This 'from' is for the test page only
                             name: 'DSVI API Test'
                         }
                     })
