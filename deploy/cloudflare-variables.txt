@@ -1,0 +1,67 @@
+# DSVI Email System - Cloudflare Pages Environment Variables
+
+Copy these environment variables to your Cloudflare Pages dashboard:
+
+## Production Environment Variables
+
+```
+VITE_SUPABASE_URL=https://rzfilfpjxfinxxfldzuv.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6ZmlsZnBqeGZpbnh4ZmxkenV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgzMjA0NzMsImV4cCI6MjA2Mzg5NjQ3M30.6Wf8vIJ2Bo1QS0Ie_16xqHZQhCdfsXDmNATPLT3sAfg
+VITE_DEFAULT_RESEND_API_KEY=re_6ayikHHF_JhrAdn6hK4iEPKCThk9vquJq
+```
+
+## Deployment Instructions
+
+### 1. Cloudflare Pages Setup
+1. Go to your Cloudflare Pages dashboard
+2. Connect your Git repository (GitHub/GitLab)
+3. Set the following build settings:
+   - **Build command:** `npm run build` or `./build.sh`
+   - **Output directory:** `dist`
+   - **Node.js version:** 18 or higher
+
+### 2. Environment Variables
+1. In your Cloudflare Pages project dashboard
+2. Go to **Settings** > **Environment variables**
+3. Add each variable from the "Production Environment Variables" section above
+4. Make sure to add them to the **Production** environment
+5. Click **Save**
+
+### 3. Deploy
+1. Push your code to the connected repository
+2. Cloudflare Pages will automatically build and deploy
+3. The email system will be ready to use!
+
+## Testing After Deployment
+
+1. Visit your deployed site
+2. Log in to the admin panel  
+3. Navigate to the **Email Test** page
+4. Run the connection test
+5. Send a test message to verify full functionality
+
+## Required for Email Functionality
+
+- **VITE_SUPABASE_URL:** Your Supabase project URL (for database access)
+- **VITE_SUPABASE_ANON_KEY:** Your Supabase anonymous key (for authentication)
+- **VITE_DEFAULT_RESEND_API_KEY:** Your Resend API key (for email sending)
+
+## Troubleshooting
+
+### Common Issues:
+- **"Email API Error":** Check if environment variables are set correctly in Cloudflare Pages
+- **"Connection failed":** Verify Resend API key is valid and active
+- **"Access denied":** Check Supabase URL and anon key are correct
+
+### Email Sending Flow:
+1. Frontend creates message in Supabase database
+2. Calls Cloudflare Pages Function at `/api/email/send`
+3. Function reads email settings from Supabase
+4. Sends email via Resend API
+5. Updates message status in database
+
+## Success Criteria
+- ✅ Email connection test passes
+- ✅ Test message sends successfully
+- ✅ Recipient receives email
+- ✅ Message status updates in database

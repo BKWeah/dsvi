@@ -420,12 +420,47 @@ export class MessagingService {
           .eq('id', messageData.id);
       }
 
-      return {
-        message_id: messageData.id,
-        total_recipients: recipients.length,
-        status: 'success',
-        delivery_provider: 'email'
-      };
+      // Now actually send the emails
+      console.log(`📧 Starting email sending process for message ${messageData.id} with ${recipients.length} recipients`);
+      
+      // Initialize email service
+      await emailService.initialize();
+      
+      // Get full recipient details for email sending
+      const recipientDetails = await this.getMessageRecipients(messageData.id);
+      
+      // Send emails using the email service
+      const emailResult = await emailService.sendMessage(messageData, recipientDetails);
+      
+      if (emailResult) {
+        console.log(`📧 Email sending completed successfully for message ${messageData.id}`);
+        return {
+          message_id: messageData.id,
+          total_recipients: recipients.length,
+          status: 'success',
+          delivery_provider: emailResult.delivery_provider || 'email',
+          delivery_id: emailResult.delivery_id
+        };
+      } else {
+        console.error(`📧 Email sending failed for message ${messageData.id}`);
+        
+        // Update message status to failed
+        await supabase
+          .from('messages')
+          .update({
+            status: 'failed',
+            error_message: 'Email sending failed'
+          })
+          .eq('id', messageData.id);
+        
+        return {
+          message_id: messageData.id,
+          total_recipients: recipients.length,
+          status: 'failed',
+          delivery_provider: 'email',
+          errors: ['Email sending failed']
+        };
+      }
 
     } catch (error) {
       console.error('Failed to send message:', error);

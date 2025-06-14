@@ -9,6 +9,8 @@
     "build:cf": "rm -f package-lock.json && npm install && vite build",
     "build:bun": "bun install && bun run vite build",
     "build:dev": "vite build --mode development",
+    "build:enhanced": "chmod +x enhanced-build.sh && ./enhanced-build.sh",
+    "setup:cloudflare": "node deploy/cloudflare-env-setup.js",
     "lint": "eslint .",
     "preview": "vite preview",
     "features": "node scripts/featureFlagManager.js",

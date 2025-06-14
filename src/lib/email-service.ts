@@ -292,21 +292,34 @@ export class EmailService {
       console.log(`📧 Recipients: ${recipients.length}`);
       console.log(`📧 Subject: ${message.subject}`);
 
-      // Use the new simple email service for all sending
-      const emailRecipients = recipients.map(r => ({
-        email: r.recipient_email,
-        name: r.recipient_name || undefined
-      }));
+      // Format recipients for the Cloudflare function
+      const formattedRecipients = recipients.map(r => {
+        if (r.recipient_type === 'school_admin' && r.school_id) {
+          // For school admins, let the Cloudflare function resolve the email
+          return {
+            recipient_type: 'school_admin',
+            school_id: r.school_id,
+            recipient_name: r.recipient_name || undefined
+          };
+        } else {
+          // For external recipients, provide the email directly
+          return {
+            recipient_type: 'external',
+            recipient_email: r.recipient_email,
+            recipient_name: r.recipient_name || undefined
+          };
+        }
+      });
 
-      console.log(`📧 Calling simpleEmailService.sendEmail...`);
+      console.log(`📧 Calling simpleEmailService.sendEmail with formatted recipients...`);
       
       const result = await simpleEmailService.sendEmail({
-        to: emailRecipients,
+        to: formattedRecipients,
         subject: message.subject,
         html: message.body,
         from: {
-          email: this.config?.from_email || 'onboarding@libdsvi.com', // Use from_email from config
-          name: this.config?.from_name || 'DSVI Team' // Use from_name from config
+          email: this.config?.from_email || 'onboarding@libdsvi.com',
+          name: this.config?.from_name || 'DSVI Team'
         }
       });
 
@@ -320,7 +333,7 @@ export class EmailService {
           message_id: message.id,
           total_recipients: recipients.length,
           status: 'success',
-          delivery_provider: 'brevo-simple',
+          delivery_provider: 'resend',
           delivery_id: result.messageId
         };
       } else {
@@ -331,7 +344,7 @@ export class EmailService {
           message_id: message.id,
           total_recipients: recipients.length,
           status: 'failed',
-          delivery_provider: 'brevo-simple',
+          delivery_provider: 'resend',
           errors: [result.error || 'Unknown error']
         };
       }

@@ -12,7 +12,7 @@ export class SimpleEmailService {
   }
 
   /**
-   * Send email via the new email API
+   * Send email via the new email API with proper recipient format
    */
   async sendEmail({ to, subject, html, from }: {
     to: string | Array<{ email: string; name?: string }>;
@@ -21,6 +21,12 @@ export class SimpleEmailService {
     from?: { email: string; name: string };
   }): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
+      console.log('📧 SimpleEmailService.sendEmail called with:', {
+        to: Array.isArray(to) ? `${to.length} recipients` : to,
+        subject: subject.substring(0, 50) + '...',
+        hasFrom: !!from
+      });
+
       const response = await fetch(this.apiUrl, {
         method: 'POST',
         headers: {
@@ -30,17 +36,25 @@ export class SimpleEmailService {
           to,
           subject,
           html,
-          from // Use the 'from' object as provided, no fallback
+          from
         })
       });
 
       const result = await response.json();
       
+      console.log('📧 Email API response:', {
+        ok: response.ok,
+        status: response.status,
+        success: result.success,
+        messageId: result.messageId,
+        error: result.error
+      });
+      
       if (!response.ok) {
-        console.error('Email API Error:', result);
+        console.error('📧 Email API Error:', result);
         return {
           success: false,
-          error: result.error || `HTTP ${response.status}`
+          error: result.error || `HTTP ${response.status}: ${response.statusText}`
         };
       }
 
@@ -50,7 +64,7 @@ export class SimpleEmailService {
       };
 
     } catch (error) {
-      console.error('Email sending failed:', error);
+      console.error('📧 Email sending failed:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error'
