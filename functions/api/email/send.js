@@ -4,6 +4,7 @@
  */
 
 import { Resend } from 'resend';
+import { createClient } from '@supabase/supabase-js'; // Import Supabase client
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -17,6 +18,37 @@ export async function onRequestPost(context) {
   };
 
   try {
+    // Initialize Supabase client
+    const supabaseUrl = env.VITE_SUPABASE_URL; // Corrected environment variable name
+    const supabaseAnonKey = env.VITE_SUPABASE_ANON_KEY; // Corrected environment variable name
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      throw new Error('Supabase URL or Anon Key not configured in environment');
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+    // Fetch active email settings from database
+    const { data: emailSettings, error: dbError } = await supabase
+      .from('email_settings')
+      .select('*')
+      .eq('is_active', true)
+      .eq('provider', 'resend') // Ensure we get Resend settings
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (dbError || !emailSettings) {
+      console.error('Database error fetching email settings:', dbError);
+      throw new Error('Failed to retrieve active email settings from database.');
+    }
+
+    const resendApiKey = emailSettings.api_key;
+    if (!resendApiKey) {
+      throw new Error('Resend API key not found in database settings.');
+    }
+    const resend = new Resend(resendApiKey);
+
     // Parse request body
     const { to, subject, html, from } = await request.json();
     
@@ -31,20 +63,13 @@ export async function onRequestPost(context) {
       });
     }
 
-    // Initialize Resend with API key from environment
-    const resendApiKey = env.RESEND_API_KEY;
-    if (!resendApiKey) {
-      throw new Error('RESEND_API_KEY not configured in environment');
-    }
-    const resend = new Resend(resendApiKey);
-
     // Prepare email data for Resend
     const emailData = {
-      from: from?.email || 'onboarding@libdsvi.com', // Resend requires a verified sender domain
-      to: Array.isArray(to) ? to.map(recipient => recipient.email) : [to], // Resend 'to' expects an array of strings
+      from: from?.email || emailSettings.from_email, // Use from_email from database settings as fallback
+      to: Array.isArray(to) ? to.map(recipient => recipient.email) : [to],
       subject: subject,
       html: html,
-      tags: [{ name: 'category', value: 'dsvi-email' }] // Resend tags format
+      tags: [{ name: 'category', value: 'dsvi-email' }]
     };
 
     // Send via Resend API

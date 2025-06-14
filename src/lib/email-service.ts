@@ -84,8 +84,8 @@ export class EmailService {
       });
 
       // Update local state
-      this.settings = settingsData;
-      this.config = this.buildConfigFromSettings(settingsData);
+      this.settings = settingsData as EmailSettings; // Explicitly cast to EmailSettings
+      this.config = this.buildConfigFromSettings(settingsData as EmailSettings); // Explicitly cast
       
       console.log('🎉 LOAD PROCESS COMPLETED - Settings loaded into service');
       
@@ -98,9 +98,9 @@ export class EmailService {
    * Create default settings from environment variables if none exist
    */
   private async createDefaultSettingsIfNeeded(): Promise<void> {
-    const defaultApiKey = import.meta.env.VITE_DEFAULT_BREVO_API_KEY;
+    const defaultApiKey = import.meta.env.VITE_DEFAULT_RESEND_API_KEY; // Changed to Resend API key
     if (!defaultApiKey) {
-      console.warn('No default Brevo API key found in environment variables');
+      console.warn('No default Resend API key found in environment variables'); // Updated warning
       return;
     }
 
@@ -108,7 +108,7 @@ export class EmailService {
       console.log('Creating default email settings from environment variables');
       
       const defaultSettings = {
-        provider: 'brevo' as const,
+        provider: 'resend' as const, // Changed default provider to Resend
         api_key: defaultApiKey,
         api_secret: null,
         smtp_host: null,
@@ -136,15 +136,15 @@ export class EmailService {
         return;
       }
 
-      this.settings = data;
-      this.config = this.buildConfigFromSettings(data);
+      this.settings = data as EmailSettings; // Explicitly cast to EmailSettings
+      this.config = this.buildConfigFromSettings(data as EmailSettings); // Explicitly cast
       console.log('Default email settings created successfully');
       
     } catch (error) {
       console.error('Failed to create default email settings:', error);
       // Create in-memory config as fallback
       const defaultSettings = {
-        provider: 'brevo' as const,
+        provider: 'resend' as const, // Changed default provider to Resend
         api_key: defaultApiKey,
         from_email: 'onboarding@libdsvi.com',
         from_name: 'DSVI Team',
@@ -204,12 +204,21 @@ export class EmailService {
         };
       case 'brevo':
         // For Brevo, try the provided API key first, then fall back to environment
-        const apiKey = settings.api_key || import.meta.env.VITE_DEFAULT_BREVO_API_KEY;
-        if (!apiKey) return null;
+        const brevoApiKey = settings.api_key || import.meta.env.VITE_DEFAULT_BREVO_API_KEY;
+        if (!brevoApiKey) return null;
         return {
           ...baseConfig,
           brevo: {
-            api_key: apiKey
+            api_key: brevoApiKey
+          }
+        };
+      case 'resend': // Added Resend case
+        const resendApiKey = settings.api_key || import.meta.env.VITE_DEFAULT_RESEND_API_KEY;
+        if (!resendApiKey) return null;
+        return {
+          ...baseConfig,
+          resend: {
+            api_key: resendApiKey
           }
         };
       default:
@@ -263,6 +272,13 @@ export class EmailService {
             api_key: settings.api_key!
           }
         };
+      case 'resend': // Added Resend case
+        return {
+          ...baseConfig,
+          resend: {
+            api_key: settings.api_key!
+          }
+        };
       default:
         return baseConfig;
     }
@@ -289,8 +305,8 @@ export class EmailService {
         subject: message.subject,
         html: message.body,
         from: {
-          email: 'onboarding@libdsvi.com',
-          name: 'DSVI Team'
+          email: this.config?.from_email || 'onboarding@libdsvi.com', // Use from_email from config
+          name: this.config?.from_name || 'DSVI Team' // Use from_name from config
         }
       });
 
@@ -436,8 +452,8 @@ export class EmailService {
       console.log('🔍 Verification - Active settings after insert:', verifyActive?.length || 0, verifyActive);
 
       // Step 6: Update local state immediately
-      this.settings = insertedData;
-      this.config = this.buildConfigFromSettings(insertedData);
+      this.settings = insertedData as EmailSettings; // Explicitly cast to EmailSettings
+      this.config = this.buildConfigFromSettings(insertedData as EmailSettings); // Explicitly cast
       
       console.log('🎉 SAVE PROCESS COMPLETED - Local state updated');
       

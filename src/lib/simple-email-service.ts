@@ -30,10 +30,7 @@ export class SimpleEmailService {
           to,
           subject,
           html,
-          from: from || {
-            email: 'onboarding@libdsvi.com',
-            name: 'DSVI Team'
-          }
+          from // Use the 'from' object as provided, no fallback
         })
       });
 
@@ -103,8 +100,8 @@ export class SimpleEmailService {
             <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
               <h3>System Details:</h3>
               <ul>
-                <li><strong>Provider:</strong> Brevo SMTP</li>
-                <li><strong>Implementation:</strong> Simplified Cloudflare Pages Function</li>
+                <li><strong>Provider:</strong> Resend</li>
+                <li><strong>Implementation:</strong> Cloudflare Pages Function with Resend API</li>
                 <li><strong>Test Time:</strong> ${new Date().toLocaleString()}</li>
                 <li><strong>Environment:</strong> ${window.location.origin}</li>
               </ul>
@@ -112,10 +109,9 @@ export class SimpleEmailService {
             
             <p>✨ <strong>Key improvements in this implementation:</strong></p>
             <ul>
-              <li>Direct SMTP via Brevo's API</li>
-              <li>No complex fallbacks or CORS issues</li>
-              <li>Simple Cloudflare Pages Function</li>
-              <li>Easy to maintain and debug</li>
+              <li>Direct email sending via Resend API</li>
+              <li>Leverages Cloudflare Pages Function for secure API key handling</li>
+              <li>Simplified and efficient email delivery</li>
             </ul>
             
             <p>If you received this email, your email system is now working properly! 🎉</p>
@@ -123,7 +119,7 @@ export class SimpleEmailService {
             <hr style="margin: 30px 0; border: 1px solid #e5e7eb;">
             <p style="color: #6b7280; font-size: 14px;">
               This is an automated test email from your DSVI Admin Panel.<br>
-              Sent via Brevo SMTP Service
+              Sent via Resend Service
             </p>
           </div>
         `

@@ -12,8 +12,8 @@ import { Key, Save, TestTube, CheckCircle, AlertTriangle } from 'lucide-react';
 
 export function QuickEmailSettings() {
   const [settings, setSettings] = useState<Partial<EmailSettings>>({
-    provider: 'brevo',
-    api_key: import.meta.env.VITE_DEFAULT_BREVO_API_KEY || '',
+    provider: 'resend', // Changed default provider to Resend
+    api_key: import.meta.env.VITE_DEFAULT_RESEND_API_KEY || '', // Changed default API key env var
     from_email: 'onboarding@libdsvi.com',
     from_name: 'DSVI Team',
     is_active: false
@@ -161,9 +161,9 @@ export function QuickEmailSettings() {
               <SelectValue placeholder="Select provider" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="brevo">Brevo (Recommended)</SelectItem>
+              <SelectItem value="resend">Resend (Recommended)</SelectItem> {/* Set Resend as recommended */}
+              <SelectItem value="brevo">Brevo</SelectItem> {/* Removed (Recommended) from Brevo */}
               <SelectItem value="sendgrid">SendGrid</SelectItem>
-              <SelectItem value="resend">Resend</SelectItem>
               <SelectItem value="smtp">SMTP</SelectItem>
             </SelectContent>
           </Select>
@@ -179,13 +179,7 @@ export function QuickEmailSettings() {
               onChange={(e) => setSettings(prev => ({ ...prev, api_key: e.target.value }))}
               placeholder={settings.provider === 'brevo' ? 'xkeysib-...' : 'Enter your API key'}
             />
-            {settings.provider === 'brevo' && (
-              <Alert>
-                <AlertDescription>
-                  Default API Key is already configured. You can update it here if needed.
-                </AlertDescription>
-              </Alert>
-            )}
+            {/* Removed provider-specific API key alert as it's now fetched from DB */}
           </div>
         )}
 
