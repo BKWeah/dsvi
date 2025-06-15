@@ -463,6 +463,7 @@ export class MessagingService {
           sent_at: new Date().toISOString()
         }));
 
+        console.log('📧 Recipient records to insert:', recipientRecords); // Add this line for debugging
         const { error: recipientError } = await supabase
           .from('message_recipients')
           .insert(recipientRecords);
