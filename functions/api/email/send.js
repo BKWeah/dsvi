@@ -172,7 +172,7 @@ export async function onRequestPost(context) {
 
     // Prepare email data for Resend
     const emailData = {
-      from: from?.email || emailSettings.from_email,
+      from: from?.email || activeSettings.from_email,
       to: resendRecipients.map(r => r.email), // Removed non-null assertion
       subject: subject,
       html: html,
