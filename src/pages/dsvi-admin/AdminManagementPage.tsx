@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
+import { SimpleEmailService } from '@/lib/simple-email-service';
 import { InvitationSuccessDialog } from '@/components/dsvi-admin/InvitationSuccessDialog';
 import { PendingInvitations } from '@/components/dsvi-admin/PendingInvitations';
 import { ViewAdminDialog } from '@/components/dsvi-admin/ViewAdminDialog';
@@ -102,6 +103,102 @@ export default function AdminManagementPage() {
   const [selectedAdmin, setSelectedAdmin] = useState<Level2Admin | null>(null);
   const [lastInvitationData, setLastInvitationData] = useState<any>(null);
   const { toast } = useToast();
+
+  // Initialize email service
+  const emailService = new SimpleEmailService();
+
+  // Function to send invitation email
+  const sendInvitationEmail = async (email: string, name: string, signupLink: string, tempPassword: string) => {
+    try {
+      console.log('📧 Sending invitation email to:', email);
+
+      const emailTemplate = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background-color: #2563eb; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background-color: #f8fafc; padding: 30px; border-radius: 0 0 8px 8px; }
+            .button { background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 20px 0; }
+            .credentials { background-color: #e5e7eb; padding: 15px; border-radius: 6px; margin: 20px 0; }
+            .footer { text-align: center; margin-top: 20px; font-size: 14px; color: #6b7280; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🎉 Welcome to DSVI Admin Portal</h1>
+            </div>
+            <div class="content">
+              <h2>Hello ${name},</h2>
+              
+              <p>You've been invited to join the DSVI platform as a <strong>Level 2 Administrator</strong>!</p>
+              
+              <p>As a Level 2 Admin, you'll have access to manage specific schools and help coordinate educational services through our platform.</p>
+              
+              <div class="credentials">
+                <h3>📋 Your Setup Information:</h3>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Temporary Password:</strong> <code>${tempPassword}</code></p>
+                <p><em>You'll be prompted to change this password during setup.</em></p>
+              </div>
+              
+              <h3>🚀 Next Steps:</h3>
+              <ol>
+                <li>Click the button below to complete your account setup</li>
+                <li>Use your email and temporary password to sign in</li>
+                <li>Create a new secure password</li>
+                <li>Complete your profile information</li>
+              </ol>
+              
+              <div style="text-align: center;">
+                <a href="${signupLink}" class="button">Complete Your Setup →</a>
+              </div>
+              
+              <p><strong>⏰ Important:</strong> This invitation will expire in 7 days. Please complete your setup as soon as possible.</p>
+              
+              <p>If you have any questions, please contact our support team or reply to this email.</p>
+              
+              <p>Welcome to the team!</p>
+              <p><strong>The DSVI Team</strong></p>
+            </div>
+            <div class="footer">
+              <p>© 2025 DSVI Platform. All rights reserved.</p>
+              <p>This is an automated message. Please do not reply directly to this email.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      const emailResult = await emailService.sendEmail({
+        to: [{
+          recipient_type: 'external',
+          recipient_email: email,
+          recipient_name: name
+        }],
+        subject: `Welcome to DSVI - Complete Your Level 2 Admin Setup`,
+        html: emailTemplate,
+        from: {
+          email: 'onboarding@libdsvi.com',
+          name: 'DSVI Team'
+        }
+      });
+
+      if (emailResult.success) {
+        console.log('✅ Invitation email sent successfully:', emailResult.messageId);
+        return true;
+      } else {
+        console.error('❌ Failed to send invitation email:', emailResult.error);
+        return false;
+      }
+    } catch (error) {
+      console.error('💥 Error sending invitation email:', error);
+      return false;
+    }
+  };
 
   // Form states
   const [newAdminEmail, setNewAdminEmail] = useState('');
@@ -227,6 +324,17 @@ export default function AdminManagementPage() {
         inviteToken: inviteToken
       });
 
+      // Send invitation email
+      console.log('📧 Sending invitation email...');
+      const emailSent = await sendInvitationEmail(newAdminEmail, newAdminName, signupLink, tempPassword || '');
+      
+      if (emailSent) {
+        console.log('✅ Invitation email sent successfully');
+      } else {
+        console.warn('⚠️ Invitation email failed to send, but invitation was created');
+        // Still continue with the process even if email fails
+      }
+
       // Reset form
       setNewAdminEmail('');
       setNewAdminName('');
@@ -242,13 +350,17 @@ export default function AdminManagementPage() {
       try {
         await navigator.clipboard.writeText(signupLink);
         toast({
-          title: "Invitation Created!",
-          description: "Signup link copied to clipboard and stored in database",
+          title: "Invitation Created & Email Sent!",
+          description: emailSent 
+            ? "Invitation email sent successfully. Signup link also copied to clipboard." 
+            : "Signup link copied to clipboard. Email sending failed but invitation was created.",
         });
       } catch (clipboardError) {
         toast({
           title: "Invitation Created!",
-          description: "Invitation stored in database - use the dialog to copy the signup link",
+          description: emailSent 
+            ? "Invitation email sent successfully. Use the dialog to copy the signup link." 
+            : "Invitation stored in database. Email sending failed - use the dialog to copy the signup link.",
         });
       }
 
