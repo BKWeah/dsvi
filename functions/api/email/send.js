@@ -19,14 +19,19 @@ export async function onRequestPost(context) {
 
   try {
     // Initialize Supabase client
-    const supabaseUrl = env.VITE_SUPABASE_URL; // Corrected environment variable name
-    const supabaseAnonKey = env.VITE_SUPABASE_ANON_KEY; // Corrected environment variable name
+    const supabaseUrl = env.VITE_SUPABASE_URL;
+    const supabaseServiceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY; // Use service role key
 
-    if (!supabaseUrl || !supabaseAnonKey) {
-      throw new Error('Supabase URL or Anon Key not configured in environment');
+    if (!supabaseUrl || !supabaseServiceRoleKey) {
+      throw new Error('Supabase URL or Service Role Key not configured in environment');
     }
 
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    // Initialize Supabase client with service role key to bypass RLS
+    const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
+      auth: {
+        persistSession: false, // Do not persist session for service role
+      },
+    });
 
     // Fetch active email settings from database
     const { data: emailSettings, error: dbError } = await supabase
