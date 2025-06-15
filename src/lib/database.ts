@@ -245,17 +245,22 @@ export async function createSchool(
         });
 
       // Log the school creation
-      await logActivity(
-        currentUser.user.id,
-        createdSchool.id,
-        'SCHOOL_CREATED',
-        { 
-          school_name: createdSchool.name,
-          package_type: createdSchool.package_type,
-          subscription_end: createdSchool.subscription_end,
-          admin_email: adminEmail 
-        }
-      );
+      try {
+        await logActivity(
+          currentUser.user.id,
+          createdSchool.id,
+          'SCHOOL_CREATED',
+          { 
+            school_name: createdSchool.name,
+            package_type: createdSchool.package_type,
+            subscription_end: createdSchool.subscription_end,
+            admin_email: adminEmail 
+          }
+        );
+      } catch (logError) {
+        console.warn('Failed to log school creation activity:', logError);
+        // Don't fail school creation if logging fails
+      }
     }
   } catch (historyError) {
     console.warn('Failed to create subscription history:', historyError);
@@ -331,16 +336,21 @@ export async function upsertPageContent(pageData: Omit<PageContent, 'id' | 'crea
   // Log the page content update
   const { data: currentUser } = await supabase.auth.getUser();
   if (currentUser.user) {
-    await logActivity(
-      currentUser.user.id,
-      pageData.school_id,
-      'PAGE_CONTENT_UPDATED',
-      { 
-        page_slug: pageData.page_slug,
-        page_title: pageData.title,
-        sections_count: pageData.sections.length
-      }
-    );
+    try {
+      await logActivity(
+        currentUser.user.id,
+        pageData.school_id,
+        'PAGE_CONTENT_UPDATED',
+        { 
+          page_slug: pageData.page_slug,
+          page_title: pageData.title,
+          sections_count: pageData.sections.length
+        }
+      );
+    } catch (error) {
+      console.warn('Failed to log page update activity:', error);
+      // Don't fail the page save if logging fails
+    }
   }
 
   return data as PageContent;
@@ -562,12 +572,16 @@ export async function createSchoolAssignment(assignment: {
   if (error) throw error;
 
   // Log the assignment
-  await logActivity(
-    assignment.assigned_by,
-    assignment.school_id,
-    'SCHOOL_ADMIN_ASSIGNED',
-    { assigned_admin: assignment.school_admin_id }
-  );
+  try {
+    await logActivity(
+      assignment.assigned_by,
+      assignment.school_id,
+      'SCHOOL_ADMIN_ASSIGNED',
+      { assigned_admin: assignment.school_admin_id }
+    );
+  } catch (logError) {
+    console.warn('Failed to log assignment activity:', logError);
+  }
 
   return data as AdminSchoolAssignment;
 }
@@ -589,12 +603,16 @@ export async function removeSchoolAssignment(assignmentId: string, removedBy: st
 
   // Log the removal
   if (assignment) {
-    await logActivity(
-      removedBy,
-      assignment.school_id,
-      'SCHOOL_ADMIN_REMOVED',
-      { removed_admin: assignment.school_admin_id }
-    );
+    try {
+      await logActivity(
+        removedBy,
+        assignment.school_id,
+        'SCHOOL_ADMIN_REMOVED',
+        { removed_admin: assignment.school_admin_id }
+      );
+    } catch (logError) {
+      console.warn('Failed to log removal activity:', logError);
+    }
   }
 }
 
@@ -630,12 +648,16 @@ export async function updateSchoolAssignmentPermissions(
   if (error) throw error;
 
   // Log the permission update
-  await logActivity(
-    updatedBy,
-    data.school_id,
-    'ASSIGNMENT_PERMISSIONS_UPDATED',
-    { assignment_id: assignmentId, new_permissions: permissions }
-  );
+  try {
+    await logActivity(
+      updatedBy,
+      data.school_id,
+      'ASSIGNMENT_PERMISSIONS_UPDATED',
+      { assignment_id: assignmentId, new_permissions: permissions }
+    );
+  } catch (logError) {
+    console.warn('Failed to log permission update activity:', logError);
+  }
 
   return data as AdminSchoolAssignment;
 }
@@ -646,20 +668,65 @@ export async function logActivity(
   schoolId: string | null,
   action: string,
   details: Record<string, any> = {}
-): Promise<ActivityLog> {
-  const { data, error } = await supabase
-    .from('activity_logs')
-    .insert({
-      user_id: userId,
-      school_id: schoolId,
-      action,
-      details
-    })
-    .select()
-    .single();
+): Promise<ActivityLog | null> {
+  try {
+    // Check if user profile exists, if not create it
+    const { data: existingProfile } = await supabase
+      .from('user_profiles')
+      .select('id')
+      .eq('user_id', userId)
+      .single();
 
-  if (error) throw error;
-  return data as ActivityLog;
+    if (!existingProfile) {
+      console.log('User profile not found, creating one for user:', userId);
+      
+      // Get user info from auth
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user && user.id === userId) {
+        // Create user profile
+        const { error: profileError } = await supabase
+          .from('user_profiles')
+          .insert({
+            user_id: userId,
+            email: user.email,
+            name: user.user_metadata?.name || user.email?.split('@')[0] || 'User',
+            role: user.user_metadata?.role || 'USER',
+            created_at: new Date().toISOString()
+          });
+
+        if (profileError) {
+          console.warn('Failed to create user profile, skipping activity log:', profileError);
+          return null;
+        }
+      } else {
+        console.warn('User info not available, skipping activity log');
+        return null;
+      }
+    }
+
+    // Now try to insert the activity log
+    const { data, error } = await supabase
+      .from('activity_logs')
+      .insert({
+        user_id: userId,
+        school_id: schoolId,
+        action,
+        details
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.warn('Failed to log activity:', error);
+      return null;
+    }
+
+    return data as ActivityLog;
+  } catch (error) {
+    console.warn('Error in logActivity:', error);
+    return null;
+  }
 }
 
 export async function getActivityLogs(options: {
@@ -806,12 +873,16 @@ export async function updateSchoolWithSubscription(
   // Log the update
   const currentUser = await supabase.auth.getUser();
   if (currentUser.data.user) {
-    await logActivity(
-      currentUser.data.user.id,
-      schoolId,
-      'SCHOOL_UPDATED',
-      { updated_fields: Object.keys(data) }
-    );
+    try {
+      await logActivity(
+        currentUser.data.user.id,
+        schoolId,
+        'SCHOOL_UPDATED',
+        { updated_fields: Object.keys(data) }
+      );
+    } catch (logError) {
+      console.warn('Failed to log school update activity:', logError);
+    }
   }
 
   return updatedSchool as School;
