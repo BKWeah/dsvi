@@ -289,7 +289,7 @@ export class MessagingService {
           }
 
           // Explicitly cast data to AdminSchoolAssignmentResult[]
-          const assignments: AdminSchoolAssignmentResult[] = data as AdminSchoolAssignmentResult[];
+          const assignments: AdminSchoolAssignmentResult[] = data as unknown as AdminSchoolAssignmentResult[];
           const schools = assignments.map(item => item.school).filter((school): school is { id: string; name: string } => Boolean(school));
           
           if (schools.length === 0) {
@@ -336,60 +336,45 @@ export class MessagingService {
       const { data: currentUser } = await supabase.auth.getUser();
       if (!currentUser.user) throw new Error('Not authenticated');
 
-      // Build recipient email list
-      let emailRecipients: Array<{ email: string; name?: string }> = [];
+      // Build recipient email list in the format expected by the Cloudflare Pages Function
+      let emailRecipients: Array<{
+        recipient_type: RecipientType;
+        recipient_email?: string;
+        recipient_name?: string;
+        school_id?: string;
+      }> = [];
 
       // Add external emails directly
       if (request.recipients.external_emails) {
         for (const external of request.recipients.external_emails) {
           if (external.email && external.email.trim()) {
             emailRecipients.push({
-              email: external.email.trim(),
-              name: external.name || undefined
+              recipient_type: 'external',
+              recipient_email: external.email.trim(),
+              recipient_name: external.name || undefined
             });
           }
         }
       }
 
-      // Handle school recipients - get their admin emails
-      if (request.recipients.school_ids || request.recipients.all_schools) {
+      // Handle school recipients - send school_ids to the API for resolution
+      if (request.recipients.school_ids) {
+        for (const schoolId of request.recipients.school_ids) {
+          emailRecipients.push({
+            recipient_type: 'school_admin',
+            school_id: schoolId
+          });
+        }
+      }
+      if (request.recipients.all_schools) {
+        // If all schools are selected, we need to fetch their IDs to send to the API
+        // The API will then resolve their admin emails
         const accessibleSchools = await this.getAccessibleSchools();
-        let schoolsToMessage = request.recipients.all_schools 
-          ? accessibleSchools 
-          : accessibleSchools.filter(s => request.recipients.school_ids?.includes(s.id));
-
-        console.log('📧 Schools to message:', schoolsToMessage);
-
-        // Get admin emails for these schools
-        for (const school of schoolsToMessage) {
-          try {
-            const { data: schoolData } = await supabase
-              .from('schools')
-              .select('admin_user_id, name')
-              .eq('id', school.id)
-              .single();
-
-            if (schoolData?.admin_user_id) {
-              const { data: adminProfile } = await supabase
-                .from('profiles')
-                .select('email')
-                .eq('id', schoolData.admin_user_id)
-                .single();
-
-              if (adminProfile?.email && adminProfile.email.trim()) {
-                emailRecipients.push({
-                  email: adminProfile.email.trim(),
-                  name: schoolData.name || school.name
-                });
-              } else {
-                console.warn(`No email found for admin of school ${school.name}`);
-              }
-            } else {
-              console.warn(`No admin_user_id found for school ${school.name}`);
-            }
-          } catch (error) {
-            console.warn(`Failed to get email for school ${school.name}:`, error);
-          }
+        for (const school of accessibleSchools) {
+          emailRecipients.push({
+            recipient_type: 'school_admin',
+            school_id: school.id
+          });
         }
       }
 
@@ -470,9 +455,10 @@ export class MessagingService {
       if (messageData) {
         const recipientRecords = emailRecipients.map(recipient => ({
           message_id: messageData.id,
-          recipient_email: recipient.email,
-          recipient_name: recipient.name || null,
-          recipient_type: 'external' as const,
+          recipient_email: recipient.recipient_email || null,
+          recipient_name: recipient.recipient_name || null,
+          recipient_type: recipient.recipient_type,
+          school_id: recipient.school_id || null, // Add school_id
           delivery_status: 'sent' as const,
           sent_at: new Date().toISOString()
         }));

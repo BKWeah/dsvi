@@ -3,6 +3,8 @@
  * Clean implementation using Brevo SMTP via Cloudflare Pages Function
  */
 
+import { RecipientType } from './messaging-types'; // Import RecipientType
+
 export class SimpleEmailService {
   private apiUrl: string;
 
@@ -15,7 +17,7 @@ export class SimpleEmailService {
    * Send email via the new email API with proper recipient format
    */
   async sendEmail({ to, subject, html, from }: {
-    to: string | Array<{ email: string; name?: string }>;
+    to: string | Array<{ recipient_type: RecipientType; recipient_email?: string; recipient_name?: string; school_id?: string; }>;
     subject: string;
     html: string;
     from?: { email: string; name: string };
