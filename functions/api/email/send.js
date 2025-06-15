@@ -20,34 +20,58 @@ export async function onRequestPost(context) {
   try {
     // Initialize Supabase client
     const supabaseUrl = env.VITE_SUPABASE_URL;
-    const supabaseServiceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY; // Use service role key
+    const supabaseAnonKey = env.VITE_SUPABASE_ANON_KEY; // Use anon key since RLS is disabled
 
-    if (!supabaseUrl || !supabaseServiceRoleKey) {
-      throw new Error('Supabase URL or Service Role Key not configured in environment');
+    // Debug environment variables
+    console.log('DEBUG: Environment variables check:', {
+      hasSupabaseUrl: !!supabaseUrl,
+      supabaseUrlLength: supabaseUrl?.length || 0,
+      hasAnonKey: !!supabaseAnonKey,
+      anonKeyLength: supabaseAnonKey?.length || 0,
+      supabaseUrlPreview: supabaseUrl?.substring(0, 20) + '...',
+      anonKeyPreview: supabaseAnonKey?.substring(0, 20) + '...'
+    });
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      throw new Error('Supabase URL or Anon Key not configured in environment');
     }
 
-    // Initialize Supabase client with service role key to bypass RLS
-    const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
+    // Initialize Supabase client with anon key (no RLS on email_settings table)
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
-        persistSession: false, // Do not persist session for service role
+        persistSession: false,
       },
     });
 
+    console.log('DEBUG: Supabase client initialized successfully');
+
     // Fetch active email settings from database
+    console.log('DEBUG: Querying email_settings table...');
     const { data: emailSettings, error: dbError } = await supabase
       .from('email_settings')
       .select('*')
       .eq('is_active', true)
       .eq('provider', 'resend') // Ensure we get Resend settings
       .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
+      .limit(1);
 
-    if (dbError || !emailSettings) {
+    console.log('DEBUG: Query result:', {
+      hasError: !!dbError,
+      error: dbError,
+      dataLength: emailSettings?.length || 0,
+      data: emailSettings
+    });
+
+    // Remove .single() and handle array result instead
+    const activeSettings = emailSettings && emailSettings.length > 0 ? emailSettings[0] : null;
+
+    if (dbError || !activeSettings) {
       console.error('Database error fetching email settings:', dbError);
-      console.error('Email settings data:', emailSettings); // Add this line
+      console.error('Email settings data:', emailSettings);
       throw new Error('Failed to retrieve active email settings from database.');
     }
+
+    const resendApiKey = activeSettings.api_key;
 
     const resendApiKey = emailSettings.api_key;
     if (!resendApiKey) {

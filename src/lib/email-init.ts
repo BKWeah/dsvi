@@ -25,16 +25,16 @@ export async function initializeDefaultEmailSettings(): Promise<void> {
 
     console.log('📝 EMAIL INIT: No settings found, creating defaults...');
 
-    // Get the default Brevo API key from environment
-    const defaultApiKey = import.meta.env.VITE_DEFAULT_BREVO_API_KEY;
+    // Get the default Resend API key from environment
+    const defaultApiKey = import.meta.env.VITE_DEFAULT_RESEND_API_KEY;
     
     if (!defaultApiKey) {
-      console.warn('⚠️ EMAIL INIT: No default Brevo API key found in environment variables');
+      console.warn('⚠️ EMAIL INIT: No default Resend API key found in environment variables');
       return;
     }
 
     const defaultSettings: Omit<EmailSettings, 'id' | 'created_at' | 'updated_at'> = {
-      provider: 'brevo',
+      provider: 'resend',
       api_key: defaultApiKey,
       api_secret: null,
       smtp_host: null,
@@ -70,9 +70,9 @@ export async function initializeDefaultEmailSettings(): Promise<void> {
 }
 
 /**
- * Update the Brevo API key for existing settings
+ * Update the Resend API key for existing settings
  */
-export async function updateBrevoApiKey(newApiKey: string): Promise<boolean> {
+export async function updateResendApiKey(newApiKey: string): Promise<boolean> {
   try {
     const { data: currentUser } = await supabase.auth.getUser();
     
@@ -86,7 +86,7 @@ export async function updateBrevoApiKey(newApiKey: string): Promise<boolean> {
     const { error } = await supabase
       .from('email_settings')
       .insert({
-        provider: 'brevo',
+        provider: 'resend',
         api_key: newApiKey,
         from_email: 'onboarding@libdsvi.com',
         from_name: 'DSVI Team',
@@ -98,14 +98,14 @@ export async function updateBrevoApiKey(newApiKey: string): Promise<boolean> {
       });
 
     if (error) {
-      console.error('Failed to update Brevo API key:', error);
+      console.error('Failed to update Resend API key:', error);
       return false;
     }
 
-    console.log('Brevo API key updated successfully');
+    console.log('Resend API key updated successfully');
     return true;
   } catch (error) {
-    console.error('Error updating Brevo API key:', error);
+    console.error('Error updating Resend API key:', error);
     return false;
   }
 }
