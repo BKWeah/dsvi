@@ -45,6 +45,7 @@ export async function onRequestPost(context) {
 
     if (dbError || !emailSettings) {
       console.error('Database error fetching email settings:', dbError);
+      console.error('Email settings data:', emailSettings); // Add this line
       throw new Error('Failed to retrieve active email settings from database.');
     }
 
