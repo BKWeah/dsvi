@@ -170,10 +170,17 @@ export default function SchoolsPage() {
     }
   };
 
-  const handleSchoolAdded = useCallback(() => {
-    fetchSchools();
-    setShowAddDialog(false);
-  }, [fetchSchools]);
+  const generateSchoolWebsiteUrl = (school: School) => {
+    // Use the school's slug if available, otherwise create one from the name
+    const slug = school.slug || school.name
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+    
+    return generateSchoolHomepageUrl(slug);
+  };
 
   const handleInviteAdmin = (school: School) => {
     setSelectedSchool(school);
@@ -302,7 +309,15 @@ export default function SchoolsPage() {
             {filteredSchools.map((school) => (
               <MobileCard key={school.id} title={school.name}>
                 <div className="p-4">
-                  <h3 className="font-semibold text-lg mb-2">{school.name}</h3>
+                  <a
+                    href={generateSchoolWebsiteUrl(school)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline transition-colors font-semibold text-lg mb-2"
+                  >
+                    {school.name}
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
                   
                   <div className="space-y-2 mb-3">
                     <div className="flex justify-between items-center">
@@ -436,7 +451,17 @@ export default function SchoolsPage() {
             <TableBody>
               {filteredSchools.map((school) => (
                 <TableRow key={school.id}>
-                  <TableCell className="font-medium">{school.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <a
+                      href={generateSchoolWebsiteUrl(school)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                    >
+                      {school.name}
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  </TableCell>
                   <TableCell>
                     {getSubscriptionStatusBadge(school.subscription_status, school.subscription_end)}
                   </TableCell>
