@@ -1,5 +1,126 @@
 import { supabase } from '@/integrations/supabase/client';
 import { School, PageContent, ContentSection, AdminSchoolAssignment, ActivityLog, DashboardStats, SchoolWithAssignments } from './types';
+import { SimpleEmailService } from './simple-email-service';
+
+// Initialize email service
+const emailService = new SimpleEmailService();
+
+/**
+ * Send invitation email to school admin
+ */
+async function sendSchoolAdminInvitationEmail(
+  adminEmail: string,
+  schoolName: string,
+  schoolId: string
+): Promise<boolean> {
+  try {
+    console.log('📧 Sending school admin invitation email to:', adminEmail, 'for school:', schoolName);
+
+    // Generate signup link (same format as InviteSchoolAdminDialog)
+    const params = new URLSearchParams({
+      school_id: schoolId,
+      school_name: schoolName,
+      role: 'SCHOOL_ADMIN'
+    });
+    const signupLink = `${typeof window !== 'undefined' ? window.location.origin : 'https://libdsvi.com'}/signup?${params.toString()}`;
+
+    const emailTemplate = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #059669; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background-color: #f0fdf4; padding: 30px; border-radius: 0 0 8px 8px; }
+          .button { background-color: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 20px 0; }
+          .school-info { background-color: #dcfce7; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #059669; }
+          .footer { text-align: center; margin-top: 20px; font-size: 14px; color: #6b7280; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🏫 Welcome to DSVI - School Administrator</h1>
+          </div>
+          <div class="content">
+            <h2>Hello!</h2>
+            
+            <p>You've been invited to join the DSVI platform as the <strong>School Administrator</strong> for <strong>${schoolName}</strong>!</p>
+            
+            <p>As a School Administrator, you'll be able to:</p>
+            <ul>
+              <li>🎓 Manage your school's profile and information</li>
+              <li>📝 Create and update school content</li>
+              <li>👥 Coordinate with DSVI administrators</li>
+              <li>📊 Access school-specific features and analytics</li>
+              <li>🔧 Customize your school's settings and preferences</li>
+            </ul>
+            
+            <div class="school-info">
+              <h3>🏫 Your School Assignment:</h3>
+              <p><strong>School:</strong> ${schoolName}</p>
+              <p><strong>Role:</strong> School Administrator</p>
+              <p><strong>Platform:</strong> DSVI Digital School Management</p>
+            </div>
+            
+            <h3>🚀 Getting Started:</h3>
+            <ol>
+              <li>Click the signup button below to create your account</li>
+              <li>Complete the registration form with your details</li>
+              <li>Verify your email address</li>
+              <li>Access your school's admin dashboard</li>
+              <li>Explore the platform features and tools</li>
+            </ol>
+            
+            <div style="text-align: center;">
+              <a href="${signupLink}" class="button">Create Your School Admin Account →</a>
+            </div>
+            
+            <p><strong>🔗 Direct Link:</strong> If the button doesn't work, copy and paste this link into your browser:</p>
+            <p style="word-break: break-all; background-color: #f3f4f6; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px;">${signupLink}</p>
+            
+            <p><strong>💡 Need Help?</strong> If you have any questions or need assistance getting started, please contact our support team or reply to this email.</p>
+            
+            <p>We're excited to have you on board and look forward to supporting your school's digital journey!</p>
+            
+            <p><strong>The DSVI Team</strong></p>
+          </div>
+          <div class="footer">
+            <p>© 2025 DSVI Platform. All rights reserved.</p>
+            <p>This invitation is specific to ${schoolName}. Please do not share this link.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const emailResult = await emailService.sendEmail({
+      to: [{
+        recipient_type: 'external',
+        recipient_email: adminEmail,
+        recipient_name: undefined // We don't have the admin name at this point
+      }],
+      subject: `Welcome to DSVI - ${schoolName} Administrator Invitation`,
+      html: emailTemplate,
+      from: {
+        email: 'onboarding@libdsvi.com',
+        name: 'DSVI Team'
+      }
+    });
+
+    if (emailResult.success) {
+      console.log('✅ School admin invitation email sent successfully:', emailResult.messageId);
+      return true;
+    } else {
+      console.error('❌ Failed to send school admin invitation email:', emailResult.error);
+      return false;
+    }
+  } catch (error) {
+    console.error('💥 Error sending school admin invitation email:', error);
+    return false;
+  }
+}
 
 // School-related functions
 export async function getSchools(): Promise<School[]> {
@@ -143,6 +264,21 @@ export async function createSchool(
 
   if (adminEmail && createdSchool) {
     console.log('Admin email provided:', adminEmail, 'for school:', createdSchool.id);
+    
+    // Send invitation email to school admin
+    try {
+      console.log('📧 Sending invitation email to school administrator...');
+      const emailSent = await sendSchoolAdminInvitationEmail(adminEmail, createdSchool.name, createdSchool.id);
+      
+      if (emailSent) {
+        console.log('✅ School admin invitation email sent successfully');
+      } else {
+        console.warn('⚠️ School admin invitation email failed to send, but school was created successfully');
+      }
+    } catch (emailError) {
+      console.error('💥 Error sending school admin invitation email:', emailError);
+      // Don't fail the school creation if email fails
+    }
   }
 
   return createdSchool as School;

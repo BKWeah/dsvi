@@ -58,7 +58,9 @@ export function AddSchoolDialog({ open, onOpenChange, onSchoolAdded }: AddSchool
 
       toast({
         title: "Success",
-        description: `School "${school.name}" created successfully! Admin users can be assigned separately.`,
+        description: formData.admin_email 
+          ? `School "${school.name}" created successfully! An invitation email has been sent to ${formData.admin_email}.`
+          : `School "${school.name}" created successfully! Admin users can be assigned separately.`,
       });
 
       // Reset form
@@ -133,16 +135,16 @@ export function AddSchoolDialog({ open, onOpenChange, onSchoolAdded }: AddSchool
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="admin_email">Admin Email (for reference)</Label>
+            <Label htmlFor="admin_email">Admin Email (optional)</Label>
             <Input
               id="admin_email"
               type="email"
               value={formData.admin_email}
               onChange={(e) => setFormData(prev => ({ ...prev, admin_email: e.target.value }))}
-              placeholder="admin@school.com (optional)"
+              placeholder="admin@school.com"
             />
             <p className="text-xs text-muted-foreground">
-              Note: Admin users should sign up separately and can be linked to the school later.
+              If provided, an invitation email will be sent to this address with signup instructions.
             </p>
           </div>
           
