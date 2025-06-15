@@ -72,8 +72,6 @@ export async function onRequestPost(context) {
     }
 
     const resendApiKey = activeSettings.api_key;
-
-    const resendApiKey = emailSettings.api_key;
     if (!resendApiKey) {
       throw new Error('Resend API key not found in database settings.');
     }
