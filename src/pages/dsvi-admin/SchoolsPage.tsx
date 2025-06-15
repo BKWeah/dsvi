@@ -182,6 +182,11 @@ export default function SchoolsPage() {
     return generateSchoolHomepageUrl(slug);
   };
 
+  const handleSchoolAdded = useCallback(() => {
+    fetchSchools();
+    setShowAddDialog(false);
+  }, [fetchSchools]);
+
   const handleInviteAdmin = (school: School) => {
     setSelectedSchool(school);
     setShowInviteDialog(true);
