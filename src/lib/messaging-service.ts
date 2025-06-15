@@ -453,15 +453,15 @@ export class MessagingService {
 
       // Save recipients to database
       if (messageData) {
-        const recipientRecords = emailRecipients.map(recipient => ({
-          message_id: messageData.id,
-          recipient_email: recipient.recipient_email || null,
-          recipient_name: recipient.recipient_name || null,
-          recipient_type: recipient.recipient_type,
-          school_id: recipient.school_id || null, // Add school_id
-          delivery_status: 'sent' as const,
-          sent_at: new Date().toISOString()
-        }));
+            const recipientRecords = emailRecipients.map(recipient => ({
+              message_id: messageData.id,
+              recipient_email: recipient.recipient_email || '', // Ensure it's a non-null string
+              recipient_name: recipient.recipient_name || null,
+              recipient_type: recipient.recipient_type,
+              school_id: recipient.school_id || null, // Add school_id
+              delivery_status: 'sent' as const,
+              sent_at: new Date().toISOString()
+            }));
 
         console.log('📧 Recipient records to insert:', recipientRecords); // Add this line for debugging
         const { error: recipientError } = await supabase

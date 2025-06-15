@@ -81,19 +81,18 @@ export async function onRequestPost(context) {
       const adminUserIds = schoolsData.map(s => s.admin_user_id).filter(Boolean);
 
       if (adminUserIds.length > 0) {
-        // Fetch profiles (emails) for these admin_user_ids
-        // Assuming 'profiles' table is public and has 'id' and 'email' columns
+        // Fetch admin emails from the consolidated dsvi_admins table
         const { data: adminProfiles, error: profilesError } = await supabase
-          .from('profiles')
-          .select('id, email')
-          .in('id', adminUserIds);
+          .from('dsvi_admins') // Changed from 'profiles' to 'dsvi_admins'
+          .select('user_id, email') // Select user_id instead of id, as dsvi_admins uses user_id for auth.users reference
+          .in('user_id', adminUserIds); // Filter by user_id
 
         if (profilesError) {
           console.error('Error fetching admin profiles:', profilesError);
           throw profilesError;
         }
 
-        const userEmailMap = new Map(adminProfiles.map(p => [p.id, p.email]));
+        const userEmailMap = new Map(adminProfiles.map(p => [p.user_id, p.email])); // Use user_id for the map key
 
         for (const school of schoolsData) {
           if (school.admin_user_id && userEmailMap.has(school.admin_user_id)) {
