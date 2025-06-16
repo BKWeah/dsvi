@@ -22,7 +22,10 @@ import {
   TextWithImageSectionConfig,
   GallerySectionConfig,
   FacultyListSectionConfig,
-  ContactFormSectionConfig
+  ContactFormSectionConfig,
+  HighlightsSectionConfig,
+  TestimonialsSectionConfig,
+  CallToActionSectionConfig
 } from '@/lib/types';
 import { 
   getPageContent, 
@@ -42,6 +45,9 @@ const SECTION_TYPES: { value: SectionType; label: string }[] = [
   { value: 'hero', label: 'Hero Section' },
   { value: 'text', label: 'Text Section' },
   { value: 'textWithImage', label: 'Text with Image' },
+  { value: 'highlights', label: 'Highlights Section' },
+  { value: 'testimonials', label: 'Testimonials Section' },
+  { value: 'callToAction', label: 'Call to Action' },
   { value: 'gallery', label: 'Image Gallery' },
   { value: 'facultyList', label: 'Faculty List' },
   { value: 'contactForm', label: 'Contact Form' },
@@ -164,6 +170,33 @@ export function PageEditor({ schoolId, pageSlug, onSave }: PageEditorProps) {
         return { heading: 'Section Heading', body: 'Section content goes here...' };
       case 'textWithImage':
         return { heading: 'Section Heading', body: 'Section content...', imageUrl: '', imagePosition: 'right' };
+      case 'highlights':
+        return { 
+          title: 'Why Choose Our School', 
+          subtitle: 'Excellence in education with proven results',
+          highlights: [
+            { icon: 'Trophy', title: 'Achievement', description: 'Outstanding academic performance', badge: 'Excellence', color: 'green' }
+          ],
+          ctaText: 'Learn More',
+          ctaLink: '/about'
+        };
+      case 'testimonials':
+        return { 
+          title: 'What Our Community Says', 
+          subtitle: 'Hear from parents, students, and graduates',
+          testimonials: [
+            { id: '1', name: 'John Doe', role: 'Parent', content: 'Great school with excellent teachers.', rating: 5 }
+          ]
+        };
+      case 'callToAction':
+        return { 
+          title: 'Ready to Join Our School?', 
+          subtitle: 'Take the first step towards an excellent education.',
+          primaryButtonText: 'Apply Now',
+          primaryButtonLink: '/admissions',
+          secondaryButtonText: 'Schedule a Visit',
+          secondaryButtonLink: '/contact'
+        };
       case 'gallery':
         return { images: [] };
       case 'facultyList':
@@ -539,6 +572,164 @@ function SectionConfigEditor({ type, config, onUpdate, schoolId, sectionId }: Se
               placeholder="Contact form description..."
               rows={3}
             />
+          </div>
+        </div>
+      );
+
+    case 'highlights':
+      return (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Title</Label>
+            <Input
+              value={config.title || ''}
+              onChange={(e) => handleInputChange('title', e.target.value)}
+              placeholder="Section title"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Subtitle</Label>
+            <Input
+              value={config.subtitle || ''}
+              onChange={(e) => handleInputChange('subtitle', e.target.value)}
+              placeholder="Section subtitle"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Highlights (JSON format)</Label>
+            <Textarea
+              value={JSON.stringify(config.highlights || [], null, 2)}
+              onChange={(e) => {
+                try {
+                  const highlights = JSON.parse(e.target.value);
+                  handleInputChange('highlights', highlights);
+                } catch (error) {
+                  // Handle invalid JSON gracefully
+                }
+              }}
+              placeholder="Enter highlights as JSON array..."
+              rows={8}
+            />
+          <p className="text-sm text-gray-500">
+            {'Format: [{"icon": "Trophy", "title": "Achievement", "description": "Description", "badge": "Badge", "color": "green"}]'}
+          </p>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>CTA Button Text</Label>
+              <Input
+                value={config.ctaText || ''}
+                onChange={(e) => handleInputChange('ctaText', e.target.value)}
+                placeholder="Learn More"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>CTA Link</Label>
+              <Input
+                value={config.ctaLink || ''}
+                onChange={(e) => handleInputChange('ctaLink', e.target.value)}
+                placeholder="/about"
+              />
+            </div>
+          </div>
+        </div>
+      );
+
+    case 'testimonials':
+      return (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Title</Label>
+            <Input
+              value={config.title || ''}
+              onChange={(e) => handleInputChange('title', e.target.value)}
+              placeholder="Section title"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Subtitle</Label>
+            <Input
+              value={config.subtitle || ''}
+              onChange={(e) => handleInputChange('subtitle', e.target.value)}
+              placeholder="Section subtitle"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Testimonials (JSON format)</Label>
+            <Textarea
+              value={JSON.stringify(config.testimonials || [], null, 2)}
+              onChange={(e) => {
+                try {
+                  const testimonials = JSON.parse(e.target.value);
+                  handleInputChange('testimonials', testimonials);
+                } catch (error) {
+                  // Handle invalid JSON gracefully
+                }
+              }}
+              placeholder="Enter testimonials as JSON array..."
+              rows={8}
+            />
+          <p className="text-sm text-gray-500">
+            {'Format: [{"id": "1", "name": "John Doe", "role": "Parent", "content": "Great school!", "rating": 5}]'}
+          </p>
+          </div>
+        </div>
+      );
+
+    case 'callToAction':
+      return (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Title</Label>
+            <Input
+              value={config.title || ''}
+              onChange={(e) => handleInputChange('title', e.target.value)}
+              placeholder="Ready to Join Our School?"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Subtitle</Label>
+            <Input
+              value={config.subtitle || ''}
+              onChange={(e) => handleInputChange('subtitle', e.target.value)}
+              placeholder="Take the first step towards an excellent education."
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Primary Button Text</Label>
+              <Input
+                value={config.primaryButtonText || ''}
+                onChange={(e) => handleInputChange('primaryButtonText', e.target.value)}
+                placeholder="Apply Now"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Primary Button Link</Label>
+              <Input
+                value={config.primaryButtonLink || ''}
+                onChange={(e) => handleInputChange('primaryButtonLink', e.target.value)}
+                placeholder="/admissions"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Secondary Button Text</Label>
+              <Input
+                value={config.secondaryButtonText || ''}
+                onChange={(e) => handleInputChange('secondaryButtonText', e.target.value)}
+                placeholder="Schedule a Visit"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Secondary Button Link</Label>
+              <Input
+                value={config.secondaryButtonLink || ''}
+                onChange={(e) => handleInputChange('secondaryButtonLink', e.target.value)}
+                placeholder="/contact"
+              />
+            </div>
           </div>
         </div>
       );

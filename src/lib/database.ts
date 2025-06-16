@@ -442,10 +442,106 @@ export function createDefaultSections(pageSlug: string): ContentSection[] {
       },
       {
         id: generateSectionId(),
-        type: 'text',
+        type: 'highlights',
         config: {
-          heading: 'About Our School',
-          body: 'We are committed to providing quality education and fostering a supportive learning environment.'
+          title: 'Why Choose Our School',
+          subtitle: 'Excellence in education with proven results',
+          highlights: [
+            {
+              icon: 'Trophy',
+              title: '100% WAEC Pass Rate',
+              description: 'Outstanding academic performance with all students passing their examinations',
+              badge: 'Achievement',
+              color: 'green'
+            },
+            {
+              icon: 'Award',
+              title: 'STEM Excellence',
+              description: 'State-of-the-art science, technology, engineering and mathematics programs',
+              badge: 'Programs',
+              color: 'blue'
+            },
+            {
+              icon: 'Users',
+              title: 'Expert Faculty',
+              description: 'Highly qualified teachers with years of experience in education',
+              badge: 'Team',
+              color: 'purple'
+            },
+            {
+              icon: 'Heart',
+              title: 'Character Building',
+              description: 'Developing moral values and leadership skills alongside academics',
+              badge: 'Values',
+              color: 'red'
+            },
+            {
+              icon: 'Target',
+              title: 'Scholarship Programs',
+              description: 'Financial assistance available for deserving students',
+              badge: 'Support',
+              color: 'orange'
+            },
+            {
+              icon: 'BookOpen',
+              title: 'Modern Facilities',
+              description: 'Well-equipped classrooms, laboratories, and library resources',
+              badge: 'Infrastructure',
+              color: 'blue'
+            }
+          ],
+          ctaText: 'Learn More About Our Programs',
+          ctaLink: '/academics'
+        }
+      },
+      {
+        id: generateSectionId(),
+        type: 'testimonials',
+        config: {
+          title: 'What Our Community Says',
+          subtitle: 'Hear from parents, students, and graduates about their experience',
+          testimonials: [
+            {
+              id: '1',
+              name: 'Mrs. Adebayo',
+              role: 'Parent',
+              content: 'This school has transformed my daughter\'s academic journey. The teachers are dedicated and the environment is truly conducive for learning.',
+              rating: 5
+            },
+            {
+              id: '2',
+              name: 'David Okafor',
+              role: 'Graduate, Class of 2023',
+              content: 'The STEM program here prepared me excellently for university. I\'m now studying Engineering at the University of Lagos.',
+              rating: 5
+            },
+            {
+              id: '3',
+              name: 'Mrs. Johnson',
+              role: 'Parent',
+              content: 'The character building aspect of this school is remarkable. My son has developed strong leadership skills and moral values.',
+              rating: 5
+            },
+            {
+              id: '4',
+              name: 'Fatima Ibrahim',
+              role: 'Current Student',
+              content: 'I love the supportive environment and the way teachers encourage us to reach our full potential in every subject.',
+              rating: 5
+            }
+          ]
+        }
+      },
+      {
+        id: generateSectionId(),
+        type: 'callToAction',
+        config: {
+          title: 'Ready to Join Our School?',
+          subtitle: 'Take the first step towards an excellent education. Apply today and become part of our thriving academic community.',
+          primaryButtonText: 'Schedule a Visit',
+          primaryButtonLink: '/contact',
+          secondaryButtonText: 'Download Brochure',
+          secondaryButtonLink: '/about'
         }
       }
     ];

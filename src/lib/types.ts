@@ -180,7 +180,7 @@ export interface PageContent {
   sections: ContentSection[];
 }
 
-export type SectionType = 'hero' | 'text' | 'textWithImage' | 'gallery' | 'facultyList' | 'contactForm';
+export type SectionType = 'hero' | 'text' | 'textWithImage' | 'gallery' | 'facultyList' | 'contactForm' | 'highlights' | 'testimonials' | 'callToAction';
 
 export interface ContentSection {
   id: string; // UUID, generated client-side when adding a new section
@@ -227,6 +227,48 @@ export interface ContactFormSectionConfig {
   title?: string;
   description?: string;
 }
+
+export interface HighlightItem {
+  icon: string; // Lucide icon name
+  title: string;
+  description: string;
+  badge?: string;
+  color?: 'blue' | 'green' | 'purple' | 'orange' | 'red';
+}
+
+export interface HighlightsSectionConfig {
+  title?: string;
+  subtitle?: string;
+  highlights: Array<HighlightItem>;
+  ctaText?: string;
+  ctaLink?: string;
+}
+
+export interface Testimonial {
+  id: string;
+  name: string;
+  role: string;
+  content: string;
+  avatar?: string;
+  rating?: number;
+}
+
+export interface TestimonialsSectionConfig {
+  title?: string;
+  subtitle?: string;
+  testimonials: Array<Testimonial>;
+}
+
+export interface CallToActionSectionConfig {
+  title: string;
+  subtitle?: string;
+  primaryButtonText?: string;
+  primaryButtonLink?: string;
+  secondaryButtonText?: string;
+  secondaryButtonLink?: string;
+  backgroundColor?: string;
+}
+
 // Type guards for section configs
 export const isHeroConfig = (config: any): config is HeroSectionConfig => {
   return config && typeof config.title === 'string' && typeof config.imageUrl === 'string';
