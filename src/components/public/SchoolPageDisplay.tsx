@@ -7,9 +7,10 @@ import SchoolPageRenderer from '@/components/templates/SchoolPageRenderer';
 import { getSchoolBySlug, getPageContent, createDefaultSections } from '@/lib/database';
 import { School, PageContent } from '@/lib/types';
 import { applyTheme } from '@/lib/theme-utils';
+import SchoolTeamPage from './SchoolTeamPage'; // Import the new component
 
 export function SchoolPageDisplay() {
-  const { schoolSlug, pageType = 'homepage' } = useParams<{ schoolSlug: string; pageType?: string }>();
+  const { schoolSlug, pageType = 'homepage', subsectionId } = useParams<{ schoolSlug: string; pageType?: string; subsectionId?: string }>();
   const [school, setSchool] = useState<School | null>(null);
   const [pageContent, setPageContent] = useState<PageContent | null>(null);
   const [loading, setLoading] = useState(true);
@@ -119,6 +120,19 @@ export function SchoolPageDisplay() {
           </CardContent>
         </Card>
       </div>
+    );
+  }
+
+  // If it's the team page, render the dedicated SchoolTeamPage component
+  if (pageType === 'team') {
+    return (
+      <>
+        <Helmet>
+          <title>Our Team - {school.name}</title>
+          <meta name="description" content={`Meet the team at ${school.name}`} />
+        </Helmet>
+        <SchoolTeamPage school={school} subsectionId={subsectionId} />
+      </>
     );
   }
 

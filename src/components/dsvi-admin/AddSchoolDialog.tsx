@@ -33,7 +33,9 @@ export function AddSchoolDialog({ open, onOpenChange, onSchoolAdded }: AddSchool
     admin_email: '',
     package_type: 'standard' as 'standard' | 'advanced',
     subscription_start: new Date().toISOString().split('T')[0], // Today's date
-    subscription_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // One year from now
+    subscription_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // One year from now
+    year_established: '',
+    permit_url: ''
   });
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -53,7 +55,9 @@ export function AddSchoolDialog({ open, onOpenChange, onSchoolAdded }: AddSchool
         package_type: formData.package_type,
         subscription_start: formData.subscription_start,
         subscription_end: formData.subscription_end,
-        subscription_status: 'active'
+        subscription_status: 'active',
+        year_established: formData.year_established ? parseInt(formData.year_established) : null,
+        permit_url: formData.permit_url || null
       }, formData.admin_email);
 
       toast({
@@ -70,7 +74,9 @@ export function AddSchoolDialog({ open, onOpenChange, onSchoolAdded }: AddSchool
         admin_email: '',
         package_type: 'standard',
         subscription_start: new Date().toISOString().split('T')[0],
-        subscription_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        subscription_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        year_established: '',
+        permit_url: ''
       });
 
       onSchoolAdded();
@@ -164,6 +170,33 @@ export function AddSchoolDialog({ open, onOpenChange, onSchoolAdded }: AddSchool
                 <SelectItem value="advanced">Advanced Package</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="year_established">Year Established</Label>
+            <Input
+              id="year_established"
+              type="number"
+              min="1800"
+              max={new Date().getFullYear() + 10}
+              value={formData.year_established}
+              onChange={(e) => setFormData(prev => ({ ...prev, year_established: e.target.value }))}
+              placeholder="e.g., 1995"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="permit_url">Permit to Operate / Accreditation Certificate URL</Label>
+            <Input
+              id="permit_url"
+              type="url"
+              value={formData.permit_url}
+              onChange={(e) => setFormData(prev => ({ ...prev, permit_url: e.target.value }))}
+              placeholder="https://example.com/permit.pdf"
+            />
+            <p className="text-xs text-muted-foreground">
+              Upload your permit document to a file hosting service and paste the public URL here. This will be visible in the school's profile.
+            </p>
           </div>
           
           <div className="grid grid-cols-2 gap-4">

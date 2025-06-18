@@ -26,10 +26,12 @@ export default function RegisterPage() {
     county: '',
     schoolType: '',
     studentCount: '',
+    yearEstablished: '', // Added Year Established
     website: '',
     preferredPackage: 'standard',
     paymentMethod: 'mobile_money',
-    message: ''
+    message: '',
+    permitFile: null as File | null // Added for file upload
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -63,6 +65,33 @@ export default function RegisterPage() {
     'advanced2': 350
   };
       
+      let permitUrl: string | null = null;
+      if (formData.permitFile) {
+        const file = formData.permitFile;
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${formData.schoolName.replace(/\s+/g, '_').toLowerCase()}-${Date.now()}.${fileExt}`;
+        const filePath = `permits/${fileName}`; // Assuming 'permits' bucket
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('school-permits') // Use a dedicated bucket for school permits
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false,
+          });
+
+        if (uploadError) {
+          console.error('Error uploading permit file:', uploadError);
+          toast({
+            title: "Upload Error",
+            description: "Failed to upload permit. Please try again.",
+            variant: "destructive",
+          });
+          setIsSubmitting(false);
+          return;
+        }
+        permitUrl = supabase.storage.from('school-permits').getPublicUrl(filePath).data.publicUrl;
+      }
+
       const { data, error } = await supabase
         .from('school_requests')
         .insert({
@@ -73,13 +102,15 @@ export default function RegisterPage() {
           address: formData.address,
           school_type: formData.schoolType,
           student_count: formData.studentCount === '' ? null : formData.studentCount,
+          year_established: formData.yearEstablished === '' ? null : parseInt(formData.yearEstablished),
           website: formData.website,
           message: formData.message,
           preferred_package: formData.preferredPackage,
           payment_method: formData.paymentMethod,
           receipt_number: receiptNumber,
           amount_paid: packagePrices[formData.preferredPackage as keyof typeof packagePrices],
-          payment_status: 'pending'
+          payment_status: 'pending',
+          permit_url: permitUrl // Added permit_url
         })
         .select()
         .single();
@@ -237,6 +268,19 @@ export default function RegisterPage() {
                             placeholder="Approximate student count"
                           />
                         </div>
+                        <div>
+                          <Label htmlFor="yearEstablished">Year Established *</Label>
+                          <Input
+                            id="yearEstablished"
+                            type="number"
+                            value={formData.yearEstablished}
+                            onChange={(e) => handleInputChange('yearEstablished', e.target.value)}
+                            placeholder="e.g., 1990"
+                            min="1800"
+                            max={new Date().getFullYear()}
+                            required
+                          />
+                        </div>
                       </div>
                       <div className="mt-4">
                         <Label htmlFor="address">School Address *</Label>
@@ -296,6 +340,29 @@ export default function RegisterPage() {
                             onChange={(e) => handleInputChange('website', e.target.value)}
                             placeholder="https://yourschool.com"
                           />
+                        </div>
+                        <div className="col-span-1 md:col-span-2">
+                          <Label htmlFor="permitFile" className="flex items-center gap-2">
+                            <FileText className="h-4 w-4 text-blue-600" />
+                            Permit to Operate or Accreditation Certificate *
+                          </Label>
+                          <Input
+                            id="permitFile"
+                            type="file"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0] || null;
+                              setFormData(prev => ({
+                                ...prev,
+                                permitFile: file
+                              }));
+                            }}
+                            required
+                            className="mt-2"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Upload your school's official permit or accreditation document (PDF, JPG, PNG)
+                          </p>
                         </div>
                       </div>
                     </div>

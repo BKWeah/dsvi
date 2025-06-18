@@ -167,6 +167,9 @@ export interface School {
   settings?: {
     enable_donations?: boolean;
   } | null;
+  // School Registration Information
+  year_established?: number | null;
+  permit_url?: string | null;
 }
 
 export interface PageContent {

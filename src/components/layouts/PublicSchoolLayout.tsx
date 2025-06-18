@@ -6,7 +6,14 @@ import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMe
 import { FullScreenMobileMenu } from '@/components/mobile/FullScreenMobileMenu';
 import { useTheme } from '@/contexts/ThemeContext';
 import { generateSchoolUrl } from '@/lib/subdomain-utils';
-import { School } from '@/lib/types';
+import { School, ComprehensiveThemeSettings } from '@/lib/types'; // Removed Json
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from 'lucide-react'; // Added ChevronDown
 
 const PAGE_TYPES = [
   { type: 'homepage', label: 'Home' },
@@ -14,7 +21,16 @@ const PAGE_TYPES = [
   { type: 'academics', label: 'Academics' },
   { type: 'admissions', label: 'Admissions' },
   { type: 'faculty', label: 'Faculty' },
+  { type: 'team', label: 'Team' }, // Added Team page type
   { type: 'contact', label: 'Contact' }
+];
+
+const TEAM_SUBSECTIONS = [
+  { id: 'leadership', label: 'Leadership' },
+  { id: 'operations', label: 'Operations' },
+  { id: 'it', label: 'IT' },
+  { id: 'support', label: 'Support' },
+  { id: 'media', label: 'Media' },
 ];
 
 export function PublicSchoolLayout() {
@@ -42,11 +58,25 @@ export function PublicSchoolLayout() {
         .single();
 
       if (error) throw error;
-      setSchool(data);
+      setSchool({
+        ...data,
+        theme_settings: data.theme_settings as ComprehensiveThemeSettings,
+        contact_info: data.contact_info as { address?: string; phone?: string; email?: string; mapEmbedUrl?: string; } | null,
+        package_type: data.package_type as 'standard' | 'advanced' | undefined, // Explicitly cast package_type
+        subscription_status: data.subscription_status as 'active' | 'expiring' | 'inactive' | 'trial' | undefined, // Explicitly cast subscription_status
+        payment_status: data.payment_status as 'paid' | 'pending' | 'overdue' | undefined // Explicitly cast payment_status
+      } as School); // Explicitly cast data and its nested properties
       
       // Apply the school's theme
       if (data) {
-        applyTheme(data);
+        applyTheme({ 
+          ...data, 
+          theme_settings: data.theme_settings as ComprehensiveThemeSettings,
+          contact_info: data.contact_info as { address?: string; phone?: string; email?: string; mapEmbedUrl?: string; } | null,
+          package_type: data.package_type as 'standard' | 'advanced' | undefined, // Explicitly cast package_type
+          subscription_status: data.subscription_status as 'active' | 'expiring' | 'inactive' | 'trial' | undefined, // Explicitly cast subscription_status
+          payment_status: data.payment_status as 'paid' | 'pending' | 'overdue' | undefined // Explicitly cast payment_status
+        }); // Explicitly cast theme_settings, contact_info, and package_type
       }
     } catch (error) {
       console.error('Error fetching school:', error);
@@ -124,21 +154,54 @@ export function PublicSchoolLayout() {
             </div>
             
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-8">
-              {PAGE_TYPES.map((pageType) => (
-                <Link
-                  key={pageType.type}
-                  to={generateSchoolUrl(school.slug, pageType.type)}
-                  className="px-3 py-2 text-sm font-medium transition-colors hover:opacity-75"
-                  style={{ 
-                    color: 'var(--theme-text-secondary, #475569)',
-                    fontFamily: 'var(--theme-font-primary, Inter, system-ui, sans-serif)'
-                  }}
-                >
-                  {pageType.label}
-                </Link>
-              ))}
-            </nav>
+            {/* Desktop Navigation */}
+            <NavigationMenu className="hidden md:flex">
+              <NavigationMenuList>
+                {PAGE_TYPES.map((pageType) => (
+                  pageType.type === 'team' ? (
+                    <NavigationMenuItem key={pageType.type}>
+                      <NavigationMenuTrigger 
+                        style={{ 
+                          color: 'var(--theme-text-secondary, #475569)',
+                          fontFamily: 'var(--theme-font-primary, Inter, system-ui, sans-serif)'
+                        }}
+                      >
+                        {pageType.label}
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <ul className="grid w-[200px] gap-3 p-4 md:w-[200px] md:grid-cols-1 lg:w-[200px]">
+                          {TEAM_SUBSECTIONS.map((subsection) => (
+                            <li key={subsection.id}>
+                              <NavigationMenuLink asChild>
+                                <Link
+                                  to={generateSchoolUrl(school.slug, pageType.type, subsection.id)}
+                                  className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                                >
+                                  <div className="text-sm font-medium leading-none">{subsection.label}</div>
+                                </Link>
+                              </NavigationMenuLink>
+                            </li>
+                          ))}
+                        </ul>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                  ) : (
+                    <NavigationMenuItem key={pageType.type}>
+                      <Link
+                        to={generateSchoolUrl(school.slug, pageType.type)}
+                        className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+                        style={{ 
+                          color: 'var(--theme-text-secondary, #475569)',
+                          fontFamily: 'var(--theme-font-primary, Inter, system-ui, sans-serif)'
+                        }}
+                      >
+                        {pageType.label}
+                      </Link>
+                    </NavigationMenuItem>
+                  )
+                ))}
+              </NavigationMenuList>
+            </NavigationMenu>
             
             {/* Mobile Menu */}
             <FullScreenMobileMenu 
@@ -180,12 +243,32 @@ export function PublicSchoolLayout() {
               <ul className="space-y-2">
                 {PAGE_TYPES.map((pageType) => (
                   <li key={pageType.type}>
-                    <Link
-                      to={generateSchoolUrl(school.slug, pageType.type)}
-                      className="text-slate-300 hover:text-white transition-colors text-sm"
-                    >
-                      {pageType.label}
-                    </Link>
+                    {pageType.type === 'team' ? (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="text-slate-300 hover:text-white transition-colors text-sm flex items-center">
+                          {pageType.label} <ChevronDown className="ml-1 h-4 w-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          {TEAM_SUBSECTIONS.map((subsection) => (
+                            <DropdownMenuItem key={subsection.id}>
+                              <Link
+                                to={generateSchoolUrl(school.slug, pageType.type, subsection.id)}
+                                className="block w-full text-left"
+                              >
+                                {subsection.label}
+                              </Link>
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    ) : (
+                      <Link
+                        to={generateSchoolUrl(school.slug, pageType.type)}
+                        className="text-slate-300 hover:text-white transition-colors text-sm"
+                      >
+                        {pageType.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>

@@ -1,8 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import { gsap } from 'gsap';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface NavigationProps {
   onLoginClick: () => void;
@@ -20,10 +26,21 @@ export const Navigation: React.FC<NavigationProps> = ({ onLoginClick, heroRef })
   const menuItemsRef = useRef<HTMLDivElement>(null);
   const actionsRef = useRef<HTMLDivElement>(null);
 
+  // Updated navigation structure with dropdown sections
   const navItems = [
     { label: 'Home', href: '#home' },
     { label: 'About', href: '#about' },
-    { label: 'Team', href: '#team' },
+    { 
+      label: 'Team', 
+      href: '#team',
+      dropdownItems: [
+        { label: 'Leadership', href: '#leadership' },
+        { label: 'Operations', href: '#operations' },
+        { label: 'IT', href: '#it' },
+        { label: 'Support', href: '#support' },
+        { label: 'Media', href: '#media' }
+      ]
+    },
     // { label: 'How It Works', href: '#how-it-works' },
     { label: 'Packages', href: '#packages' },
     { label: 'Testimonials', href: '#testimonials' },
@@ -81,7 +98,7 @@ export const Navigation: React.FC<NavigationProps> = ({ onLoginClick, heroRef })
     if (href.startsWith('#')) {
       if (location.pathname !== '/') {
         // If not on home page, navigate to home and then scroll
-        navigate(`/${href}`); // Navigate to home with hash
+        navigate(`/${href}`, { state: { smoothTransition: true } }); // Pass state for smooth transition
       } else {
         // If already on home page, just scroll
         const element = document.querySelector(href);
@@ -90,8 +107,8 @@ export const Navigation: React.FC<NavigationProps> = ({ onLoginClick, heroRef })
         }
       }
     } else if (href.startsWith('/')) {
-      // Handle route navigation for non-hash links
-      navigate(href);
+      // Handle route navigation for non-hash links with smooth transition
+      navigate(href, { state: { smoothTransition: true } });
     }
   };
 
@@ -120,6 +137,7 @@ export const Navigation: React.FC<NavigationProps> = ({ onLoginClick, heroRef })
     ? '' // Default for outline button (inherits from Button component)
     : 'text-white border-gray-700 hover:bg-white/20'} transition-colors duration-300`;
 
+  const dropdownMenuTriggerClass = `${navItemColorClass} font-medium hover:scale-105 transform flex items-center gap-1 cursor-pointer`;
 
   return (
     <nav 
@@ -142,13 +160,32 @@ export const Navigation: React.FC<NavigationProps> = ({ onLoginClick, heroRef })
           {/* Desktop Navigation */}
           <div ref={menuItemsRef} className="hidden lg:flex items-center space-x-8">
             {navItems.map((item) => (
-              <button
-                key={item.label}
-                onClick={() => handleSmoothScroll(item.href)}
-                className={`${navItemColorClass} font-medium hover:scale-105 transform`}
-              >
-                {item.label}
-              </button>
+              item.dropdownItems ? (
+                <DropdownMenu key={item.label}>
+                  <DropdownMenuTrigger className={dropdownMenuTriggerClass}>
+                    {item.label} <ChevronDown className="h-4 w-4" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="center" className="bg-white shadow-lg rounded-md p-2 min-w-[150px]">
+                    {item.dropdownItems.map((subItem) => (
+                      <DropdownMenuItem 
+                        key={subItem.label}
+                        onClick={() => handleSmoothScroll(subItem.href)}
+                        className="hover:bg-blue-50 cursor-pointer"
+                      >
+                        {subItem.label}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <button
+                  key={item.label}
+                  onClick={() => handleSmoothScroll(item.href)}
+                  className={`${navItemColorClass} font-medium hover:scale-105 transform`}
+                >
+                  {item.label}
+                </button>
+              )
             ))}
           </div>
           
@@ -157,7 +194,7 @@ export const Navigation: React.FC<NavigationProps> = ({ onLoginClick, heroRef })
             <Button variant="ghost" onClick={onLoginClick} className={loginButtonClass}>
               Admin Planet
             </Button>
-            <Link to="/register">
+            <Link to="/register" state={{ smoothTransition: true }}>
               <Button 
                 className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 hover:scale-105 transition-all duration-300 shadow-lg"
               >
@@ -182,19 +219,38 @@ export const Navigation: React.FC<NavigationProps> = ({ onLoginClick, heroRef })
           <div className={`lg:hidden mt-4 pb-4 border-t animate-in slide-in-from-top-5 duration-300 ${mobileMenuBorderClass}`}>
             <div className="flex flex-col space-y-4 pt-4">
               {navItems.map((item) => (
-                <button
-                  key={item.label}
-                  onClick={() => handleSmoothScroll(item.href)}
-                  className={`${navItemColorClass} font-medium text-left`}
-                >
-                  {item.label}
-                </button>
+                item.dropdownItems ? (
+                  <div key={item.label} className="space-y-2">
+                    <div className={`${navItemColorClass} font-medium`}>
+                      {item.label}
+                    </div>
+                    <div className="pl-4 space-y-2 border-l-2 border-gray-200">
+                      {item.dropdownItems.map((subItem) => (
+                        <button
+                          key={subItem.label}
+                          onClick={() => handleSmoothScroll(subItem.href)}
+                          className={`${navItemColorClass} text-sm block`}
+                        >
+                          {subItem.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    key={item.label}
+                    onClick={() => handleSmoothScroll(item.href)}
+                    className={`${navItemColorClass} font-medium text-left`}
+                  >
+                    {item.label}
+                  </button>
+                )
               ))}
               <div className="flex flex-col space-y-2 pt-2">
                 <Button variant="outline" onClick={onLoginClick} className={`w-full ${mobileLoginButtonClass}`}>
                   Admin Planet
                 </Button>
-                <Link to="/register" className="w-full">
+                <Link to="/register" className="w-full" state={{ smoothTransition: true }}>
                   <Button className="w-full bg-gradient-to-r from-blue-600 to-green-600">
                     Onboard Your School
                   </Button>

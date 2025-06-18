@@ -24,6 +24,8 @@ interface School {
   package_type?: string;
   subscription_status?: string;
   subscription_end?: string;
+  year_established?: number | null;
+  permit_url?: string | null;
 }
 
 export default function SchoolsPage() {
@@ -70,7 +72,7 @@ export default function SchoolsPage() {
 
       if (error) throw error;
 
-      setSchools(data || []);
+      setSchools(data as School[] || []); // Cast data to School[] to resolve TypeScript error
     } catch (error) {
       console.error('Error fetching schools:', error);
       toast({
@@ -338,6 +340,25 @@ export default function SchoolsPage() {
                         {formatDaysUntilExpiry(school.subscription_end)}
                       </p>
                     )}
+                    {school.year_established && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Year Est.</span>
+                        <span className="text-sm">{school.year_established}</span>
+                      </div>
+                    )}
+                    {school.permit_url && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Permit</span>
+                        <a 
+                          href={school.permit_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-blue-600 hover:underline text-sm"
+                        >
+                          View Permit
+                        </a>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="grid grid-cols-2 gap-2">
@@ -449,6 +470,8 @@ export default function SchoolsPage() {
                 <TableHead>Status</TableHead>
                 <TableHead>Package</TableHead>
                 <TableHead>Expiry</TableHead>
+                <TableHead>Year Est.</TableHead>
+                <TableHead>Permit</TableHead>
                 <TableHead>Admin</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -475,6 +498,23 @@ export default function SchoolsPage() {
                   </TableCell>
                   <TableCell className="text-sm">
                     {formatDaysUntilExpiry(school.subscription_end)}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {school.year_established || 'N/A'}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {school.permit_url ? (
+                      <a 
+                        href={school.permit_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-blue-600 hover:underline"
+                      >
+                        View Permit
+                      </a>
+                    ) : (
+                      'N/A'
+                    )}
                   </TableCell>
                   <TableCell>
                     {school.admin_user_id ? (

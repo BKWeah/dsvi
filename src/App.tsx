@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -22,6 +22,7 @@ import { getSubdomainInfo, getCurrentSchoolSlug, isSubdomainRouting } from "./li
 import { SchoolRedirectHandler } from "./components/redirects/SchoolRedirectHandler";
 import { PERMISSION_TYPES, RESTRICTED_PERMISSIONS } from "./lib/admin/permissions";
 import { initializeDefaultEmailSettings } from "./lib/email-init";
+import { PageFade } from "./components/ui/page-fade";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -84,42 +85,44 @@ const App = () => {
                     // Subdomain routing for schools
                     <Routes>
                       <Route path="/" element={<SubdomainSchoolLayout />}>
-                        <Route index element={<SubdomainSchoolPageDisplay />} />
-                        <Route path=":pageType" element={<SubdomainSchoolPageDisplay />} />
+<Route index element={<PageFade><SubdomainSchoolPageDisplay /></PageFade>} />
+<Route path=":pageType" element={<PageFade><SubdomainSchoolPageDisplay /></PageFade>} />
                       </Route>
-                      <Route path="*" element={<NotFound />} />
+<Route path="*" element={<PageFade><NotFound /></PageFade>} />
                     </Routes>
                   ) : (
                     // Regular routing for main domain
                     <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/level2-admin-signup" element={<Level2AdminSignupPage />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/unauthorized" element={<Unauthorized />} />
-            
-            {/* Public Website Pages */}
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/team" element={<TeamPage />} />
-            <Route path="/how-it-works" element={<HowItWorksPage />} />
-            <Route path="/packages" element={<PackagesPage />} />
-            <Route path="/testimonials" element={<TestimonialsPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/thank-you" element={<ThankYouPage />} />
-            <Route path="/faq" element={<FAQPage />} />
-            <Route path="/todo-tracker" element={<TodoTrackerPage />} />
-            <Route path="/client-approval" element={<ClientApprovalPage />} />
-            <Route path="/debug-supabase" element={<DebugSupabasePage />} />
-            <Route path="/test-subdomain" element={
-              <div className="p-8">
-                <h1 className="text-2xl font-bold mb-4">Subdomain Test</h1>
-                <p>Hostname: {typeof window !== 'undefined' ? window.location.hostname : 'N/A'}</p>
-                <p>Is Subdomain: {isSubdomainRouting() ? 'Yes' : 'No'}</p>
-                <p>School Slug: {getCurrentSchoolSlug() || 'None'}</p>
-              </div>
-            } />
+<Route path="/" element={<PageFade><Index /></PageFade>} />
+<Route path="/login" element={<PageFade><Login /></PageFade>} />
+<Route path="/signup" element={<PageFade><Signup /></PageFade>} />
+<Route path="/level2-admin-signup" element={<PageFade><Level2AdminSignupPage /></PageFade>} />
+<Route path="/dashboard" element={<PageFade><Dashboard /></PageFade>} />
+<Route path="/unauthorized" element={<PageFade><Unauthorized /></PageFade>} />
+
+{/* Public Website Pages */}
+<Route path="/about" element={<PageFade><AboutPage /></PageFade>} />
+<Route path="/team" element={<PageFade><TeamPage /></PageFade>} />
+<Route path="/how-it-works" element={<PageFade><HowItWorksPage /></PageFade>} />
+<Route path="/packages" element={<PageFade><PackagesPage /></PageFade>} />
+<Route path="/testimonials" element={<PageFade><TestimonialsPage /></PageFade>} />
+<Route path="/contact" element={<PageFade><ContactPage /></PageFade>} />
+<Route path="/register" element={<PageFade><RegisterPage /></PageFade>} />
+<Route path="/thank-you" element={<PageFade><ThankYouPage /></PageFade>} />
+<Route path="/faq" element={<PageFade><FAQPage /></PageFade>} />
+<Route path="/todo-tracker" element={<PageFade><TodoTrackerPage /></PageFade>} />
+<Route path="/client-approval" element={<PageFade><ClientApprovalPage /></PageFade>} />
+<Route path="/debug-supabase" element={<PageFade><DebugSupabasePage /></PageFade>} />
+<Route path="/test-subdomain" element={
+  <PageFade>
+    <div className="p-8">
+      <h1 className="text-2xl font-bold mb-4">Subdomain Test</h1>
+      <p>Hostname: {typeof window !== 'undefined' ? window.location.hostname : 'N/A'}</p>
+      <p>Is Subdomain: {isSubdomainRouting() ? 'Yes' : 'No'}</p>
+      <p>School Slug: {getCurrentSchoolSlug() || 'None'}</p>
+    </div>
+  </PageFade>
+} />
             
             {/* DSVI Admin Routes */}
             <Route 
@@ -180,22 +183,22 @@ const App = () => {
                   <EditPagePage />
                 </FeatureProtectedRoute>
               } />
-              <Route path="schools/:schoolId/settings" element={
-                <FeatureProtectedRoute feature="schools">
-                  <SchoolSettingsPage />
-                </FeatureProtectedRoute>
-              } />
+<Route path="schools/:schoolId/settings" element={
+  <FeatureProtectedRoute feature="schools">
+    <PageFade><SchoolSettingsPage /></PageFade>
+  </FeatureProtectedRoute>
+} />
             </Route>
             
             {/* Deployment Management Route - Feature Flag System */}
-            <Route 
-              path="/deploy" 
-              element={
-                <ProtectedRoute roles={['DSVI_ADMIN']}>
-                  <DeploymentManagePage />
-                </ProtectedRoute>
-              } 
-            />
+<Route 
+  path="/deploy" 
+  element={
+    <ProtectedRoute roles={['DSVI_ADMIN']}>
+      <PageFade><DeploymentManagePage /></PageFade>
+    </ProtectedRoute>
+  } 
+/>
             
             {/* School Admin Routes */}
             <Route 
@@ -206,30 +209,30 @@ const App = () => {
                 </ProtectedRoute>
               }
             >
-              <Route index element={<SchoolAdminDashboard />} />
-              <Route path="pages/:pageType/edit" element={<EditSchoolPagePage />} />
-              <Route path="branding" element={<SchoolBrandingPageAdmin />} />
-              <Route path="messaging" element={<SchoolAdminMessagingPage />} />
+<Route index element={<PageFade><SchoolAdminDashboard /></PageFade>} />
+<Route path="pages/:pageType/edit" element={<PageFade><EditSchoolPagePage /></PageFade>} />
+<Route path="branding" element={<PageFade><SchoolBrandingPageAdmin /></PageFade>} />
+<Route path="messaging" element={<PageFade><SchoolAdminMessagingPage /></PageFade>} />
             </Route>
             
             {/* Public School Website Routes */}
             <Route path="/s/:schoolSlug" element={<PublicSchoolLayout />}>
-              <Route index element={
-                <>
-                  <SchoolRedirectHandler />
-                  <SchoolPageDisplay />
-                </>
-              } />
-              <Route path=":pageType" element={
-                <>
-                  <SchoolRedirectHandler />
-                  <SchoolPageDisplay />
-                </>
-              } />
+<Route index element={
+  <PageFade>
+    <SchoolRedirectHandler />
+    <SchoolPageDisplay />
+  </PageFade>
+} />
+<Route path=":pageType" element={
+  <PageFade>
+    <SchoolRedirectHandler />
+    <SchoolPageDisplay />
+  </PageFade>
+} />
             </Route>
             
             {/* Catch-all route */}
-            <Route path="*" element={<NotFound />} />
+<Route path="*" element={<PageFade><NotFound /></PageFade>} />
           </Routes>
           )}
         </BrowserRouter>

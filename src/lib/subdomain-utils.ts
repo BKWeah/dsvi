@@ -57,29 +57,35 @@ export function getSubdomainInfo(): SubdomainInfo {
  * Generate navigation URL based on current context
  * Always prefers subdomain format when possible
  */
-export function generateSchoolUrl(schoolSlug: string, pageType?: string): string {
+export function generateSchoolUrl(schoolSlug: string, pageType?: string, subsectionId?: string): string {
   if (typeof window === 'undefined') {
-    return `/s/${schoolSlug}${pageType ? `/${pageType}` : ''}`;
+    let path = pageType ? `/${pageType}` : '';
+    if (subsectionId) {
+      path += `/${subsectionId}`;
+    }
+    return `/s/${schoolSlug}${path}`;
   }
 
   const subdomainInfo = getSubdomainInfo();
   const protocol = window.location.protocol;
   const port = window.location.port ? `:${window.location.port}` : '';
   
+  let path = pageType ? `/${pageType}` : '';
+  if (subsectionId) {
+    path += `/${subsectionId}`;
+  }
+
   // For localhost development
   if (window.location.hostname.includes('localhost')) {
-    const path = pageType ? `/${pageType}` : '';
     return `${protocol}//${schoolSlug}.localhost${port}${path}`;
   }
   
   // For production domains
   if (subdomainInfo.domain && subdomainInfo.domain !== 'localhost') {
-    const path = pageType ? `/${pageType}` : '';
     return `${protocol}//${schoolSlug}.${subdomainInfo.domain}${port}${path}`;
   }
   
   // Fallback to path-based routing (should rarely be used now)
-  const path = pageType ? `/${pageType}` : '';
   return `/s/${schoolSlug}${path}`;
 }
 

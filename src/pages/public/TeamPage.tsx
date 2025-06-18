@@ -7,8 +7,14 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { 
   Users, GraduationCap, Code, HeadphonesIcon, 
-  MegaphoneIcon, ArrowRight, Mail, Linkedin, Github 
+  MegaphoneIcon, ArrowRight, Mail, Linkedin, Github, ChevronDown 
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function TeamPage() {
   const handleRegisterClick = () => {
@@ -17,6 +23,13 @@ export default function TeamPage() {
 
   const handleLoginClick = () => {
     window.location.href = '/login';
+  };
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const teamMembers = [
@@ -39,6 +52,16 @@ export default function TeamPage() {
       email: "deputy@libdsvi.com",
       linkedin: "#"
     },    
+    // Operations Team (Placeholder)
+    {
+      name: "John Doe",
+      role: "Operations Manager",
+      department: "Operations",
+      image: "/api/placeholder/300/300",
+      bio: "Ensuring smooth daily operations and efficiency",
+      email: "operations@libdsvi.com",
+      linkedin: "#"
+    },
     // IT Team
     {
       name: "Michael Chen",
@@ -87,20 +110,20 @@ export default function TeamPage() {
       email: "help@libdsvi.com",
       linkedin: "#"
     },    
-    // Marketing Team
+    // Media Team
     {
       name: "Emma Williams",
-      role: "Marketing Director",
-      department: "Marketing",
+      role: "Media Director",
+      department: "Media",
       image: "/api/placeholder/300/300",
       bio: "Spreading awareness about DSVI across Liberia",
-      email: "marketing@libdsvi.com",
+      email: "media@libdsvi.com",
       linkedin: "#"
     },
     {
       name: "John Tuweh",
       role: "Community Outreach Coordinator",
-      department: "Marketing",
+      department: "Media",
       image: "/api/placeholder/300/300", 
       bio: "Building relationships with schools nationwide",
       email: "outreach@libdsvi.com",
@@ -108,14 +131,15 @@ export default function TeamPage() {
     }
   ];
 
-  const departments = ["Leadership", "IT", "Support", "Marketing"];
+  const departments = ["Leadership", "Operations", "IT", "Support", "Media"];
 
   const getDepartmentIcon = (dept: string) => {
     switch(dept) {
       case "Leadership": return <GraduationCap className="h-6 w-6" />;
+      case "Operations": return <Users className="h-6 w-6" />; // Using Users icon for Operations
       case "IT": return <Code className="h-6 w-6" />;
       case "Support": return <HeadphonesIcon className="h-6 w-6" />;
-      case "Marketing": return <MegaphoneIcon className="h-6 w-6" />;
+      case "Media": return <MegaphoneIcon className="h-6 w-6" />;
       default: return <Users className="h-6 w-6" />;
     }
   };
@@ -123,9 +147,10 @@ export default function TeamPage() {
   const getDepartmentColor = (dept: string) => {
     switch(dept) {
       case "Leadership": return "bg-blue-600";
+      case "Operations": return "bg-yellow-600"; // New color for Operations
       case "IT": return "bg-green-600";
       case "Support": return "bg-purple-600";
-      case "Marketing": return "bg-orange-600";
+      case "Media": return "bg-orange-600"; // Changed from Marketing
       default: return "bg-gray-600";
     }
   };
@@ -156,12 +181,32 @@ export default function TeamPage() {
           </div>
         </section>
 
+        {/* Dropdown Navigation for Team Sections */}
+        <section className="py-8 bg-gray-50">
+          <div className="container mx-auto px-4 text-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="text-lg px-6 py-3">
+                  Jump to Section <ChevronDown className="ml-2 h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56">
+                {departments.map((department) => (
+                  <DropdownMenuItem key={department} onClick={() => scrollToSection(department.toLowerCase().replace(/\s/g, '-'))}>
+                    {department}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </section>
+
         {/* Team Sections */}
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               {departments.map((department, deptIndex) => (
-                <div key={department} className={`${deptIndex > 0 ? 'mt-20' : ''}`}>
+                <div key={department} id={department.toLowerCase()} className={`${deptIndex > 0 ? 'mt-20' : ''}`}>
                   <div className="text-center mb-12">
                     <div className={`${getDepartmentColor(department)} w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4`}>
                       <div className="text-white">
