@@ -1,6 +1,4 @@
 import React from 'react';
-import { Navigation } from './components/Navigation';
-import { Footer } from './components/Footer';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -44,14 +42,8 @@ export default function FAQPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
-      <Navigation 
-        onRegisterClick={() => window.location.href = '/register'}
-        onLoginClick={() => window.location.href = '/login'}
-      />
-      
-      <main className="pt-20">
-        <section className="py-20 bg-gradient-to-br from-blue-600 to-green-600 text-white">
+    <>
+      <section className="pt-32 pb-20 bg-gradient-to-br from-blue-600 to-green-600 text-white">
           <div className="container mx-auto px-4 text-center">
             <Badge className="mb-6 bg-white/20 text-white border-white/30">
               <HelpCircle className="h-4 w-4 mr-2" />
@@ -103,9 +95,6 @@ export default function FAQPage() {
             </div>
           </div>
         </section>
-      </main>
-
-      <Footer />
-    </div>
+    </>
   );
 }

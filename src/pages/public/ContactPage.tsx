@@ -1,6 +1,4 @@
 import React, { useState, useRef } from 'react';
-import { Navigation } from './components/Navigation';
-import { Footer } from './components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,14 +30,9 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <Navigation 
-        onLoginClick={() => window.location.href = '/login'}
-        heroRef={heroRef} // Pass the heroRef
-      />
-      <main className="pt-20">
-        <section className="py-20 bg-gradient-to-br from-blue-600 to-green-600 text-white">
-          <div className="container mx-auto px-4 text-center">
+    <>
+      <section className="pt-32 pb-20 bg-gradient-to-br from-blue-600 to-green-600 text-white">
+        <div className="container mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">Contact DSVI</h1>
             <p className="text-xl">Get in touch with our team for inquiries and support</p>
           </div>
@@ -142,8 +135,6 @@ export default function ContactPage() {
             </div>
           </div>
         </section>
-      </main>
-      <Footer />
-    </div>
+    </>
   );
 }

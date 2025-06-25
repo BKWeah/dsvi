@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
-// Simple page transition wrapper without framer-motion
+// Simple page transition wrapper with scroll-to-top functionality
 interface PageTransitionProps {
   children: React.ReactNode
 }
@@ -12,28 +12,42 @@ export const PageFade: React.FC<PageTransitionProps> = ({ children }) => {
   const [transitionStage, setTransitionStage] = useState('fadeIn')
   
   useEffect(() => {
+    // Always scroll to top when location changes
+    window.scrollTo(0, 0)
+    
     // Check if navigation has a smooth transition state
     const smoothTransition = location.state && location.state.smoothTransition
     
-    if (location !== displayLocation && smoothTransition) {
-      setTransitionStage('fadeOut')
-      setTimeout(() => {
+    if (location !== displayLocation) {
+      if (smoothTransition) {
+        // Start fade out
+        setTransitionStage('fadeOut')
+        
+        // After fade out completes, update content and fade in
+        const timer = setTimeout(() => {
+          setDisplayLocation(location)
+          setTransitionStage('fadeIn')
+        }, 150) // Reduced timeout for smoother transition
+        
+        return () => clearTimeout(timer)
+      } else {
+        // Immediate update for direct navigation
         setDisplayLocation(location)
         setTransitionStage('fadeIn')
-      }, 300) // Match this with the transition duration
-    } else {
-      setDisplayLocation(location)
-      setTransitionStage('fadeIn')
+      }
     }
   }, [location, displayLocation])
 
   return (
     <div
-      className={`transition-opacity duration-300 ${
+      className={`transition-opacity duration-300 ease-in-out ${
         transitionStage === 'fadeIn' ? 'opacity-100' : 'opacity-0'
       }`}
+      style={{
+        minHeight: transitionStage === 'fadeOut' ? '100vh' : 'auto'
+      }}
     >
-      {children}
+      {React.cloneElement(children as React.ReactElement, { key: displayLocation.pathname })}
     </div>
   )
 }

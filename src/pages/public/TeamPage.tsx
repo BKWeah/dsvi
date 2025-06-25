@@ -1,14 +1,10 @@
-import React from 'react';
-import { Navigation } from './components/Navigation';
-import { Footer } from './components/Footer';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
-import { 
-  Users, GraduationCap, Code, HeadphonesIcon, 
-  MegaphoneIcon, ArrowRight, Mail, Linkedin, Github, ChevronDown 
-} from 'lucide-react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Mail, Linkedin, Github, ChevronDown, ArrowRight } from 'lucide-react';
+import { teamMembers, departments, getDepartmentIcon, getDepartmentColor } from '@/data/teamData';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,169 +13,46 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export default function TeamPage() {
-  const handleRegisterClick = () => {
-    window.location.href = '/register';
-  };
+  const { department: departmentParam } = useParams<{ department: string }>();
+  const navigate = useNavigate();
+  const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
 
-  const handleLoginClick = () => {
-    window.location.href = '/login';
-  };
-
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+  useEffect(() => {
+    if (departmentParam) {
+      let formattedDept = departmentParam.toLowerCase();
+      if (formattedDept === "it") {
+        formattedDept = "IT"; // Special case for "IT" department
+      } else {
+        formattedDept = formattedDept.charAt(0).toUpperCase() + formattedDept.slice(1);
+      }
+      setSelectedDepartment(formattedDept);
+    } else {
+      setSelectedDepartment("Leadership"); // Default to Leadership if no param
     }
-  };
+  }, [departmentParam]);
 
-  const teamMembers = [
-    // Leadership Team
-    {
-      name: "Boniface Koffa Weah, Jr.",
-      role: "Director",
-      department: "Leadership",
-      image: "/api/placeholder/300/300",
-      bio: "Leading DSVI's mission to digitally empower every Liberian school",
-      email: "director@libdsvi.com",
-      linkedin: "#"
-    },
-    {
-      name: "Sarah Johnson",
-      role: "Deputy Director",
-      department: "Leadership", 
-      image: "/api/placeholder/300/300",
-      bio: "Strategic oversight and operational excellence",
-      email: "deputy@libdsvi.com",
-      linkedin: "#"
-    },    
-    // Operations Team (Placeholder)
-    {
-      name: "John Doe",
-      role: "Operations Manager",
-      department: "Operations",
-      image: "/api/placeholder/300/300",
-      bio: "Ensuring smooth daily operations and efficiency",
-      email: "operations@libdsvi.com",
-      linkedin: "#"
-    },
-    // IT Team
-    {
-      name: "Michael Chen",
-      role: "Technical Lead",
-      department: "IT",
-      image: "/api/placeholder/300/300",
-      bio: "Full-stack developer specializing in educational technology",
-      email: "tech@libdsvi.com",
-      github: "#"
-    },
-    {
-      name: "Fatima Al-Rashid",
-      role: "Frontend Developer",
-      department: "IT",
-      image: "/api/placeholder/300/300",
-      bio: "Creating beautiful, responsive user interfaces",
-      email: "frontend@libdsvi.com",
-      github: "#"
-    },
-    {
-      name: "James Parker",
-      role: "Backend Developer",
-      department: "IT",
-      image: "/api/placeholder/300/300",
-      bio: "Building robust, scalable web applications",
-      email: "backend@libdsvi.com",
-      github: "#"
-    },
-    
-    // Support Team
-    {
-      name: "Grace Kollie",
-      role: "Customer Success Manager",
-      department: "Support",
-      image: "/api/placeholder/300/300",
-      bio: "Ensuring every school's success with our platform",
-      email: "support@libdsvi.com",
-      linkedin: "#"
-    },
-    {
-      name: "Daniel Roberts",
-      role: "Technical Support Specialist",
-      department: "Support",
-      image: "/api/placeholder/300/300",
-      bio: "Providing 24/7 technical assistance to schools",
-      email: "help@libdsvi.com",
-      linkedin: "#"
-    },    
-    // Media Team
-    {
-      name: "Emma Williams",
-      role: "Media Director",
-      department: "Media",
-      image: "/api/placeholder/300/300",
-      bio: "Spreading awareness about DSVI across Liberia",
-      email: "media@libdsvi.com",
-      linkedin: "#"
-    },
-    {
-      name: "John Tuweh",
-      role: "Community Outreach Coordinator",
-      department: "Media",
-      image: "/api/placeholder/300/300", 
-      bio: "Building relationships with schools nationwide",
-      email: "outreach@libdsvi.com",
-      linkedin: "#"
-    }
-  ];
-
-  const departments = ["Leadership", "Operations", "IT", "Support", "Media"];
-
-  const getDepartmentIcon = (dept: string) => {
-    switch(dept) {
-      case "Leadership": return <GraduationCap className="h-6 w-6" />;
-      case "Operations": return <Users className="h-6 w-6" />; // Using Users icon for Operations
-      case "IT": return <Code className="h-6 w-6" />;
-      case "Support": return <HeadphonesIcon className="h-6 w-6" />;
-      case "Media": return <MegaphoneIcon className="h-6 w-6" />;
-      default: return <Users className="h-6 w-6" />;
-    }
-  };
-
-  const getDepartmentColor = (dept: string) => {
-    switch(dept) {
-      case "Leadership": return "bg-blue-600";
-      case "Operations": return "bg-yellow-600"; // New color for Operations
-      case "IT": return "bg-green-600";
-      case "Support": return "bg-purple-600";
-      case "Media": return "bg-orange-600"; // Changed from Marketing
-      default: return "bg-gray-600";
-    }
-  };
+  // Removed handleRegisterClick and handleLoginClick as Navigation component handles its own routing
+  // Removed scrollToSection as navigation is now handled by react-router-dom
 
   return (
-    <div className="min-h-screen bg-white">
-      <Navigation 
-        onRegisterClick={handleRegisterClick}
-        onLoginClick={handleLoginClick}
-      />
-      
-      <main className="pt-20">
-        {/* Hero Section */}
-        <section className="py-20 bg-gradient-to-br from-blue-600 via-blue-700 to-green-600 text-white">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <Badge className="mb-6 bg-white/20 text-white border-white/30">
-                Meet Our Team
-              </Badge>
-              <h1 className="text-4xl md:text-6xl font-bold mb-6">
-                The People Behind
-                <span className="text-yellow-300"> DSVI's Success</span>
-              </h1>
-              <p className="text-xl md:text-2xl text-blue-100">
-                Dedicated professionals working together to transform Liberian education through digital innovation
-              </p>
-            </div>
+    <>
+      {/* Hero Section */}
+      <section className="py-20 bg-gradient-to-br from-blue-600 via-blue-700 to-green-600 text-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <Badge className="mb-6 bg-white/20 text-white border-white/30">
+              Meet Our Team
+            </Badge>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              The People Behind
+              <span className="text-yellow-300"> DSVI's Success</span>
+            </h1>
+            <p className="text-xl md:text-2xl text-blue-100">
+              Dedicated professionals working together to transform Liberian education through digital innovation
+            </p>
           </div>
-        </section>
+        </div>
+      </section>
 
         {/* Dropdown Navigation for Team Sections */}
         <section className="py-8 bg-gray-50">
@@ -192,8 +65,11 @@ export default function TeamPage() {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">
                 {departments.map((department) => (
-                  <DropdownMenuItem key={department} onClick={() => scrollToSection(department.toLowerCase().replace(/\s/g, '-'))}>
-                    {department}
+                  <DropdownMenuItem 
+                    key={department.name} 
+                    onClick={() => navigate(`/team/${department.name.toLowerCase()}`)}
+                  >
+                    {department.name}
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
@@ -205,55 +81,90 @@ export default function TeamPage() {
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
-              {departments.map((department, deptIndex) => (
-                <div key={department} id={department.toLowerCase()} className={`${deptIndex > 0 ? 'mt-20' : ''}`}>
+              {selectedDepartment && (
+                <div key={selectedDepartment} id={selectedDepartment.toLowerCase().replace(/\s/g, '-')}>
                   <div className="text-center mb-12">
-                    <div className={`${getDepartmentColor(department)} w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4`}>
+                    <div className={`${getDepartmentColor(selectedDepartment)} w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4`}>
                       <div className="text-white">
-                        {getDepartmentIcon(department)}
+                        {React.createElement(getDepartmentIcon(selectedDepartment), { className: "h-6 w-6" })}
                       </div>
                     </div>
                     <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                      {department} Team
+                      {selectedDepartment} Team
                     </h2>
                   </div>
 
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {teamMembers
-                      .filter(member => member.department === department)
-                      .map((member, index) => (
-                        <Card key={index} className="border-none shadow-lg hover:shadow-xl transition-shadow">
-                          <CardHeader className="text-center">
-                            <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                              <Users className="h-12 w-12 text-blue-600" />
-                            </div>
-                            <CardTitle className="text-xl">{member.name}</CardTitle>
-                            <p className="text-blue-600 font-medium">{member.role}</p>
-                          </CardHeader>
-                          <CardContent className="text-center">
-                            <p className="text-gray-600 mb-4">{member.bio}</p>
-                            <div className="flex justify-center gap-3">
-                              <Button variant="outline" size="sm" className="p-2">
-                                <Mail className="h-4 w-4" />
-                              </Button>
-                              {member.linkedin && (
-                                <Button variant="outline" size="sm" className="p-2">
-                                  <Linkedin className="h-4 w-4" />
-                                </Button>
+                      .filter(member => member.department === selectedDepartment)
+                      .map((member, index) => {
+                        const IconComponent = member.icon;
+                        return (
+                          <Card key={index} className={`border-none shadow-lg hover:shadow-xl transition-shadow ${member.isVacant ? 'opacity-75' : ''}`}>
+                            <CardHeader className="text-center">
+                              <div className="relative mb-6">
+                                {member.hasPhoto ? (
+                                  <div className="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden border-4 border-gradient-to-br from-blue-600 to-green-600">
+                                    <img 
+                                      src={member.name === "B. K. Weah, Jr." ? "/updates_assets/B. K. Weah Pro.jpg" : 
+                                           member.name === "John Gyawu" ? "/updates_assets/MR. JOHN GYAWU.jpg" : 
+                                           ""} 
+                                      alt={member.name}
+                                      className="w-full h-full object-cover object-top"
+                                      style={{ objectPosition: '50% 0%' }}
+                                    />
+                                  </div>
+                                ) : (
+                                  <div className={`w-24 h-24 ${member.isVacant ? 'bg-gray-400' : 'bg-gradient-to-br from-blue-600 to-green-600'} rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl`}>
+                                    {member.isVacant ? '?' : member.avatar}
+                                  </div>
+                                )}
+                                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg">
+                                  <IconComponent className="h-4 w-4 text-gray-600" />
+                                </div>
+                              </div>
+                              <CardTitle className={`text-xl ${member.isVacant ? 'text-gray-500' : 'text-gray-900'}`}>
+                                {member.name}
+                              </CardTitle>
+                              <p className={`font-semibold mb-1 ${member.isVacant ? 'text-gray-400' : 'text-blue-600'}`}>{member.role}</p>
+                              <Badge className={`mb-4 text-xs ${member.isVacant ? 'bg-gray-200 text-gray-600' : 'bg-gray-100 text-gray-700'}`}>
+                                {member.department}
+                              </Badge>
+                            </CardHeader>
+                            <CardContent className="text-center">
+                              <p className={`text-sm leading-relaxed mb-4 ${member.isVacant ? 'text-gray-500' : 'text-gray-600'}`}>
+                                {member.description}
+                              </p>
+                              {member.isVacant && (
+                                <p className="text-xs text-red-500 mt-2 font-medium">Position Available</p>
                               )}
-                              {member.github && (
-                                <Button variant="outline" size="sm" className="p-2">
-                                  <Github className="h-4 w-4" />
-                                </Button>
+                              {!member.isVacant && (
+                                <div className="flex justify-center gap-3">
+                                  {member.email && (
+                                    <Button variant="outline" size="sm" className="p-2">
+                                      <Mail className="h-4 w-4" />
+                                    </Button>
+                                  )}
+                                  {member.linkedin && (
+                                    <Button variant="outline" size="sm" className="p-2">
+                                      <Linkedin className="h-4 w-4" />
+                                    </Button>
+                                  )}
+                                  {member.github && (
+                                    <Button variant="outline" size="sm" className="p-2">
+                                      <Github className="h-4 w-4" />
+                                    </Button>
+                                  )}
+                                </div>
                               )}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))
+                            </CardContent>
+                          </Card>
+                        );
+                      })
                     }
                   </div>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </section>
@@ -282,9 +193,6 @@ export default function TeamPage() {
             </div>
           </div>
         </section>
-      </main>
-
-      <Footer />
-    </div>
+    </>
   );
 }

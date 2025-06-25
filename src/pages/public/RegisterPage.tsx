@@ -1,6 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Navigation } from './components/Navigation';
-import { Footer } from './components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -153,14 +151,8 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <Navigation 
-        onLoginClick={() => window.location.href = '/login'}
-        heroRef={heroRef} // Pass the heroRef
-      />
-      
-      <main className="pt-20">
-        {/* Hero Section */}
+    <>
+      {/* Hero Section */}
         <section className="py-20 bg-gradient-to-br from-blue-600 via-blue-700 to-green-600 text-white">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
@@ -475,9 +467,6 @@ export default function RegisterPage() {
             </div>
           </div>
         </section>
-      </main>
-
-      <Footer />
-    </div>
+    </>
   );
 }

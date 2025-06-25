@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Navigation } from './components/Navigation';
-import { Footer } from './components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,18 +19,12 @@ export default function ThankYouPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
-      <Navigation 
-        onRegisterClick={() => window.location.href = '/register'}
-        onLoginClick={() => window.location.href = '/login'}
-      />
-      
-      <main className="pt-20">
-        {/* Success Section */}
-        <section className="py-20 bg-gradient-to-br from-green-600 via-blue-600 to-green-600 text-white">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
+    <>
+      {/* Success Section */}
+      <section className="pt-32 pb-20 bg-gradient-to-br from-green-600 via-blue-600 to-green-600 text-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle className="h-12 w-12 text-white" />
               </div>
               <h1 className="text-4xl md:text-6xl font-bold mb-6">
@@ -164,9 +156,6 @@ export default function ThankYouPage() {
             </div>
           </div>
         </section>
-      </main>
-
-      <Footer />
-    </div>
+    </>
   );
 }

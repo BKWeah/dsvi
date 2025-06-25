@@ -1,6 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import { Navigation } from './components/Navigation';
-import { Footer } from './components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -188,19 +186,13 @@ export default function TestimonialsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
-      <Navigation 
-        onRegisterClick={() => window.location.href = '/register'}
-        onLoginClick={() => window.location.href = '/login'}
-      />
-      
-      <main className="pt-20">
-        {/* Hero Section */}
-        <section className="py-20 bg-gradient-to-br from-blue-600 to-green-600 text-white">
-          <div className="container mx-auto px-4 text-center">
-            <Badge className="mb-6 bg-white/20 text-white border-white/30">
-              Success Stories
-            </Badge>
+    <>
+      {/* Hero Section */}
+      <section className="pt-32 pb-20 bg-gradient-to-br from-blue-600 to-green-600 text-white">
+        <div className="container mx-auto px-4 text-center">
+          <Badge className="mb-6 bg-white/20 text-white border-white/30">
+            Success Stories
+          </Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
               Real Schools, Real
               <span className="text-yellow-300"> Transformations</span>
@@ -381,9 +373,6 @@ export default function TestimonialsPage() {
             </Button>
           </div>
         </section>
-      </main>
-
-      <Footer />
-    </div>
+    </>
   );
 }

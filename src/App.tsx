@@ -23,6 +23,8 @@ import { SchoolRedirectHandler } from "./components/redirects/SchoolRedirectHand
 import { PERMISSION_TYPES, RESTRICTED_PERMISSIONS } from "./lib/admin/permissions";
 import { initializeDefaultEmailSettings } from "./lib/email-init";
 import { PageFade } from "./components/ui/page-fade";
+import { ScrollToTop } from "./components/ui/scroll-to-top";
+import { PublicLayout } from "./components/layouts/PublicLayout";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -81,6 +83,7 @@ const App = () => {
                 <Toaster />
                 <Sonner />
                 <BrowserRouter>
+                  <ScrollToTop />
                   {subdomainInfo.isSubdomain && subdomainInfo.schoolSlug ? (
                     // Subdomain routing for schools
                     <Routes>
@@ -93,23 +96,31 @@ const App = () => {
                   ) : (
                     // Regular routing for main domain
                     <Routes>
+{/* Home page (special case - uses its own layout) */}
 <Route path="/" element={<PageFade><Index /></PageFade>} />
+
+{/* Auth pages (no layout) */}
 <Route path="/login" element={<PageFade><Login /></PageFade>} />
 <Route path="/signup" element={<PageFade><Signup /></PageFade>} />
 <Route path="/level2-admin-signup" element={<PageFade><Level2AdminSignupPage /></PageFade>} />
 <Route path="/dashboard" element={<PageFade><Dashboard /></PageFade>} />
 <Route path="/unauthorized" element={<PageFade><Unauthorized /></PageFade>} />
 
-{/* Public Website Pages */}
-<Route path="/about" element={<PageFade><AboutPage /></PageFade>} />
-<Route path="/team" element={<PageFade><TeamPage /></PageFade>} />
-<Route path="/how-it-works" element={<PageFade><HowItWorksPage /></PageFade>} />
-<Route path="/packages" element={<PageFade><PackagesPage /></PageFade>} />
-<Route path="/testimonials" element={<PageFade><TestimonialsPage /></PageFade>} />
-<Route path="/contact" element={<PageFade><ContactPage /></PageFade>} />
-<Route path="/register" element={<PageFade><RegisterPage /></PageFade>} />
-<Route path="/thank-you" element={<PageFade><ThankYouPage /></PageFade>} />
-<Route path="/faq" element={<PageFade><FAQPage /></PageFade>} />
+{/* Public Website Pages with shared layout */}
+<Route element={<PublicLayout />}>
+  <Route path="/about" element={<PageFade><AboutPage /></PageFade>} />
+  <Route path="/team" element={<PageFade><TeamPage /></PageFade>} />
+  <Route path="/team/:department" element={<PageFade><TeamPage /></PageFade>} />
+  <Route path="/how-it-works" element={<PageFade><HowItWorksPage /></PageFade>} />
+  <Route path="/packages" element={<PageFade><PackagesPage /></PageFade>} />
+  <Route path="/testimonials" element={<PageFade><TestimonialsPage /></PageFade>} />
+  <Route path="/contact" element={<PageFade><ContactPage /></PageFade>} />
+  <Route path="/register" element={<PageFade><RegisterPage /></PageFade>} />
+  <Route path="/thank-you" element={<PageFade><ThankYouPage /></PageFade>} />
+  <Route path="/faq" element={<PageFade><FAQPage /></PageFade>} />
+</Route>
+
+{/* Utility/Debug pages (no layout) */}
 <Route path="/todo-tracker" element={<PageFade><TodoTrackerPage /></PageFade>} />
 <Route path="/client-approval" element={<PageFade><ClientApprovalPage /></PageFade>} />
 <Route path="/debug-supabase" element={<PageFade><DebugSupabasePage /></PageFade>} />
