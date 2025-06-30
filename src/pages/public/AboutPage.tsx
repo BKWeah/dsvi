@@ -46,8 +46,28 @@ export default function AboutPage() {
                   What is DSVI?
                 </h2>
                 <p className="text-xl text-gray-600 leading-relaxed">
-                  The Digital School Visibility Initiative (DSVI) is a groundbreaking program designed to bring every Liberian school into the digital age. We provide professional, affordable website solutions that help schools showcase their achievements, connect with their communities, and access new opportunities for growth and development.
+                  The Digital School Visibility Initiative (DSVI) is the flagship service of the Liberia Digital Service Initiative (LDSI), created to help schools across Liberia establish a strong, credible, and professional online presence.
                 </p>
+                <p className="text-lg text-gray-600 leading-relaxed mt-6">
+                  DSVI brings every school into the digital age by providing custom-built, mobile-responsive websites that are intuitive, reliable, and tailored to the specific communication needs of administrators, educators, and parents.
+                </p>
+                <p className="text-lg text-gray-600 leading-relaxed mt-4">
+                  More than just websites, DSVI delivers affordable digital tools that enable schools to showcase achievements, engage their communities, and access new opportunities for growth and visibility. Each platform is uniquely crafted to reflect the identity of the school it serves, supporting daily operations, real-time updates, and long-term credibility.
+                </p>
+                <p className="text-lg text-gray-600 leading-relaxed mt-4 font-semibold">
+                  DSVI is not just about being online—it's about being seen, trusted, and valued in a connected world.
+                </p>
+                <div className="mt-8">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">DSVI is designed to:</h3>
+                  <ul className="text-lg text-gray-600 space-y-2 list-disc list-inside">
+                    <li>Strengthen school identity and communication</li>
+                    <li>Facilitate digital interaction with students, parents, and the public</li>
+                    <li>Increase trust and visibility among partners, donors, and stakeholders</li>
+                  </ul>
+                  <p className="text-lg text-gray-600 leading-relaxed mt-4">
+                    Every DSVI website reflects the mission, values, and vibrancy of the school it represents, supporting better engagement and operational excellence in a digital age.
+                  </p>
+                </div>
               </div>
 
               <div className="grid md:grid-cols-3 gap-8">
@@ -114,7 +134,7 @@ export default function AboutPage() {
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-4">Our Vision</h3>
                   <p className="text-gray-600 leading-relaxed">
-                    A digitally connected Liberian education system where every school thrives online, fostering transparency, community engagement, and educational excellence that drives national development and positions Liberia as a leader in educational innovation in West Africa.
+                    A digitally connected Liberian education system where every school thrives online, fostering transparency, community engagement, and educational excellence that drives national development and positions Liberia as a leader in educational innovation in Africa.
                   </p>
                 </div>
 
@@ -155,7 +175,7 @@ export default function AboutPage() {
                     <Quote className="h-12 w-12 text-blue-600 flex-shrink-0 mt-2" />
                     <div>
                       <blockquote className="text-lg md:text-xl text-gray-700 leading-relaxed mb-8 italic">
-                        "At LIB NO.1, we believe every school, no matter its size or location, deserves a digital presence. Through DSVI, we're building not just websites, but digital access, connection, and opportunities for Liberian education. Thank you for trusting us to support your school's growth."
+                        "At LDSI, we believe every institution, whether a school, business, or nonprofit, deserves the power of a professional digital presence, no matter its size or location. Through platforms like DSVI, the DSVI School Directory, and DVI, we go beyond building websites, delivering access, amplifying visibility, and opening pathways for connection, growth, and meaningful impact across Liberia. Thank you for allowing us to walk with you on this journey of digital transformation."
                       </blockquote>
                       
                       <div className="flex items-center gap-4">
@@ -167,7 +187,7 @@ export default function AboutPage() {
                             Boniface Koffa Weah, Jr.
                           </p>
                           <p className="text-gray-600">
-                            Director, Digital School Visibility Initiative (DSVI)
+                            Director, Liberia Digital Service Initiative (LDSI)
                           </p>
                         </div>
                       </div>

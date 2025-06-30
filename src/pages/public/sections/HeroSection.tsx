@@ -65,7 +65,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ heroRef }) => {
           <div ref={badgeRef}>
             <Badge className="mb-8 bg-white/20 text-white border-white/30 hover:bg-white/30 transition-all duration-300 text-lg px-6 py-2">
               <GraduationCap className="mr-2 h-5 w-5" />
-              🇱🇷 A Website for Every Liberian School
+              🎓 A Website for Every School
             </Badge>
           </div>
           
