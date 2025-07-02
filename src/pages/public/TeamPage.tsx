@@ -19,15 +19,23 @@ export default function TeamPage() {
 
   useEffect(() => {
     if (departmentParam) {
-      let formattedDept = departmentParam.toLowerCase();
-      if (formattedDept === "it") {
-        formattedDept = "IT"; // Special case for "IT" department
-      } else {
-        formattedDept = formattedDept.charAt(0).toUpperCase() + formattedDept.slice(1);
-      }
-      setSelectedDepartment(formattedDept);
+      // Map URL parameters to actual department names
+      const departmentMapping: { [key: string]: string } = {
+        'executive leadership': 'Executive Leadership',
+        'leadership': 'Executive Leadership',
+        'technology & product': 'Technology & Product',
+        'marketing & communications': 'Marketing & Communications',
+        'client services': 'Client Services',
+        'operations & finance': 'Operations & Finance',
+        'dsvi': 'DSVI',
+        'dsvi school directory': 'DSVI School Directory',
+        'dvi': 'DVI'
+      };
+      
+      const mappedDept = departmentMapping[departmentParam.toLowerCase()] || departmentParam;
+      setSelectedDepartment(mappedDept);
     } else {
-      setSelectedDepartment("Leadership"); // Default to Leadership if no param
+      setSelectedDepartment("Executive Leadership"); // Default to Executive Leadership if no param
     }
   }, [departmentParam]);
 
@@ -106,8 +114,8 @@ export default function TeamPage() {
                                 {member.hasPhoto ? (
                                   <div className="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden border-4 border-gradient-to-br from-blue-600 to-green-600">
                                     <img 
-                                      src={member.name === "B. K. Weah, Jr." ? "/updates_assets/B. K. Weah Pro.jpg" : 
-                                           member.name === "John Gyawu" ? "/updates_assets/MR. JOHN GYAWU.jpg" : 
+                                      src={member.name === "Boniface K. Weah, Jr." ? "/updates_assets/B. K. Weah Pro.jpg" : 
+                                           member.name === "John K. Gyawu" ? "/updates_assets/MR. JOHN GYAWU.jpg" : 
                                            ""} 
                                       alt={member.name}
                                       className="w-full h-full object-cover object-top"
