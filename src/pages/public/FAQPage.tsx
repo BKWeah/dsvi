@@ -38,6 +38,14 @@ export default function FAQPage() {
     {
       question: "What happens if we need changes after launch?",
       answer: "We offer ongoing support for updates and changes. Basic content updates are included, and we can discuss any major modifications needed."
+    },
+    {
+      question: "What happens after I register?",
+      answer: "After registration and payment, you'll receive a digital receipt and onboarding instructions. Our team will contact you within 24 hours to begin the content submission process and guide you through each step."
+    },
+    {
+      question: "Is my data secure?",
+      answer: "Yes! We use enterprise-grade security with SSL certificates, automatic backups, and 99.9% uptime guarantee. Your school's data is protected with the highest security standards and regular backups ensure nothing is ever lost."
     }
   ];
 

@@ -1,4 +1,4 @@
-import { Users, Briefcase, Code, Headphones, Megaphone, Shield } from 'lucide-react';
+import { Users, Briefcase, Code, Headphones, Megaphone, Shield, Building, Globe, UserCheck, Settings, DollarSign, FileText, Search, TrendingUp } from 'lucide-react';
 
 export interface TeamMember {
   name: string;
@@ -23,158 +23,317 @@ export interface Department {
 }
 
 export const teamMembers: TeamMember[] = [
-  // Leadership
+  // Executive Leadership
   {
-    name: "John Gyawu",
-    role: "Establishment Executive",
-    department: "Leadership",
+    name: "John K. Gyawu",
+    role: "Chief Executive Officer (CEO)",
+    department: "Executive Leadership",
     avatar: "JG",
     icon: Briefcase,
-    description: "Originator and steward of DSVI's long-term mission, driving strategic direction, public trust, and institutional impact.",
+    description: "Provides the overarching vision, leads external partnerships, secures strategic alliances, and ensures organizational sustainability.",
     hasPhoto: true,
     email: "john.gyawu@libdsvi.com"
   },
   {
-    name: "B. K. Weah, Jr.",
-    role: "Director",
-    department: "Leadership", 
+    name: "Boniface K. Weah, Jr.",
+    role: "Managing Director (MD)",
+    department: "Executive Leadership", 
     avatar: "BW",
     icon: Briefcase,
-    description: "B. K. Weah, Jr. is a Liberian entrepreneur and leader who combines clear vision with practical leadership. He works at the intersection of technology, education, and social progress. For nearly 20 years, he has contributed to education, business, and social development in Liberia. He leads the Digital School Visibility Initiative (DSVI), uniting different teams and ensuring their daily work supports a larger goal. Beyond managing operations, he focuses on building strong teams and fostering organizational growth. His aim is to make a lasting, positive impact on Liberia's schools.",
+    description: "Leads day-to-day operations, manages internal coordination, executes strategy, and ensures the effective delivery of services across all divisions.",
     hasPhoto: true,
     email: "director@libdsvi.com",
     linkedin: "#"
-  },  // Operations
-  {
-    name: "Archie Wento",
-    role: "Operations Manager",
-    department: "Operations",
-    avatar: "AW",
-    icon: Users,
-    description: "Coordinates workflow, logistics, and project delivery across teams to ensure smooth execution of services.",
-    email: "operations@libdsvi.com"
   },
-  {
-    name: "Vacant",
-    role: "Finance Manager",
-    department: "Operations",
-    avatar: "FM",
-    icon: Shield,
-    description: "Manages financial planning, budgeting, and compliance to keep DSVI fiscally sound and accountable.",
-    isVacant: true
-  },
-  // IT Team
-  {
-    name: "Om Jaiswal",
-    role: "Lead Developer",
-    department: "IT",
-    avatar: "OJ",
-    icon: Code,
-    description: "Full-stack developer specializing in modern web technologies and educational platform development. Leads technical architecture and development processes.",
-    email: "om.jaiswal@libdsvi.com",
-    github: "#"
-  },
+
+  // Technology & Product Department
   {
     name: "Oluwaseun Shobayo",
-    role: "Lead Developer",
-    department: "IT",
+    role: "IT & Systems Manager",
+    department: "Technology & Product",
     avatar: "OS",
     icon: Code,
-    description: "Experienced developer focused on scalable web solutions and user experience optimization. Specializes in frontend technologies and system integration.",
+    description: "Oversees all platforms, websites, and tech systems including performance, hosting, updates, and integrations.",
     email: "oluwaseun.shobayo@libdsvi.com",
     github: "#"
   },
   {
     name: "Vacant",
-    role: "UI/UX Specialist",
-    department: "IT",
+    role: "Web Development Specialist",
+    department: "Technology & Product",
+    avatar: "WD",
+    icon: Code,
+    description: "Builds and maintains all websites and admin panels across divisions.",
+    isVacant: true
+  },
+  {
+    name: "Vacant",
+    role: "UI/UX Design Specialist",
+    department: "Technology & Product",
     avatar: "UX",
     icon: Code,
-    description: "Designs intuitive, accessible, and engaging user interfaces for school websites and internal platforms.",
+    description: "Designs user interfaces and ensures optimal user experience and mobile responsiveness.",
     isVacant: true
   },
   {
     name: "Vacant",
-    role: "Quality Assurance Specialist",
-    department: "IT",
+    role: "QA & Testing Specialist",
+    department: "Technology & Product",
     avatar: "QA",
     icon: Shield,
-    description: "Ensures every deliverable meets internal standards and is error-free across functionality, presentation, and content.",
-    isVacant: true
-  },  {
-    name: "Vacant",
-    role: "Content & Data Coordinator",
-    department: "IT",
-    avatar: "CD",
-    icon: Users,
-    description: "Responsible for uploading, organizing, and managing school-provided content across their respective websites.",
+    description: "Tests and validates site features, performance, and bug resolutions before deployment.",
     isVacant: true
   },
-  // Support
+
+  // Marketing & Communications Department
   {
     name: "Vacant",
-    role: "Training Specialist",
-    department: "Support",
-    avatar: "TS",
-    icon: Users,
-    description: "Provides comprehensive training to school administrators on website management and best practices.",
-    isVacant: true
-  },
-  {
-    name: "Vacant",
-    role: "Support Manager",
-    department: "Support",
-    avatar: "SM",
-    icon: Headphones,
-    description: "Handles ongoing post-launch technical and service support for client schools.",
-    isVacant: true
-  },
-  // Media
-  {
-    name: "Ansu Sheriff",
-    role: "Photographer & Visual Content Creator",
-    department: "Media",
-    avatar: "AS",
+    role: "Marketing & Communications Manager",
+    department: "Marketing & Communications",
+    avatar: "MC",
     icon: Megaphone,
-    description: "Captures and produces high-quality visual content to support both DSVI's brand and school website presentation.",
-    email: "ansu.sheriff@libdsvi.com"
+    description: "Manages brand visibility, outreach, digital communication, and promotional campaigns across LDSI.",
+    isVacant: true
+  },
+  {
+    name: "Vacant",
+    role: "Marketing & Outreach Specialist",
+    department: "Marketing & Communications",
+    avatar: "MO",
+    icon: TrendingUp,
+    description: "Develops and executes outreach efforts to institutions, communities, and stakeholders.",
+    isVacant: true
+  },
+  {
+    name: "Vacant",
+    role: "Content & Communications Specialist",
+    department: "Marketing & Communications",
+    avatar: "CC",
+    icon: FileText,
+    description: "Crafts content strategies, writes messaging for web and campaigns, manages tone and internal/external communication.",
+    isVacant: true
+  },
+  {
+    name: "Vacant",
+    role: "Social Media Specialist",
+    department: "Marketing & Communications",
+    avatar: "SM",
+    icon: Megaphone,
+    description: "Manages social platforms, publishes content, and drives audience engagement.",
+    isVacant: true
+  },
+
+  // Client Services Department
+  {
+    name: "Vacant",
+    role: "Client Success Manager",
+    department: "Client Services",
+    avatar: "CS",
+    icon: UserCheck,
+    description: "Ensures client satisfaction from onboarding through support, with timely assistance and updates.",
+    isVacant: true
+  },
+  {
+    name: "Vacant",
+    role: "Client Onboarding Specialist",
+    department: "Client Services",
+    avatar: "CO",
+    icon: Users,
+    description: "Assists institutions through the onboarding and briefing process.",
+    isVacant: true
+  },
+  {
+    name: "Vacant",
+    role: "Client Support Specialist",
+    department: "Client Services",
+    avatar: "CSS",
+    icon: Headphones,
+    description: "Handles technical queries, client updates, and ongoing customer support.",
+    isVacant: true
+  },
+
+  // Operations & Finance Department
+  {
+    name: "Vacant",
+    role: "Operations & Finance Manager",
+    department: "Operations & Finance",
+    avatar: "OF",
+    icon: DollarSign,
+    description: "Manages finances, human resource needs, logistics, internal processes, and compliance.",
+    isVacant: true
+  },
+  {
+    name: "Vacant",
+    role: "Accounts & Billing Specialist",
+    department: "Operations & Finance",
+    avatar: "AB",
+    icon: DollarSign,
+    description: "Manages payment processing, invoicing, subscriptions, and financial reporting.",
+    isVacant: true
+  },
+  {
+    name: "Vacant",
+    role: "Administrative Support Specialist",
+    department: "Operations & Finance",
+    avatar: "AS",
+    icon: Settings,
+    description: "Provides general office support, coordination, and logistics assistance.",
+    isVacant: true
+  },
+
+  // DSVI Division
+  {
+    name: "Vacant",
+    role: "DSVI Supervisor",
+    department: "DSVI",
+    avatar: "DS",
+    icon: Building,
+    description: "Oversees website services and support for schools, ensuring accurate reflection of school identity, academic integrity, and educational messaging.",
+    isVacant: true
+  },
+  {
+    name: "Vacant",
+    role: "Educational Liaison Specialist",
+    department: "DSVI",
+    avatar: "EL",
+    icon: Users,
+    description: "Collaborates with school reps to align academic content with website structure and user needs.",
+    isVacant: true
+  },
+  {
+    name: "Vacant",
+    role: "DSVI QA Specialist",
+    department: "DSVI",
+    avatar: "DQ",
+    icon: Shield,
+    description: "Conducts quality reviews on all school sites to ensure they meet agreed functionality and design expectations.",
+    isVacant: true
+  },
+
+  // DSVI School Directory Division
+  {
+    name: "Vacant",
+    role: "Directory Supervisor",
+    department: "DSVI School Directory",
+    avatar: "DiS",
+    icon: Search,
+    description: "Manages the central school listing platform, ensuring listings are authentic and promotions are executed smoothly.",
+    isVacant: true
+  },
+  {
+    name: "Vacant",
+    role: "Directory Admin Specialist",
+    department: "DSVI School Directory",
+    avatar: "DA",
+    icon: Settings,
+    description: "Manages school profiles, categories, metadata, and backend updates on the directory.",
+    isVacant: true
+  },
+  {
+    name: "Vacant",
+    role: "School Verification Specialist",
+    department: "DSVI School Directory",
+    avatar: "SV",
+    icon: UserCheck,
+    description: "Validates the legitimacy and accreditation of listed schools.",
+    isVacant: true
+  },
+  {
+    name: "Vacant",
+    role: "Promotions & Boost Specialist",
+    department: "DSVI School Directory",
+    avatar: "PB",
+    icon: TrendingUp,
+    description: "Manages in-directory promotional campaigns and boosts for subscribed institutions.",
+    isVacant: true
+  },
+
+  // Digital Visibility Initiative (DVI) Division
+  {
+    name: "Vacant",
+    role: "DVI Supervisor",
+    department: "DVI",
+    avatar: "DVS",
+    icon: Globe,
+    description: "Oversees all website services and directory listings for non-school institutions (businesses, NGOs, churches, etc.).",
+    isVacant: true
+  },
+  {
+    name: "Vacant",
+    role: "Client Intake & Strategy Specialist",
+    department: "DVI",
+    avatar: "CIS",
+    icon: Users,
+    description: "Conducts strategic intake sessions to define client goals and digital visibility roadmap.",
+    isVacant: true
+  },
+  {
+    name: "Vacant",
+    role: "DVI Directory Listings Specialist",
+    department: "DVI",
+    avatar: "DDL",
+    icon: Search,
+    description: "Manages profiles in the DVI Business Directory and ensures accurate listings.",
+    isVacant: true
   }
 ];
+
 export const departments: Department[] = [
   { 
-    name: "Leadership", 
+    name: "Executive Leadership", 
     color: "bg-blue-100 text-blue-800", 
     bgColor: "bg-blue-600",
     icon: Briefcase,
-    count: teamMembers.filter(member => member.department === "Leadership").length 
+    count: teamMembers.filter(member => member.department === "Executive Leadership").length 
   },
   { 
-    name: "Operations", 
-    color: "bg-green-100 text-green-800", 
-    bgColor: "bg-green-600",
-    icon: Users,
-    count: teamMembers.filter(member => member.department === "Operations").length 
-  },
-  { 
-    name: "IT", 
+    name: "Technology & Product", 
     color: "bg-purple-100 text-purple-800", 
     bgColor: "bg-purple-600",
     icon: Code,
-    count: teamMembers.filter(member => member.department === "IT").length 
+    count: teamMembers.filter(member => member.department === "Technology & Product").length 
   },
   { 
-    name: "Support", 
-    color: "bg-orange-100 text-orange-800", 
-    bgColor: "bg-orange-600",
-    icon: Headphones,
-    count: teamMembers.filter(member => member.department === "Support").length 
-  },
-  { 
-    name: "Media", 
+    name: "Marketing & Communications", 
     color: "bg-pink-100 text-pink-800", 
     bgColor: "bg-pink-600",
     icon: Megaphone,
-    count: teamMembers.filter(member => member.department === "Media").length 
+    count: teamMembers.filter(member => member.department === "Marketing & Communications").length 
+  },
+  { 
+    name: "Client Services", 
+    color: "bg-green-100 text-green-800", 
+    bgColor: "bg-green-600",
+    icon: UserCheck,
+    count: teamMembers.filter(member => member.department === "Client Services").length 
+  },
+  { 
+    name: "Operations & Finance", 
+    color: "bg-yellow-100 text-yellow-800", 
+    bgColor: "bg-yellow-600",
+    icon: DollarSign,
+    count: teamMembers.filter(member => member.department === "Operations & Finance").length 
+  },
+  { 
+    name: "DSVI", 
+    color: "bg-indigo-100 text-indigo-800", 
+    bgColor: "bg-indigo-600",
+    icon: Building,
+    count: teamMembers.filter(member => member.department === "DSVI").length 
+  },
+  { 
+    name: "DSVI School Directory", 
+    color: "bg-cyan-100 text-cyan-800", 
+    bgColor: "bg-cyan-600",
+    icon: Search,
+    count: teamMembers.filter(member => member.department === "DSVI School Directory").length 
+  },
+  { 
+    name: "DVI", 
+    color: "bg-teal-100 text-teal-800", 
+    bgColor: "bg-teal-600",
+    icon: Globe,
+    count: teamMembers.filter(member => member.department === "DVI").length 
   }
 ];
 

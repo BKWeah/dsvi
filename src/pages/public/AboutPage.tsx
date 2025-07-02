@@ -54,15 +54,12 @@ export default function AboutPage() {
                 <p className="text-lg text-gray-600 leading-relaxed mt-4">
                   More than just websites, DSVI delivers affordable digital tools that enable schools to showcase achievements, engage their communities, and access new opportunities for growth and visibility. Each platform is uniquely crafted to reflect the identity of the school it serves, supporting daily operations, real-time updates, and long-term credibility.
                 </p>
-                <p className="text-lg text-gray-600 leading-relaxed mt-4 font-semibold">
-                  DSVI is not just about being online—it's about being seen, trusted, and valued in a connected world.
-                </p>
                 <div className="mt-8">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">DSVI is designed to:</h3>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">The Digital School Visibility Initiative (DSVI) is designed to help schools enhance their professional presence and engagement in today's digital environment. Its core purpose is to:</h3>
                   <ul className="text-lg text-gray-600 space-y-2 list-disc list-inside">
-                    <li>Strengthen school identity and communication</li>
-                    <li>Facilitate digital interaction with students, parents, and the public</li>
-                    <li>Increase trust and visibility among partners, donors, and stakeholders</li>
+                    <li>Strengthen school identity and communication strategies</li>
+                    <li>Enable effective digital interaction with students, parents, and the wider public</li>
+                    <li>Improve visibility and credibility with partners, donors, and key stakeholders</li>
                   </ul>
                   <p className="text-lg text-gray-600 leading-relaxed mt-4">
                     Every DSVI website reflects the mission, values, and vibrancy of the school it represents, supporting better engagement and operational excellence in a digital age.
@@ -216,7 +213,7 @@ export default function AboutPage() {
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="lg" className="border-white text-white hover:bg-white/10">
+                <Button asChild variant="outline" size="lg" className="border-white text-black hover:bg-white/10">
                   <Link to="/how-it-works">Learn How It Works</Link>
                 </Button>
               </div>

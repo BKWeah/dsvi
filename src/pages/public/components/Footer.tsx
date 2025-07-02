@@ -35,7 +35,7 @@ export const Footer: React.FC = () => {
               </div>
             </div>
             <p className="text-gray-400 mb-6 leading-relaxed">
-              Empowering Liberian educational institutions with modern digital solutions for enhanced visibility and community engagement.
+              A digitally connected Liberian education system where every school thrives online, fostering transparency, community engagement, and educational excellence that drives national development and positions Liberia as a leader in educational innovation in Africa.
             </p>
             <div className="flex space-x-4">
               <a href="https://wa.me/2317739102999" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
@@ -58,44 +58,29 @@ export const Footer: React.FC = () => {
             <h3 className="text-lg font-semibold mb-6">Main Pages</h3>
             <ul className="space-y-3 text-gray-400">
               <li>
-                <button 
-                  onClick={() => handleSmoothScroll('#home')}
-                  className="hover:text-white cursor-pointer transition-colors"
-                >
+                <Link to="/" className="hover:text-white cursor-pointer transition-colors">
                   Home
-                </button>
+                </Link>
               </li>
               <li>
-                <button 
-                  onClick={() => handleSmoothScroll('#about')}
-                  className="hover:text-white cursor-pointer transition-colors"
-                >
-                  About Us
-                </button>
+                <Link to="/about" className="hover:text-white cursor-pointer transition-colors">
+                  About
+                </Link>
               </li>
               <li>
-                <button 
-                  onClick={() => handleSmoothScroll('#team')}
-                  className="hover:text-white cursor-pointer transition-colors"
-                >
+                <Link to="/team" className="hover:text-white cursor-pointer transition-colors">
                   Team
-                </button>
+                </Link>
               </li>
               <li>
-                <button 
-                  onClick={() => handleSmoothScroll('#how-it-works')}
-                  className="hover:text-white cursor-pointer transition-colors"
-                >
-                  How It Works
-                </button>
+                <Link to="/packages" className="hover:text-white cursor-pointer transition-colors">
+                  Packages
+                </Link>
               </li>
               <li>
-                <button 
-                  onClick={() => handleSmoothScroll('#packages')}
-                  className="hover:text-white cursor-pointer transition-colors"
-                >
-                  Website Packages
-                </button>
+                <Link to="/testimonials" className="hover:text-white cursor-pointer transition-colors">
+                  Testimonials
+                </Link>
               </li>
             </ul>
           </div>
@@ -105,20 +90,9 @@ export const Footer: React.FC = () => {
             <h3 className="text-lg font-semibold mb-6">Services & Support</h3>
             <ul className="space-y-3 text-gray-400">
               <li>
-                <button 
-                  onClick={() => handleSmoothScroll('#testimonials')}
-                  className="hover:text-white cursor-pointer transition-colors"
-                >
-                  Testimonials
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => handleSmoothScroll('#faq')}
-                  className="hover:text-white cursor-pointer transition-colors"
-                >
+                <Link to="/faq" className="hover:text-white cursor-pointer transition-colors">
                   FAQ
-                </button>
+                </Link>
               </li>
               <li>
                 <Link to="/contact" className="hover:text-white cursor-pointer transition-colors">
