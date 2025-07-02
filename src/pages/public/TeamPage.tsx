@@ -194,7 +194,7 @@ export default function TeamPage() {
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="lg" className="border-white text-white hover:bg-white/10">
+                <Button asChild variant="outline" size="lg" className="border-white text-black hover:bg-white/10">
                   <Link to="/contact">Contact Our Team</Link>
                 </Button>
               </div>
