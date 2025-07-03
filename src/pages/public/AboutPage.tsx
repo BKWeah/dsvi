@@ -102,44 +102,45 @@ export default function AboutPage() {
                   </p>
                 </div>
               </div>
-            </div>
+              
+              <div className="text-center mt-16 mb-16">
+                <div className="grid md:grid-cols-3 gap-8">
+                  <Card className="text-center border-none shadow-lg">
+                    <CardHeader>
+                      <Globe className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+                      <CardTitle>Digital Presence</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-600">
+                        Creating professional online identities for schools across all 15 counties of Liberia
+                      </p>
+                    </CardContent>
+                  </Card>
 
-              <div className="grid md:grid-cols-3 gap-8">
-                <Card className="text-center border-none shadow-lg">
-                  <CardHeader>
-                    <Globe className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-                    <CardTitle>Digital Presence</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600">
-                      Creating professional online identities for schools across all 15 counties of Liberia
-                    </p>
-                  </CardContent>
-                </Card>
+                  <Card className="text-center border-none shadow-lg">
+                    <CardHeader>
+                      <Users className="h-12 w-12 text-green-600 mx-auto mb-4" />
+                      <CardTitle>Community Connection</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-600">
+                        Bridging the gap between schools, parents, students, and the wider community
+                      </p>
+                    </CardContent>
+                  </Card>
 
-                <Card className="text-center border-none shadow-lg">
-                  <CardHeader>
-                    <Users className="h-12 w-12 text-green-600 mx-auto mb-4" />
-                    <CardTitle>Community Connection</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600">
-                      Bridging the gap between schools, parents, students, and the wider community
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="text-center border-none shadow-lg">
-                  <CardHeader>
-                    <Award className="h-12 w-12 text-purple-600 mx-auto mb-4" />
-                    <CardTitle>Growth Opportunities</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600">
-                      Opening doors to partnerships, funding, and recognition for educational excellence
-                    </p>
-                  </CardContent>
-                </Card>
+                  <Card className="text-center border-none shadow-lg">
+                    <CardHeader>
+                      <Award className="h-12 w-12 text-purple-600 mx-auto mb-4" />
+                      <CardTitle>Growth Opportunities</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-600">
+                        Opening doors to partnerships, funding, and recognition for educational excellence
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             </div>
           </div>
