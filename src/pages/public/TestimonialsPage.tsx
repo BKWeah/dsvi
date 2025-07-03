@@ -76,7 +76,8 @@ export default function TestimonialsPage() {
 
   const testimonials = [
     {
-      name: "Principal Martha Johnson",
+      name: "Martha Johnson",
+      position: "Principal",
       school: "Liberty High School",
       county: "Montserrado",
       rating: 5,
@@ -85,7 +86,8 @@ export default function TestimonialsPage() {
       results: "300% increase in parent engagement"
     },
     {
-      name: "Director Samuel Koffa",
+      name: "Samuel Koffa",
+      position: "Director",
       school: "Saint Paul Elementary",
       county: "Margibi", 
       rating: 5,
@@ -94,7 +96,8 @@ export default function TestimonialsPage() {
       results: "40% enrollment increase"
     },
     {
-      name: "Administrator Grace Williams",
+      name: "Grace Williams",
+      position: "Administrator",
       school: "Future Leaders Academy",
       county: "Nimba",
       rating: 5,
@@ -103,7 +106,8 @@ export default function TestimonialsPage() {
       results: "Enhanced community reputation"
     },
     {
-      name: "Principal James Tuweh",
+      name: "James Tuweh",
+      position: "Principal",
       school: "Bong County Technical Institute",
       county: "Bong",
       rating: 5,
@@ -112,7 +116,8 @@ export default function TestimonialsPage() {
       results: "Improved stakeholder communication"
     },
     {
-      name: "Director Mary Kollie",
+      name: "Mary Kollie",
+      position: "Director",
       school: "River Cess Community School",
       county: "River Cess",
       rating: 5,
@@ -121,7 +126,8 @@ export default function TestimonialsPage() {
       results: "Connected to global opportunities"
     },
     {
-      name: "Principal Joseph Roberts",
+      name: "Joseph Roberts",
+      position: "Principal",
       school: "Grand Bassa Prep Academy",
       county: "Grand Bassa",
       rating: 5,
@@ -269,7 +275,7 @@ export default function TestimonialsPage() {
                         </div>
                         <div>
                           <CardTitle className="text-lg">{testimonial.name}</CardTitle>
-                          <p className="text-sm text-gray-600 font-medium">{testimonial.school}</p>
+                          <p className="text-sm text-gray-600 font-medium">{testimonial.position}, {testimonial.school}</p>
                           <p className="text-xs text-blue-600">{testimonial.county} County</p>
                         </div>
                       </div>

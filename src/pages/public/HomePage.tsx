@@ -5,7 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { 
   GraduationCap, Users, Globe, Palette, Shield, BarChart3, 
-  CheckCircle, ArrowRight, School, Star, Phone, Mail, MessageSquare
+  CheckCircle, ArrowRight, School, Star, Phone, Mail, MessageSquare,
+  Search, FileText, Plus
 } from 'lucide-react';
 
 interface HomePageProps {
@@ -169,6 +170,83 @@ export default function HomePage({ setHeroRef }: HomePageProps) {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* DSVI Directory Promotion Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Explore the DSVI Ecosystem
+            </h2>
+            <p className="text-xl text-gray-600">
+              Discover and connect with Liberian schools through our comprehensive directory platform
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Explore Directory Card */}
+            <Card className="border-2 border-blue-100 hover:border-blue-300 transition-colors duration-300 shadow-lg hover:shadow-xl">
+              <CardHeader className="text-center pb-6">
+                <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="h-10 w-10 text-blue-600" />
+                </div>
+                <CardTitle className="text-2xl text-gray-900">
+                  Explore the DSVI School Directory
+                </CardTitle>
+                <CardDescription className="text-lg text-gray-600">
+                  Find Any Verified Liberian School, Instantly
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-gray-600 mb-6">
+                  Search through our comprehensive database of verified Liberian schools. Find contact information, programs, and connect with educational institutions across all 15 counties.
+                </p>
+                <Button asChild size="lg" className="w-full bg-blue-600 hover:bg-blue-700">
+                  <Link to="/directory">
+                    Browse Directory
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* List Your School Card */}
+            <Card className="border-2 border-green-100 hover:border-green-300 transition-colors duration-300 shadow-lg hover:shadow-xl">
+              <CardHeader className="text-center pb-6">
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Plus className="h-10 w-10 text-green-600" />
+                </div>
+                <CardTitle className="text-2xl text-gray-900">
+                  List Your School in the Directory
+                </CardTitle>
+                <CardDescription className="text-lg text-gray-600">
+                  Join the Network of Verified Schools
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-gray-600 mb-6">
+                  Add your school to our directory and increase your visibility. Connect with parents, students, and educational partners looking for quality institutions.
+                </p>
+                <Button asChild size="lg" className="w-full bg-green-600 hover:bg-green-700">
+                  <Link to="/directory-listing">
+                    List Your School
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center mt-12">
+            <div className="inline-flex items-center justify-center px-6 py-3 bg-gray-100 rounded-full">
+              <FileText className="h-5 w-5 text-gray-600 mr-2" />
+              <span className="text-gray-700 font-medium">
+                Trusted by 150+ verified schools across Liberia
+              </span>
+            </div>
           </div>
         </div>
       </section>

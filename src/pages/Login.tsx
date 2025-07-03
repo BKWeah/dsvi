@@ -51,8 +51,12 @@ export default function Login() {
     <div className="min-h-screen flex flex-col justify-center bg-gradient-to-br from-blue-50 to-green-50 px-4 py-8 sm:px-6 lg:px-8">
       {/* Logo and Branding */}
       <div className="flex flex-col items-center mb-8">
-        <div className="flex items-center space-x-2 mb-4">
-          <GraduationCap className="h-8 w-8 sm:h-12 sm:w-12 text-blue-600" />
+        <div className="flex items-center space-x-3 mb-4">
+          <img 
+            src="/updates_assets/DSVI Official Logo.png" 
+            alt="DSVI Official Logo" 
+            className="h-12 w-12 sm:h-16 sm:w-16 object-contain"
+          />
           <span className="text-2xl sm:text-3xl font-bold text-gray-900">DSVI</span>
         </div>
         <p className="text-gray-600 text-center text-sm sm:text-base">
@@ -140,7 +144,7 @@ export default function Login() {
       
       <div className="mt-8 text-center">
         <p className="text-xs text-gray-500">
-          © 2024 Digital School Visibility Initiative
+          © 2025 Digital School Visibility Initiative
         </p>
       </div>
     </div>

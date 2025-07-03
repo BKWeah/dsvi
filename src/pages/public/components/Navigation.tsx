@@ -229,7 +229,10 @@ export const Navigation: React.FC<NavigationProps> = () => {
                 )
               ))}
               <div className="flex flex-col space-y-2 pt-2">
-                <Button variant="outline" onClick={() => navigate('/login')} className={`w-full ${mobileLoginButtonClass}`}>
+                <Button variant="outline" onClick={() => {
+                  setIsMenuOpen(false);
+                  navigate('/login');
+                }} className={`w-full ${mobileLoginButtonClass}`}>
                   Admin Planet
                 </Button>
                 <Link to="/register" className="w-full" state={{ smoothTransition: true }}>
