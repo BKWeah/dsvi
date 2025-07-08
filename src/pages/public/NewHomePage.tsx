@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navigation } from './components/Navigation';
 import { HeroSection } from './sections/HeroSection';
+import { DirectorySection } from './sections/DirectorySection';
 import { FeaturesSection } from './sections/FeaturesSection';
 import { HowItWorksSection } from './sections/HowItWorksSection';
 import { StatsSection } from './sections/StatsSection';
@@ -22,14 +23,15 @@ export const NewHomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navigation 
-        onLoginClick={handleLoginClick}
-        heroRef={heroRef}
-      />
+      <Navigation />
       
       <main>
         <section id="home">
           <HeroSection heroRef={heroRef} />
+        </section>
+        
+        <section id="directory">
+          <DirectorySection />
         </section>
         
         <section id="features">
