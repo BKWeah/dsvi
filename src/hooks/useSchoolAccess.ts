@@ -15,8 +15,8 @@ export function useSchoolAccess(schoolId?: string) {
         return;
       }
 
-      // DSVI Admins have access to all schools
-      if (role === 'DSVI_ADMIN') {
+      // GSS Admins have access to all schools
+      if (role === 'GSS_ADMIN') {
         setHasAccess(true);
         setLoading(false);
         return;

@@ -14,15 +14,15 @@ const iconMap = {
 };
 
 interface FeatureAwareBottomAppBarProps {
-  userRole: 'DSVI_ADMIN' | 'SCHOOL_ADMIN';
+  userRole: 'GSS_ADMIN' | 'SCHOOL_ADMIN';
 }
 
 export function FeatureAwareBottomAppBar({ userRole }: FeatureAwareBottomAppBarProps) {
   const location = useLocation();
   const enabledNavigation = useEnabledNavigation();
   
-  // Only show for DSVI_ADMIN for now
-  if (userRole !== 'DSVI_ADMIN') {
+  // Only show for GSS_ADMIN for now
+  if (userRole !== 'GSS_ADMIN') {
     return null;
   }
 

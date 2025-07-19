@@ -27,7 +27,7 @@ export default function MobileEditPagePage() {
         <div className="p-4">
           <p>Invalid page parameters</p>
         </div>
-        <BottomAppBar userRole="DSVI_ADMIN" />
+        <BottomAppBar userRole="GSS_ADMIN" />
       </div>
     );
   }
@@ -54,7 +54,7 @@ export default function MobileEditPagePage() {
         />
       </div>
 
-      <BottomAppBar userRole="DSVI_ADMIN" />
+      <BottomAppBar userRole="GSS_ADMIN" />
     </div>
   );
 }

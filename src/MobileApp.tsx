@@ -47,7 +47,7 @@ const App = () => (
                 <Route 
                   path="/gss-admin" 
                   element={
-                    <ProtectedRoute roles={['DSVI_ADMIN']}>
+                    <ProtectedRoute roles={['GSS_ADMIN']}>
                       <ResponsiveDSVIAdminLayout />
                     </ProtectedRoute>
                   }

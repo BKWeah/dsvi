@@ -35,8 +35,8 @@ export default function Login() {
         description: "Welcome back!",
       });
 
-      if (role === 'DSVI_ADMIN') {
-        navigate('/dsvi-admin');
+      if (role === 'GSS_ADMIN') {
+        navigate('/gss-admin');
       } else if (role === 'SCHOOL_ADMIN') {
         navigate('/school-admin');
       } else {
@@ -54,13 +54,13 @@ export default function Login() {
         <div className="flex items-center space-x-3 mb-4">
           <img 
             src="/updates_assets/DSVI Official Logo.png" 
-            alt="DSVI Official Logo" 
+            alt="GSS Official Logo" 
             className="h-12 w-12 sm:h-16 sm:w-16 object-contain"
           />
-          <span className="text-2xl sm:text-3xl font-bold text-gray-900">DSVI</span>
+          <span className="text-2xl sm:text-3xl font-bold text-gray-900">GSS</span>
         </div>
         <p className="text-gray-600 text-center text-sm sm:text-base">
-          Digital School Visibility Initiative
+          GyaWe School Solutions
         </p>
       </div>
 
@@ -144,7 +144,7 @@ export default function Login() {
       
       <div className="mt-8 text-center">
         <p className="text-xs text-gray-500">
-          © 2025 Digital School Visibility Initiative
+          © 2025 GyaWe School Solutions
         </p>
       </div>
     </div>

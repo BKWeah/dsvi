@@ -36,7 +36,7 @@ export function ResponsiveDSVIAdminLayout() {
     } else if (path.includes('/schools')) {
       return { title: 'Schools', subtitle: 'Manage all schools' };
     } else {
-      return { title: 'DSVI Admin', subtitle: 'Manage schools' };
+      return { title: 'GSS Admin', subtitle: 'Manage schools' };
     }
   };
 
@@ -52,7 +52,7 @@ export function ResponsiveDSVIAdminLayout() {
           showBackButton={false}
           leftContent={
             <MobileNavigation 
-              userRole="DSVI_ADMIN" 
+              userRole="GSS_ADMIN" 
               onLogout={handleLogout}
             />
           }
@@ -68,7 +68,7 @@ export function ResponsiveDSVIAdminLayout() {
           <div className="min-h-screen flex w-full">
             <Sidebar>
               <SidebarHeader className="p-4">
-                <h2 className="text-lg font-semibold">DSVI Admin</h2>
+                <h2 className="text-lg font-semibold">GSS Admin</h2>
               </SidebarHeader>
               <SidebarContent>
                 <SidebarMenu>

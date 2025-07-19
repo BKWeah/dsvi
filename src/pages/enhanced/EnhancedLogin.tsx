@@ -34,8 +34,8 @@ export default function EnhancedLogin() {
         description: "Welcome back!",
       });
 
-      if (role === 'DSVI_ADMIN') {
-        navigate('/dsvi-admin');
+      if (role === 'GSS_ADMIN') {
+        navigate('/gss-admin');
       } else if (role === 'SCHOOL_ADMIN') {
         navigate('/school-admin');
       } else {
@@ -52,10 +52,10 @@ export default function EnhancedLogin() {
       <div className="flex flex-col items-center mb-8">
         <div className="flex items-center space-x-2 mb-4">
           <GraduationCap className="h-8 w-8 sm:h-12 sm:w-12 text-blue-600" />
-          <span className="text-2xl sm:text-3xl font-bold text-gray-900">DSVI</span>
+          <span className="text-2xl sm:text-3xl font-bold text-gray-900">GSS</span>
         </div>
         <p className="text-gray-600 text-center text-sm sm:text-base">
-          Digital School Visibility Initiative
+          GyaWe School Solutions
         </p>
       </div>
 
@@ -139,7 +139,7 @@ export default function EnhancedLogin() {
       
       <div className="mt-8 text-center">
         <p className="text-xs text-gray-500">
-          © 2024 Digital School Visibility Initiative
+          © 2025 GyaWe School Solutions
         </p>
       </div>
     </div>

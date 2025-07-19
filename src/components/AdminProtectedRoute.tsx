@@ -39,8 +39,8 @@ export const AdminProtectedRoute: React.FC<AdminProtectedRouteProps> = ({
     return <Navigate to="/unauthorized" replace />;
   }
 
-  // For DSVI admin routes with enhanced protection
-  if (role === 'DSVI_ADMIN') {
+  // For GSS admin routes with enhanced protection
+  if (role === 'GSS_ADMIN') {
     // If Level 1 admin is specifically required and user is not Level 1
     if (requireLevel1 && adminLevel !== null && !isLevel1Admin) {
       return <Navigate to="/unauthorized" replace />;
@@ -51,7 +51,7 @@ export const AdminProtectedRoute: React.FC<AdminProtectedRouteProps> = ({
       return <Navigate to="/unauthorized" replace />;
     }
 
-    // For existing DSVI admins who don't have admin levels yet (backward compatibility)
+    // For existing GSS admins who don't have admin levels yet (backward compatibility)
     // Allow access if no specific requirements are set
     if (adminLevel === null && !requireLevel1 && !requiredPermission) {
       return <>{children}</>;
@@ -62,9 +62,9 @@ export const AdminProtectedRoute: React.FC<AdminProtectedRouteProps> = ({
       return <>{children}</>;
     }
 
-    // If we reach here and it's a DSVI admin without admin level but with specific requirements,
+    // If we reach here and it's a GSS admin without admin level but with specific requirements,
     // treat as Level 1 for backward compatibility during transition period
-    if (adminLevel === null && role === 'DSVI_ADMIN') {
+    if (adminLevel === null && role === 'GSS_ADMIN') {
       return <>{children}</>;
     }
   }

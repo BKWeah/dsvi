@@ -7,7 +7,7 @@ export default function Dashboard() {
   const { role } = useAuth();
 
   // Redirect to appropriate dashboard based on role
-  if (role === 'DSVI_ADMIN') {
+  if (role === 'GSS_ADMIN') {
     return <Navigate to="/dsvi-admin" replace />;
   } else if (role === 'SCHOOL_ADMIN') {
     return <Navigate to="/school-admin" replace />;

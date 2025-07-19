@@ -67,7 +67,7 @@ export default function ResponsiveEditPagePage() {
         </Button>
       </div>
 
-      <BottomAppBar userRole="DSVI_ADMIN" />
+      <BottomAppBar userRole="GSS_ADMIN" />
     </div>
   );
 }

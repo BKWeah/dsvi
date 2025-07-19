@@ -81,7 +81,7 @@ export default function EnhancedMobileSchoolsPage() {
             <p className="text-muted-foreground">Loading schools...</p>
           </div>
         </div>
-        <BottomAppBar userRole="DSVI_ADMIN" />
+        <BottomAppBar userRole="GSS_ADMIN" />
       </div>
     );
   }
@@ -163,7 +163,7 @@ export default function EnhancedMobileSchoolsPage() {
         )}
       </div>
 
-      <BottomAppBar userRole="DSVI_ADMIN" />
+      <BottomAppBar userRole="GSS_ADMIN" />
 
       {/* Dialogs */}
       <AddSchoolDialog 

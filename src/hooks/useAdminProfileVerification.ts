@@ -13,8 +13,8 @@ export const useAdminProfileVerification = () => {
 
   useEffect(() => {
     const verifyAndFixAdminProfile = async () => {
-      // Only verify for DSVI admins who don't have an admin level yet
-      if (!user || user.user_metadata?.role !== 'DSVI_ADMIN' || adminLevel !== null || isVerifying) {
+      // Only verify for GSS admins who don't have an admin level yet
+      if (!user || user.user_metadata?.role !== 'GSS_ADMIN' || adminLevel !== null || isVerifying) {
         return;
       }
 

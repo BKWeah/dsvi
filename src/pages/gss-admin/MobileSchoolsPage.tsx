@@ -87,7 +87,7 @@ export default function MobileSchoolsPage() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         </div>
-        <BottomAppBar userRole="DSVI_ADMIN" />
+        <BottomAppBar userRole="GSS_ADMIN" />
       </div>
     );
   }
@@ -165,7 +165,7 @@ export default function MobileSchoolsPage() {
         )}
       </div>
 
-      <BottomAppBar userRole="DSVI_ADMIN" />
+      <BottomAppBar userRole="GSS_ADMIN" />
 
       {/* Dialogs */}
       <AddSchoolDialog 

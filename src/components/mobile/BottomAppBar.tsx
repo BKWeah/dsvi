@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 interface BottomAppBarProps {
-  userRole: 'DSVI_ADMIN' | 'SCHOOL_ADMIN';
+  userRole: 'GSS_ADMIN' | 'SCHOOL_ADMIN';
   className?: string;
 }
 
@@ -135,7 +135,7 @@ export function BottomAppBar({ userRole, className }: BottomAppBarProps) {
     }
   ];
 
-  const tabs = userRole === 'DSVI_ADMIN' ? dsviAdminTabs : schoolAdminTabs;
+  const tabs = userRole === 'GSS_ADMIN' ? dsviAdminTabs : schoolAdminTabs;
   
   // Ensure we have at least one tab and limit to 4 for mobile
   const visibleTabs = tabs.slice(0, 4);

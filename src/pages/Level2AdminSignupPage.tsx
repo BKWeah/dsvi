@@ -197,7 +197,7 @@ export default function Level2AdminSignupPage() {
       // Step 1: Create auth user (handle existing users)
       let authData, authError;
       
-      const signupResult = await signup(email, password, 'DSVI_ADMIN', {
+      const signupResult = await signup(email, password, 'GSS_ADMIN', {
         name: inviteData?.name || adminName || email.split('@')[0],
         inviteToken: decodedInviteToken, // Use decoded token
         skipAutoAdminCreation: true // Prevent automatic Level 1 admin creation
@@ -490,7 +490,7 @@ export default function Level2AdminSignupPage() {
               <Alert>
                 <CheckCircle className="h-4 w-4" />
                 <AlertDescription>
-                  <strong>Account Type:</strong> DSVI Admin (Level 2 - Assigned Staff)<br />
+                  <strong>Account Type:</strong> GSS Admin (Level 2 - Assigned Staff)<br />
                   <strong>Admin Name:</strong> {inviteData?.name}<br />
                   <strong>Permissions:</strong> {inviteData?.permissions?.length || 0} assigned<br />
                   <strong>Schools:</strong> {inviteData?.school_ids?.length || 0} assigned

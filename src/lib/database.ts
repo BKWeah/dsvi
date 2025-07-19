@@ -627,7 +627,7 @@ export async function checkDsviAdminPermission(
 // ===============================================================================
 // DEPRECATED ADMIN FUNCTIONS (OLD MULTI-TABLE APPROACH)
 // These functions are kept for backward compatibility with SCHOOL_ADMIN role
-// but should NOT be used for DSVI_ADMIN role - use dsvi_admin functions instead
+// but should NOT be used for GSS_ADMIN role - use dsvi_admin functions instead
 // ===============================================================================
 
 // Admin School Assignments
@@ -991,8 +991,8 @@ export async function hasSchoolAccess(userId: string, schoolId: string): Promise
 
   const userRole = user.user.user_metadata?.role;
 
-  // DSVI Admins have access to all schools
-  if (userRole === 'DSVI_ADMIN') {
+  // GSS Admins have access to all schools
+  if (userRole === 'GSS_ADMIN') {
     // Check admin level using new function
     const { data: adminLevel, error } = await supabase
       .rpc('get_admin_level_new', { p_user_id: userId });
@@ -1035,7 +1035,7 @@ export async function hasSchoolAccess(userId: string, schoolId: string): Promise
     if (school?.admin_user_id === userId) return true;
 
     // Note: admin_school_assignments is still used for SCHOOL_ADMIN role
-    // This is different from DSVI_ADMIN which uses dsvi_admins table
+    // This is different from GSS_ADMIN which uses dsvi_admins table
     const { data: assignment } = await supabase
       .from('admin_school_assignments')
       .select('id')

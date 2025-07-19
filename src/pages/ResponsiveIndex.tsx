@@ -166,7 +166,7 @@ export default function ResponsiveIndex() {
                 Empowering Liberian Education
               </Badge>
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                Digital School Visibility Initiative: <span className="text-yellow-300">Transforming Education</span>
+                GyaWe School Solutions: <span className="text-yellow-300">Transforming Education</span>
               </h1>
               <p className="text-xl md:text-2xl text-blue-100 mb-8">
                 Connecting schools, students, and parents through innovative digital platforms.
@@ -390,7 +390,7 @@ export default function ResponsiveIndex() {
                 Ready to Transform Your School?
               </h2>
               <p className="text-xl mb-8 text-blue-100">
-                Join the Digital School Visibility Initiative and empower your institution for the future.
+                Join GyaWe School Solutions and empower your institution for the future.
               </p>
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
@@ -503,7 +503,7 @@ export default function ResponsiveIndex() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div>
                 <h3 className="text-xl font-bold mb-4">DSVI</h3>
-                <p className="text-gray-400">Digital School Visibility Initiative</p>
+                <p className="text-gray-400">GyaWe School Solutions</p>
                 <p className="text-gray-400 mt-2">Empowering Liberian Education Digitally.</p>
               </div>
               <div>

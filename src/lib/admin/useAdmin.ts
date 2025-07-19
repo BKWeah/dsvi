@@ -56,7 +56,7 @@ export const useAdmin = (): UseAdminReturn => {
     }
 
     // Only process DSVI admins
-    if (user.user_metadata?.role !== 'DSVI_ADMIN') {
+    if (user.user_metadata?.role !== 'GSS_ADMIN') {
       setAdminLevel(null);
       setAdminData(null);
       setLoading(false);
@@ -77,13 +77,13 @@ export const useAdmin = (): UseAdminReturn => {
         console.warn('❌ Error fetching admin level:', levelError);
         
         // If no admin level found, try to create Level 1 admin for backward compatibility
-        if (user.user_metadata?.role === 'DSVI_ADMIN') {
+        if (user.user_metadata?.role === 'GSS_ADMIN') {
           console.log('🔄 DSVI admin without level detected, attempting auto-migration...');
           
           const { error: migrationError } = await supabase.rpc('upsert_user_profile', {
             p_user_id: user.id,
             p_email: user.email || '',
-            p_role: 'DSVI_ADMIN',
+            p_role: 'GSS_ADMIN',
             p_name: user.user_metadata?.name || user.email?.split('@')[0] || 'Admin'
           });
 

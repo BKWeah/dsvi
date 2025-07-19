@@ -260,7 +260,7 @@ export class MessagingService {
 
       const userRole = currentUser.user.user_metadata?.role;
 
-      if (userRole === 'DSVI_ADMIN') {
+      if (userRole === 'GSS_ADMIN') {
         // Level 1 Admins can message all schools
         const { data, error } = await supabase
           .from('schools')
@@ -268,7 +268,7 @@ export class MessagingService {
           .order('name');
 
         if (error) {
-          console.error('Error fetching schools for DSVI admin:', error);
+          console.error('Error fetching schools for GSS admin:', error);
           throw error;
         }
         return data || [];

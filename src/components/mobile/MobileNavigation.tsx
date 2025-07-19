@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 interface MobileNavigationProps {
-  userRole: 'DSVI_ADMIN' | 'SCHOOL_ADMIN' | null;
+  userRole: 'GSS_ADMIN' | 'SCHOOL_ADMIN' | null;
   schoolName?: string;
   onLogout: () => void;
 }
@@ -29,7 +29,7 @@ export function MobileNavigation({ userRole, schoolName, onLogout }: MobileNavig
 
   const closeMenu = () => setIsOpen(false);
 
-  const DSVIAdminMenuItems = () => (
+  const GSSAdminMenuItems = () => (
     <div className="flex flex-col space-y-2 p-4">
       <Link 
         to="/dsvi-admin/schools" 
@@ -106,7 +106,7 @@ export function MobileNavigation({ userRole, schoolName, onLogout }: MobileNavig
           <div className="flex items-center justify-between">
             <div>
               <SheetTitle className="text-lg font-bold">
-                {userRole === 'DSVI_ADMIN' ? 'DSVI Admin' : 'School CMS'}
+                {userRole === 'GSS_ADMIN' ? 'GSS Admin' : 'School CMS'}
               </SheetTitle>
               {schoolName && (
                 <SheetDescription className="text-sm text-muted-foreground">
@@ -126,7 +126,7 @@ export function MobileNavigation({ userRole, schoolName, onLogout }: MobileNavig
         </SheetHeader>
         
         <div className="flex-1 overflow-y-auto">
-          {userRole === 'DSVI_ADMIN' && <DSVIAdminMenuItems />}
+          {userRole === 'GSS_ADMIN' && <GSSAdminMenuItems />}
           {userRole === 'SCHOOL_ADMIN' && <SchoolAdminMenuItems />}
         </div>
         

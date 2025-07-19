@@ -29,7 +29,7 @@ const iconMap = {
 };
 
 interface BottomAppBarProps {
-  userRole: 'DSVI_ADMIN' | 'SCHOOL_ADMIN';
+  userRole: 'GSS_ADMIN' | 'SCHOOL_ADMIN';
   className?: string;
 }
 
@@ -49,8 +49,8 @@ export function FeatureAwareBottomAppBar({ userRole, className }: BottomAppBarPr
   const enabledNavigation = useEnabledNavigation();
   const canAddSchools = useFeature('schools.addSchool');
 
-  // Build DSVI admin tabs based on enabled features
-  const buildDSVIAdminTabs = (): TabItem[] => {
+  // Build GSS admin tabs based on enabled features
+  const buildGSSAdminTabs = (): TabItem[] => {
     const tabs: TabItem[] = [];
     
     // Add enabled navigation items (limited to 3 for space)
@@ -118,7 +118,7 @@ export function FeatureAwareBottomAppBar({ userRole, className }: BottomAppBarPr
     }
   ];
 
-  const tabs = userRole === 'DSVI_ADMIN' ? buildDSVIAdminTabs() : schoolAdminTabs;
+  const tabs = userRole === 'GSS_ADMIN' ? buildGSSAdminTabs() : schoolAdminTabs;
   const gridCols = `grid-cols-${Math.min(tabs.length, 4)}`;
 
   // Don't render if no tabs are available

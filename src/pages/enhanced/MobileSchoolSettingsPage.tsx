@@ -101,7 +101,7 @@ export default function MobileSchoolSettingsPage() {
             <p className="text-muted-foreground">Loading settings...</p>
           </div>
         </div>
-        <BottomAppBar userRole="DSVI_ADMIN" />
+        <BottomAppBar userRole="GSS_ADMIN" />
       </div>
     );
   }
@@ -232,7 +232,7 @@ export default function MobileSchoolSettingsPage() {
         </Tabs>
       </div>
 
-      <BottomAppBar userRole="DSVI_ADMIN" />
+      <BottomAppBar userRole="GSS_ADMIN" />
     </div>
   );
 }

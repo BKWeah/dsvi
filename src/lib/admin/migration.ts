@@ -44,7 +44,7 @@ export const initializeAdminProfile = async (userId: string) => {
     const { error } = await supabase.rpc('upsert_user_profile', {
       p_user_id: userId,
       p_email: '', // Will be populated from auth
-      p_role: 'DSVI_ADMIN',
+      p_role: 'GSS_ADMIN',
       p_name: '' // Will be populated from auth
     });
 
@@ -70,7 +70,7 @@ export const initializeAdminProfile = async (userId: string) => {
  * Function to check if current user needs admin profile initialization
  */
 export const needsAdminProfileInit = async (userId: string, userRole: string) => {
-  if (userRole !== 'DSVI_ADMIN') return false;
+  if (userRole !== 'GSS_ADMIN') return false;
 
   try {
     const { data: adminLevel, error } = await supabase

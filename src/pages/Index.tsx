@@ -26,7 +26,7 @@ export default function Index() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex gap-4 flex-wrap">
-                {role === 'DSVI_ADMIN' && (
+                {role === 'GSS_ADMIN' && (
                   <Button asChild>
                     <Link to="/dsvi-admin">DSVI Admin Panel</Link>
                   </Button>

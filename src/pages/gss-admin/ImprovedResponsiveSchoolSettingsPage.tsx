@@ -252,7 +252,7 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
             <p className="text-muted-foreground">Loading school settings...</p>
           </div>
         </div>
-        <BottomAppBar userRole="DSVI_ADMIN" />
+        <BottomAppBar userRole="GSS_ADMIN" />
       </div>
     );
   }
@@ -269,7 +269,7 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
         <div className="p-4">
           <p className="text-muted-foreground">School not found</p>
         </div>
-        <BottomAppBar userRole="DSVI_ADMIN" />
+        <BottomAppBar userRole="GSS_ADMIN" />
       </div>
     );
   }
@@ -1643,7 +1643,7 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
       </div>
 
       {/* Bottom Navigation */}
-      <BottomAppBar userRole="DSVI_ADMIN" />
+      <BottomAppBar userRole="GSS_ADMIN" />
     </div>
   );
 }
