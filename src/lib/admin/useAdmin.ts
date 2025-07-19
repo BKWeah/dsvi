@@ -9,8 +9,8 @@ import {
   isRestrictedPermission 
 } from './permissions';
 
-// New consolidated admin interface (using dsvi_admin table)
-interface DsviAdmin {
+// New consolidated admin interface (using gss_admin table)
+interface GssAdmin {
   id: string;
   user_id: string;
   email: string;
@@ -28,7 +28,7 @@ interface DsviAdmin {
 
 interface UseAdminReturn {
   adminLevel: AdminLevel | null;
-  adminData: DsviAdmin | null;
+  adminData: GssAdmin | null;
   loading: boolean;
   error: string | null;
   hasPermission: (permission: PermissionType | string, schoolId?: string) => boolean;
@@ -43,7 +43,7 @@ interface UseAdminReturn {
 export const useAdmin = (): UseAdminReturn => {
   const { user } = useAuth();
   const [adminLevel, setAdminLevel] = useState<AdminLevel | null>(null);
-  const [adminData, setAdminData] = useState<DsviAdmin | null>(null);
+  const [adminData, setAdminData] = useState<GssAdmin | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,7 +55,7 @@ export const useAdmin = (): UseAdminReturn => {
       return;
     }
 
-    // Only process DSVI admins
+    // Only process GSS admins
     if (user.user_metadata?.role !== 'GSS_ADMIN') {
       setAdminLevel(null);
       setAdminData(null);
@@ -67,7 +67,7 @@ export const useAdmin = (): UseAdminReturn => {
       setLoading(true);
       setError(null);
 
-      console.log('🔄 Fetching admin data using consolidated dsvi_admin table for user:', user.id);
+      console.log('🔄 Fetching admin data using consolidated gss_admin table for user:', user.id);
 
       // Get admin level using the new consolidated function
       const { data: levelData, error: levelError } = await supabase
@@ -78,7 +78,7 @@ export const useAdmin = (): UseAdminReturn => {
         
         // If no admin level found, try to create Level 1 admin for backward compatibility
         if (user.user_metadata?.role === 'GSS_ADMIN') {
-          console.log('🔄 DSVI admin without level detected, attempting auto-migration...');
+          console.log('🔄 GSS admin without level detected, attempting auto-migration...');
           
           const { error: migrationError } = await supabase.rpc('upsert_user_profile', {
             p_user_id: user.id,
@@ -109,13 +109,13 @@ export const useAdmin = (): UseAdminReturn => {
         .rpc('get_admin_by_user_id', { p_user_id: user.id });
 
       if (!profileError && adminProfileData && adminProfileData.length > 0) {
-        const adminProfile = adminProfileData[0] as DsviAdmin;
+        const adminProfile = adminProfileData[0] as GssAdmin;
         setAdminData(adminProfile);
         console.log('✅ Admin profile fetched from consolidated table:', adminProfile);
         
         // Update last login timestamp
         const { error: updateError } = await supabase
-          .from('dsvi_admins')
+          .from('gss_admins')
           .update({ last_login: new Date().toISOString() })
           .eq('user_id', user.id);
           

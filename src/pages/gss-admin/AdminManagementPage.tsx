@@ -129,12 +129,12 @@ export default function AdminManagementPage() {
         <body>
           <div class="container">
             <div class="header">
-              <h1>🎉 Welcome to DSVI Admin Portal</h1>
+              <h1>🎉 Welcome to GSS Admin Portal</h1>
             </div>
             <div class="content">
               <h2>Hello ${name},</h2>
               
-              <p>You've been invited to join the DSVI platform as a <strong>Level 2 Administrator</strong>!</p>
+              <p>You've been invited to join the GSS platform as a <strong>Level 2 Administrator</strong>!</p>
               
               <p>As a Level 2 Admin, you'll have access to manage specific schools and help coordinate educational services through our platform.</p>
               
@@ -162,10 +162,10 @@ export default function AdminManagementPage() {
               <p>If you have any questions, please contact our support team or reply to this email.</p>
               
               <p>Welcome to the team!</p>
-              <p><strong>The DSVI Team</strong></p>
+              <p><strong>The GSS Team</strong></p>
             </div>
             <div class="footer">
-              <p>© 2025 DSVI Platform. All rights reserved.</p>
+              <p>© 2025 GSS Platform. All rights reserved.</p>
               <p>This is an automated message. Please do not reply directly to this email.</p>
             </div>
           </div>
@@ -179,11 +179,11 @@ export default function AdminManagementPage() {
           recipient_email: email,
           recipient_name: name
         }],
-        subject: `Welcome to DSVI - Complete Your Level 2 Admin Setup`,
+        subject: `Welcome to GSS - Complete Your Level 2 Admin Setup`,
         html: emailTemplate,
         from: {
-          email: 'onboarding@libdsvi.com',
-          name: 'DSVI Team'
+          email: 'onboarding@libgss.com',
+          name: 'GSS Team'
         }
       });
 

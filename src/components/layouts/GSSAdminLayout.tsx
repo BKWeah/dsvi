@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/sidebar';
 import { School, LogOut, Users } from 'lucide-react';
 
-export function DSVIAdminLayout() {
+export function GSSAdminLayout() {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -29,13 +29,13 @@ export function DSVIAdminLayout() {
       <div className="min-h-screen flex w-full">
         <Sidebar>
           <SidebarHeader className="p-4">
-            <h2 className="text-lg font-semibold">DSVI Admin</h2>
+            <h2 className="text-lg font-semibold">GSS Admin</h2>
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link to="/dsvi-admin/schools">
+                  <Link to="/gss-admin/schools">
                     <School className="h-4 w-4" />
                     <span>Schools</span>
                   </Link>
@@ -43,7 +43,7 @@ export function DSVIAdminLayout() {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link to="/dsvi-admin/requests">
+                  <Link to="/gss-admin/requests">
                     <Users className="h-4 w-4" />
                     <span>School Requests</span>
                   </Link>

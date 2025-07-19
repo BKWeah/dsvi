@@ -27,7 +27,7 @@ export default function TeamPage() {
         'marketing & communications': 'Marketing & Communications',
         'client services': 'Client Services',
         'operations & finance': 'Operations & Finance',
-        'dsvi': 'DSVI',
+        'dsvi': 'GSS',
         'dsvi school directory': 'GyaWe School Directory',
         'dvi': 'DVI'
       };
@@ -53,7 +53,7 @@ export default function TeamPage() {
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
               The People Behind
-              <span className="text-yellow-300"> DSVI's Success</span>
+              <span className="text-yellow-300"> GSS's Success</span>
             </h1>
             <p className="text-xl md:text-2xl text-blue-100">
               Dedicated professionals working together to transform Liberian education through digital innovation

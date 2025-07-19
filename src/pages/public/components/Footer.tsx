@@ -28,7 +28,7 @@ export const Footer: React.FC = () => {
           {/* Brand Section */}
           <div>
             <div className="flex items-center space-x-3 mb-6">
-              <img src="/updates_assets/DSVI Official Logo.png" alt="DSVI Official Logo" className="h-10 w-10 object-contain" />
+              <img src="/updates_assets/DSVI Official Logo.png" alt="GyaWe School Solutions Logo" className="h-10 w-10 object-contain" />
               <div>
                 <span className="text-xl font-bold">GSS</span>
                 <p className="text-xs text-gray-400 -mt-1">GyaWe School Solutions</p>
@@ -47,7 +47,7 @@ export const Footer: React.FC = () => {
               <a href="tel:+2317739102999" className="text-gray-400 hover:text-white transition-colors">
                 <Phone className="h-5 w-5" />
               </a>
-              <a href="https://libdsvi.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+              <a href="https://gyawe.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                 <Globe className="h-5 w-5" />
               </a>
             </div>
@@ -116,8 +116,8 @@ export const Footer: React.FC = () => {
             <div className="space-y-4 text-gray-400">
               <div className="flex items-center space-x-3">
                 <Mail className="h-4 w-4 flex-shrink-0" />
-                <a href="mailto:info@libdsvi.com" className="hover:text-white transition-colors">
-                  info@libdsvi.com
+                <a href="mailto:info@gyawe.com" className="hover:text-white transition-colors">
+                  info@gyawe.com
                 </a>
               </div>
               <div className="flex items-center space-x-3">
@@ -140,7 +140,7 @@ export const Footer: React.FC = () => {
               <div className="flex items-start space-x-3">
                 <MapPin className="h-4 w-4 flex-shrink-0 mt-1" />
                 <div>
-                  <p>DSVI Office</p>
+                  <p>GSS Office</p>
                   <p>Outland Community, Opp. LTC Compound</p>
                   <p>Paynesville, Montserrado County</p>
                   <p>Republic of Liberia</p>

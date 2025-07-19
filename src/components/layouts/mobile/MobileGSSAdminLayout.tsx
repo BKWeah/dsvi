@@ -3,7 +3,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { MobileLayout } from '@/components/mobile/MobileLayout';
 
-export function MobileDSVIAdminLayout() {
+export function MobileGSSAdminLayout() {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -14,7 +14,7 @@ export function MobileDSVIAdminLayout() {
 
   return (
     <MobileLayout
-      title="DSVI Admin"
+      title="GSS Admin"
       subtitle="Manage schools and requests"
     >
       <Outlet />

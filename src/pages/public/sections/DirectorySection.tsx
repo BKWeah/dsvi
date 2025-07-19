@@ -60,7 +60,7 @@ export const DirectorySection: React.FC = () => {
       <div className="container mx-auto px-4">
         <div ref={titleRef} className="max-w-4xl mx-auto text-center mb-20">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Explore the DSVI Ecosystem
+            Explore the GSS Ecosystem
           </h2>
           <p className="text-xl text-gray-600 leading-relaxed">
             Discover and connect with Liberian schools through our comprehensive directory platform
@@ -90,7 +90,7 @@ export const DirectorySection: React.FC = () => {
                 size="lg" 
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 text-base group-hover:bg-blue-800 transition-colors duration-300"
               >
-                <a href="https://directory.libdsvi.com" target="_blank" rel="noopener noreferrer">
+                <a href="https://directory.gyawe.com" target="_blank" rel="noopener noreferrer">
                   Browse Directory
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
                 </a>
@@ -120,7 +120,7 @@ export const DirectorySection: React.FC = () => {
                 size="lg" 
                 className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-4 text-base group-hover:bg-green-800 transition-colors duration-300"
               >
-                <a href="https://directory.libdsvi.com/submit" target="_blank" rel="noopener noreferrer">
+                <a href="https://directory.gyawe.com/submit" target="_blank" rel="noopener noreferrer">
                   List Your School
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
                 </a>

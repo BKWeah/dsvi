@@ -7,17 +7,17 @@ import AdmissionsPage from './pages/AdmissionsPage';
 import FacultyPage from './pages/FacultyPage';
 import ContactPage from './pages/ContactPage';
 
-interface DSVISchoolRendererProps {
+interface GSSSchoolRendererProps {
   school: School;
   pageContent?: PageContent;
   currentPage?: string;
 }
 
-export default function DSVISchoolRenderer({ 
+export default function GSSSchoolRenderer({ 
   school, 
   pageContent, 
   currentPage = 'home' 
-}: DSVISchoolRendererProps) {
+}: GSSSchoolRendererProps) {
   
   // Map page types to components
   const normalizedPage = currentPage === 'homepage' ? 'home' : 

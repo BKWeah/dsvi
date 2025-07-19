@@ -1,12 +1,12 @@
 import { supabase } from '../integrations/supabase/client';
 
 /**
- * Migration script to set up admin levels for existing DSVI admin users
+ * Migration script to set up admin levels for existing GSS admin users
  * This should be run once after deploying the new admin levels system
  */
 export const migrateExistingAdmins = async () => {
   try {
-    console.log('Starting migration of existing DSVI admins to Level 1...');
+    console.log('Starting migration of existing GSS admins to Level 1...');
 
     // Note: In a real production environment, this would be handled differently
     // since we can't directly query auth.users from the client side.
@@ -17,7 +17,7 @@ export const migrateExistingAdmins = async () => {
 
     const result = {
       success: true,
-      message: 'Migration setup complete. Existing DSVI admins will be automatically upgraded to Level 1 on their next login.',
+      message: 'Migration setup complete. Existing GSS admins will be automatically upgraded to Level 1 on their next login.',
       note: 'The upsert_user_profile function has been updated to handle this automatically.'
     };
 
@@ -29,14 +29,14 @@ export const migrateExistingAdmins = async () => {
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
-      message: 'Failed to migrate existing DSVI admins'
+      message: 'Failed to migrate existing GSS admins'
     };
   }
 };
 
 /**
  * Function for current admin to initialize their Level 1 admin profile
- * This should be called by existing DSVI admins when they first access the new system
+ * This should be called by existing GSS admins when they first access the new system
  */
 export const initializeAdminProfile = async (userId: string) => {
   try {

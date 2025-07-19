@@ -125,7 +125,7 @@ export default function ThankYouPage() {
                     <div>
                       <Mail className="h-8 w-8 text-green-600 mx-auto mb-2" />
                       <p className="font-medium">Email</p>
-                      <p className="text-green-600">support@libdsvi.com</p>
+                      <p className="text-green-600">support@gyawe.com</p>
                     </div>
                     <div>
                       <MessageCircle className="h-8 w-8 text-purple-600 mx-auto mb-2" />

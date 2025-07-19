@@ -153,7 +153,7 @@ serve(async (req) => {
       subject: message.subject,
       html: message.body,
       // The 'from' address will be resolved by the Cloudflare Pages Function
-      // from: { email: 'onboarding@libdsvi.com', name: 'DSVI' } // Or fetch from settings if needed
+      // from: { email: 'onboarding@libgss.com', name: 'GSS' } // Or fetch from settings if needed
     };
 
     console.log('Sending email payload to Cloudflare Pages Function:', emailPayload);

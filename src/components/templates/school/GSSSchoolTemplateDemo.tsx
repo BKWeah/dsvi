@@ -3,11 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import DSVISchoolRenderer from './DSVISchoolRenderer';
+import GSSSchoolRenderer from './GSSSchoolRenderer';
 import { sampleSchoolData } from './utils/sampleData';
 import { Eye, Code, Palette, Layout } from 'lucide-react';
 
-export default function DSVISchoolTemplateDemo() {
+export default function GSSSchoolTemplateDemo() {
   const [currentPage, setCurrentPage] = useState('home');
   const [showCode, setShowCode] = useState(false);
 
@@ -49,7 +49,7 @@ export default function DSVISchoolTemplateDemo() {
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">DSVI School Template</h1>
+              <h1 className="text-3xl font-bold text-gray-900">GSS School Template</h1>
               <p className="text-gray-600">Implementation Code</p>
             </div>
             <Button onClick={() => setShowCode(false)} variant="outline">
@@ -64,12 +64,12 @@ export default function DSVISchoolTemplateDemo() {
             </CardHeader>
             <CardContent>
               <pre className="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto text-sm">
-{`import { DSVISchoolRenderer } from '@/components/templates/school';
+{`import { GSSSchoolRenderer } from '@/components/templates/school';
 import { sampleSchoolData } from '@/components/templates/school/utils/sampleData';
 
 function SchoolWebsite() {
   return (
-    <DSVISchoolRenderer 
+    <GSSSchoolRenderer 
       school={sampleSchoolData}
       currentPage="home"
     />
@@ -89,7 +89,7 @@ function SchoolWebsite() {
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">DSVI School Template Demo</h1>
+              <h1 className="text-2xl font-bold text-gray-900">GSS School Template Demo</h1>
               <p className="text-gray-600">Beautiful, responsive school website template</p>
             </div>
             <div className="flex items-center space-x-4">
@@ -147,7 +147,7 @@ function SchoolWebsite() {
 
       {/* Template Preview */}
       <div className="bg-white">
-        <DSVISchoolRenderer 
+        <GSSSchoolRenderer 
           school={sampleSchoolData}
           currentPage={currentPage}
         />

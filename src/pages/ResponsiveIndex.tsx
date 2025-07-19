@@ -528,7 +528,7 @@ export default function ResponsiveIndex() {
                 </p>
                 <p className="text-gray-400 flex items-center">
                   <Mail className="h-5 w-5 mr-2 text-gray-500" />
-                  info@libdsvi.com
+                  info@gyawe.com
                 </p>
               </div>
             </div>

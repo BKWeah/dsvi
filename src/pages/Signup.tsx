@@ -42,7 +42,7 @@ export default function Signup() {
             <Alert className="mb-4">
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                You can only create an account through an invitation link provided by a DSVI administrator.
+                You can only create an account through an invitation link provided by a GSS administrator.
               </AlertDescription>
             </Alert>
             <Button 

@@ -241,7 +241,7 @@ export interface TemplateVariables {
 export const DEFAULT_TEMPLATE_VARIABLES: TemplateVariables = {
   support_email: 'support@dsvi.org',
   support_phone: '+1 (555) 123-4567',
-  company_name: 'Digital School Visibility Initiative',
+  company_name: 'GyaWe School Solutions',
   admin_portal_url: window.location.origin + '/school-admin'
 };
 

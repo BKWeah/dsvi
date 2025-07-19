@@ -1,4 +1,4 @@
-# DSVI Email Messaging System - Implementation Summary
+# GSS Email Messaging System - Implementation Summary
 
 ## ✅ Problem Fixed
 The messaging system was creating database records but **not actually sending emails**. I've implemented the missing email sending functionality that integrates with your existing Cloudflare Pages Function and Resend API.

@@ -44,8 +44,8 @@ async function fixEmailSettings() {
       .insert({
         provider: 'resend',
         api_key: resendApiKey,
-        from_email: 'onboarding@libdsvi.com',
-        from_name: 'DSVI Team',
+        from_email: 'onboarding@libgss.com',
+        from_name: 'GSS Team',
         reply_to_email: 'support@dsvi.org',
         is_active: true,
         test_mode: false,

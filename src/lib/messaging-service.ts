@@ -415,8 +415,8 @@ export class MessagingService {
         subject: finalSubject,
         html: finalBody,
         from: {
-          email: 'onboarding@libdsvi.com',
-          name: 'DSVI Team'
+          email: 'onboarding@libgss.com',
+          name: 'GSS Team'
         }
       });
 
@@ -502,10 +502,10 @@ export class MessagingService {
       const defaultTemplates = [
         {
           name: 'Welcome Email',
-          subject: 'Welcome to DSVI - Your School Website is Ready!',
+          subject: 'Welcome to GSS - Your School Website is Ready!',
           body: `Hello {{school_name}},
 
-Welcome to the Digital School Visibility Initiative! We're excited to have you on board.
+Welcome to GyaWe School Solutions! We're excited to have you on board.
 
 Your school website has been successfully created and is now live.
 
@@ -517,13 +517,13 @@ Next Steps:
 If you need any assistance, please don't hesitate to contact our support team.
 
 Best regards,
-The DSVI Team`,
+The GSS Team`,
           template_type: 'welcome' as const,
           variables: ['school_name']
         },
         {
           name: 'General Announcement',
-          subject: 'Important Update from DSVI',
+          subject: 'Important Update from GSS',
           body: `Hello {{school_name}},
 
 We hope this message finds you well.
@@ -533,7 +533,7 @@ We hope this message finds you well.
 If you have any questions, please feel free to contact us.
 
 Best regards,
-The DSVI Team`,
+The GSS Team`,
           template_type: 'custom' as const,
           variables: ['school_name', 'announcement_content']
         },
@@ -552,7 +552,7 @@ Meeting Details:
 Please confirm your attendance by replying to this email.
 
 Best regards,
-The DSVI Team`,
+The GSS Team`,
           template_type: 'custom' as const,
           variables: ['school_name', 'meeting_topic', 'meeting_date', 'meeting_time', 'meeting_location']
         }

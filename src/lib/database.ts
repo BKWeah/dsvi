@@ -22,7 +22,7 @@ async function sendSchoolAdminInvitationEmail(
       school_name: schoolName,
       role: 'SCHOOL_ADMIN'
     });
-    const signupLink = `${typeof window !== 'undefined' ? window.location.origin : 'https://libdsvi.com'}/signup?${params.toString()}`;
+    const signupLink = `${typeof window !== 'undefined' ? window.location.origin : 'https://libgss.com'}/signup?${params.toString()}`;
 
     const emailTemplate = `
       <!DOCTYPE html>
@@ -41,18 +41,18 @@ async function sendSchoolAdminInvitationEmail(
       <body>
         <div class="container">
           <div class="header">
-            <h1>🏫 Welcome to DSVI - School Administrator</h1>
+            <h1>🏫 Welcome to GSS - School Administrator</h1>
           </div>
           <div class="content">
             <h2>Hello!</h2>
             
-            <p>You've been invited to join the DSVI platform as the <strong>School Administrator</strong> for <strong>${schoolName}</strong>!</p>
+            <p>You've been invited to join the GSS platform as the <strong>School Administrator</strong> for <strong>${schoolName}</strong>!</p>
             
             <p>As a School Administrator, you'll be able to:</p>
             <ul>
               <li>🎓 Manage your school's profile and information</li>
               <li>📝 Create and update school content</li>
-              <li>👥 Coordinate with DSVI administrators</li>
+              <li>👥 Coordinate with GSS administrators</li>
               <li>📊 Access school-specific features and analytics</li>
               <li>🔧 Customize your school's settings and preferences</li>
             </ul>
@@ -61,7 +61,7 @@ async function sendSchoolAdminInvitationEmail(
               <h3>🏫 Your School Assignment:</h3>
               <p><strong>School:</strong> ${schoolName}</p>
               <p><strong>Role:</strong> School Administrator</p>
-              <p><strong>Platform:</strong> DSVI Digital School Management</p>
+              <p><strong>Platform:</strong> GSS Digital School Management</p>
             </div>
             
             <h3>🚀 Getting Started:</h3>
@@ -84,10 +84,10 @@ async function sendSchoolAdminInvitationEmail(
             
             <p>We're excited to have you on board and look forward to supporting your school's digital journey!</p>
             
-            <p><strong>The DSVI Team</strong></p>
+            <p><strong>The GSS Team</strong></p>
           </div>
           <div class="footer">
-            <p>© 2025 DSVI Platform. All rights reserved.</p>
+            <p>© 2025 GSS Platform. All rights reserved.</p>
             <p>This invitation is specific to ${schoolName}. Please do not share this link.</p>
           </div>
         </div>
@@ -101,11 +101,11 @@ async function sendSchoolAdminInvitationEmail(
         recipient_email: adminEmail,
         recipient_name: undefined // We don't have the admin name at this point
       }],
-      subject: `Welcome to DSVI - ${schoolName} Administrator Invitation`,
+      subject: `Welcome to GSS - ${schoolName} Administrator Invitation`,
       html: emailTemplate,
       from: {
-        email: 'onboarding@libdsvi.com',
-        name: 'DSVI Team'
+        email: 'onboarding@libgss.com',
+        name: 'GSS Team'
       }
     });
 
@@ -561,11 +561,11 @@ export function createDefaultSections(pageSlug: string): ContentSection[] {
 
 
 // ===============================================================================
-// NEW DSVI ADMIN FUNCTIONS (using dsvi_admins table)
+// NEW GSS ADMIN FUNCTIONS (using dsvi_admins table)
 // ===============================================================================
 
-// Get schools assigned to DSVI admin using new consolidated table
-export async function getDsviAdminAssignedSchools(userId: string): Promise<School[]> {
+// Get schools assigned to GSS admin using new consolidated table
+export async function getGssAdminAssignedSchools(userId: string): Promise<School[]> {
   try {
     const { data: assignedSchoolIds, error } = await supabase
       .rpc('get_assigned_schools_new', { p_user_id: userId });
@@ -593,13 +593,13 @@ export async function getDsviAdminAssignedSchools(userId: string): Promise<Schoo
 
     return schools || [];
   } catch (error) {
-    console.error('Error in getDsviAdminAssignedSchools:', error);
+    console.error('Error in getGssAdminAssignedSchools:', error);
     return [];
   }
 }
 
-// Check if DSVI admin has specific permission for a school
-export async function checkDsviAdminPermission(
+// Check if GSS admin has specific permission for a school
+export async function checkGssAdminPermission(
   userId: string, 
   permission: string, 
   schoolId?: string
@@ -619,7 +619,7 @@ export async function checkDsviAdminPermission(
 
     return hasPermission || false;
   } catch (error) {
-    console.error('Error in checkDsviAdminPermission:', error);
+    console.error('Error in checkGssAdminPermission:', error);
     return false;
   }
 }
@@ -627,7 +627,7 @@ export async function checkDsviAdminPermission(
 // ===============================================================================
 // DEPRECATED ADMIN FUNCTIONS (OLD MULTI-TABLE APPROACH)
 // These functions are kept for backward compatibility with SCHOOL_ADMIN role
-// but should NOT be used for GSS_ADMIN role - use dsvi_admin functions instead
+// but should NOT be used for GSS_ADMIN role - use gss_admin functions instead
 // ===============================================================================
 
 // Admin School Assignments
@@ -712,7 +712,7 @@ export async function removeSchoolAssignment(assignmentId: string, removedBy: st
   }
 }
 
-// DEPRECATED: Use getDsviAdminAssignedSchools for DSVI admins instead
+// DEPRECATED: Use getGssAdminAssignedSchools for GSS admins instead
 // This function is kept for SCHOOL_ADMIN role compatibility only
 export async function getAssignedSchools(adminId: string): Promise<School[]> {
   const { data, error } = await supabase
@@ -984,7 +984,7 @@ export async function updateSchoolWithSubscription(
   return updatedSchool as School;
 }
 
-// Check if user has access to school using new dsvi_admin system
+// Check if user has access to school using new gss_admin system
 export async function hasSchoolAccess(userId: string, schoolId: string): Promise<boolean> {
   const { data: user } = await supabase.auth.getUser();
   if (!user.user) return false;
@@ -1035,7 +1035,7 @@ export async function hasSchoolAccess(userId: string, schoolId: string): Promise
     if (school?.admin_user_id === userId) return true;
 
     // Note: admin_school_assignments is still used for SCHOOL_ADMIN role
-    // This is different from GSS_ADMIN which uses dsvi_admins table
+    // This is different from GSS_ADMIN which uses gss_admins table
     const { data: assignment } = await supabase
       .from('admin_school_assignments')
       .select('id')

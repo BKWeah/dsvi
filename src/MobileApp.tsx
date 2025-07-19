@@ -7,7 +7,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { ResponsiveDSVIAdminLayout } from "./components/layouts/ResponsiveDSVIAdminLayout";
+import { ResponsiveGSSAdminLayout } from "./components/layouts/ResponsiveGSSAdminLayout";
 import { ResponsiveSchoolAdminLayout } from "./components/layouts/ResponsiveSchoolAdminLayout";
 import { PublicSchoolLayout } from "./components/layouts/PublicSchoolLayout";
 import { SchoolPageDisplay } from "./components/public/SchoolPageDisplay";
@@ -43,12 +43,12 @@ const App = () => (
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/unauthorized" element={<Unauthorized />} />
                 
-                {/* DSVI Admin Routes with Responsive Layout */}
+                {/* GSS Admin Routes with Responsive Layout */}
                 <Route 
                   path="/gss-admin" 
                   element={
                     <ProtectedRoute roles={['GSS_ADMIN']}>
-                      <ResponsiveDSVIAdminLayout />
+                      <ResponsiveGSSAdminLayout />
                     </ProtectedRoute>
                   }
                 >

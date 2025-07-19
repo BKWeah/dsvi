@@ -124,12 +124,12 @@ export default function SchoolFooter({ school }: SchoolFooterProps) {
             <div className="flex items-center space-x-1">
               <span>Built with ❤️ by</span>
               <a 
-                href="https://libdsvi.com" 
+                href="https://gyawe.com" 
                 className="text-gray-300 hover:text-white transition-colors font-medium no-underline hover:underline"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                DSVI
+GSS
               </a>
             </div>
           </div>

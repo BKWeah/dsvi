@@ -88,7 +88,7 @@ export default function MobileSchoolsPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold">Schools Management</h1>
           <p className="text-muted-foreground text-sm">
-            Manage all schools in the DSVI platform
+            Manage all schools in the GSS platform
           </p>
         </div>
         

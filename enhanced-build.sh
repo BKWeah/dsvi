@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# Enhanced DSVI Email System Build & Deploy Script
+# Enhanced GSS Email System Build & Deploy Script
 # Automatically sets up email functionality and prepares for Cloudflare Pages deployment
 
-echo "🚀 DSVI Enhanced Email System - Build & Deploy"
+echo "🚀 GSS Enhanced Email System - Build & Deploy"
 echo "=============================================="
 
 # Check if we're in the right directory
 if [ ! -f "package.json" ]; then
-    echo "❌ Error: Run this script from the DSVI project root directory"
+    echo "❌ Error: Run this script from the GSS project root directory"
     exit 1
 fi
 
@@ -101,7 +101,7 @@ echo ""
 
 # Step 6: Create a quick deployment checklist
 cat > deploy/deployment-checklist.md << 'EOF'
-# DSVI Email System Deployment Checklist
+# GSS Email System Deployment Checklist
 
 ## Pre-deployment
 - [ ] Environment variables are set (check deploy/cloudflare-variables.txt)

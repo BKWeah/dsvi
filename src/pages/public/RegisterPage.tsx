@@ -49,7 +49,7 @@ export default function RegisterPage() {
   const generateReceiptNumber = () => {
     const timestamp = Date.now();
     const random = Math.floor(Math.random() * 1000);
-    return `DSVI-${timestamp}-${random}`;
+    return `GSS-${timestamp}-${random}`;
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,7 +181,7 @@ export default function RegisterPage() {
                     School Registration Form
                   </CardTitle>
                   <p className="text-gray-600">
-                    Fill out all required fields to get started with DSVI
+                    Fill out all required fields to get started with GSS
                   </p>
                 </CardHeader>
                 

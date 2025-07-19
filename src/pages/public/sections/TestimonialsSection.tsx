@@ -10,7 +10,7 @@ export const TestimonialsSection: React.FC = () => {
       role: "Principal",
       school: "Lincoln Elementary School",
       rating: 5,
-      text: "DSVI transformed our school's online presence, making it easier for parents and students to connect. Their professional service is unmatched in Liberia!",
+      text: "GSS transformed our school's online presence, making it easier for parents and students to connect. Their professional service is unmatched in Liberia!",
       avatar: "JD"
     },
     {
@@ -26,7 +26,7 @@ export const TestimonialsSection: React.FC = () => {
       role: "Director",
       school: "Oak Valley Academy",
       rating: 5,
-      text: "As a small private school, we needed an affordable solution that didn't compromise on quality. DSVI delivered exactly what we needed!",
+      text: "As a small private school, we needed an affordable solution that didn't compromise on quality. GSS delivered exactly what we needed!",
       avatar: "MB"
     }
   ];
@@ -39,10 +39,10 @@ export const TestimonialsSection: React.FC = () => {
             Success Stories
           </Badge>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            What Educators Say About DSVI
+            What Educators Say About GSS
           </h2>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-            Trusted by educational institutions across Liberia. Here's what our partners have to say about their experience with DSVI.
+            Trusted by educational institutions across Liberia. Here's what our partners have to say about their experience with GSS.
           </p>
         </div>
 

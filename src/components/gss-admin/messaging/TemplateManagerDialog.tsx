@@ -45,10 +45,10 @@ export function TemplateManagerDialog({
   // Template suggestions based on type
   const templateSuggestions = {
     welcome: {
-      subject: 'Welcome to DSVI - Your School Website is Ready!',
+      subject: 'Welcome to GSS - Your School Website is Ready!',
       body: `Hello {{school_name}},
 
-Welcome to the Digital School Visibility Initiative! We're excited to have you on board.
+Welcome to GyaWe School Solutions! We're excited to have you on board.
 
 Your school website has been created and is ready for customization.
 
