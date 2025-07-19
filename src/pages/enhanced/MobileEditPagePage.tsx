@@ -11,7 +11,7 @@ export default function MobileEditPagePage() {
   const navigate = useNavigate();
 
   const handleSave = () => {
-    navigate(`/dsvi-admin/schools/${schoolId}/content`);
+    navigate(`/gss-admin/schools/${schoolId}/content`);
   };
 
   const formatPageType = (type: string) => {
@@ -38,7 +38,7 @@ export default function MobileEditPagePage() {
         title={`Edit ${formatPageType(pageType)}`}
         subtitle="Manage page content"
         showBackButton
-        onBack={() => navigate(`/dsvi-admin/schools/${schoolId}/content`)}
+        onBack={() => navigate(`/gss-admin/schools/${schoolId}/content`)}
         actionButton={{
           label: "Save",
           icon: <Save className="h-4 w-4" />,

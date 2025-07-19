@@ -6,7 +6,7 @@ import { Mail, Send, MessageSquare, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { messagingService } from '@/lib/messaging-service';
 import { useAuth } from '@/contexts/AuthContext';
-import { ComposeMessageDialog } from '@/components/dsvi-admin/messaging/ComposeMessageDialog';
+import { ComposeMessageDialog } from '@/components/gss-admin/messaging/ComposeMessageDialog';
 
 export default function SchoolAdminMessagingPage() {
   const [accessibleSchools, setAccessibleSchools] = useState<Array<{id: string, name: string}>>([]);

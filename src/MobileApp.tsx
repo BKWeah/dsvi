@@ -17,11 +17,11 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
-import SchoolsPage from "./pages/dsvi-admin/SchoolsPage";
-import SchoolRequestsPage from "./pages/dsvi-admin/SchoolRequestsPage";
-import SchoolContentPage from "./pages/dsvi-admin/SchoolContentPage";
-import EditPagePage from "./pages/dsvi-admin/EditPagePage";
-import SchoolSettingsPage from "./pages/dsvi-admin/SchoolSettingsPage";
+import SchoolsPage from "./pages/gss-admin/SchoolsPage";
+import SchoolRequestsPage from "./pages/gss-admin/SchoolRequestsPage";
+import SchoolContentPage from "./pages/gss-admin/SchoolContentPage";
+import EditPagePage from "./pages/gss-admin/EditPagePage";
+import SchoolSettingsPage from "./pages/gss-admin/SchoolSettingsPage";
 import SchoolAdminDashboard from "./pages/school-admin/SchoolAdminDashboard";
 import EditSchoolPagePage from "./pages/school-admin/EditSchoolPagePage";
 
@@ -45,7 +45,7 @@ const App = () => (
                 
                 {/* DSVI Admin Routes with Responsive Layout */}
                 <Route 
-                  path="/dsvi-admin" 
+                  path="/gss-admin" 
                   element={
                     <ProtectedRoute roles={['DSVI_ADMIN']}>
                       <ResponsiveDSVIAdminLayout />

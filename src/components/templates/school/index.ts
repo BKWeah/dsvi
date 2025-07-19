@@ -1,10 +1,10 @@
-// DSVI Standard School Website Template
+// GyaWe School Solutions (GSS) Standard School Website Template
 // Export all components for easy importing
 
-export { default as DSVISchoolRenderer } from './DSVISchoolRenderer';
-export { default } from './DSVISchoolRenderer'; // Also export as default
+export { default as GSSSchoolRenderer } from './GSSSchoolRenderer';
+export { default } from './GSSSchoolRenderer'; // Also export as default
 export { default as SchoolLayout } from './SchoolLayout';
-export { default as DSVISchoolTemplateDemo } from './DSVISchoolTemplateDemo';
+export { default as GSSSchoolTemplateDemo } from './GSSSchoolTemplateDemo';
 
 // Pages
 export { default as HomePage } from './pages/HomePage';

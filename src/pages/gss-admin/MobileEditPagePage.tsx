@@ -9,7 +9,7 @@ export default function MobileEditPagePage() {
   const navigate = useNavigate();
 
   const handleSave = () => {
-    navigate(`/dsvi-admin/schools/${schoolId}/content`);
+    navigate(`/gss-admin/schools/${schoolId}/content`);
   };
 
   const formatPageType = (type: string) => {
@@ -35,7 +35,7 @@ export default function MobileEditPagePage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => navigate(`/dsvi-admin/schools/${schoolId}/content`)}
+              onClick={() => navigate(`/gss-admin/schools/${schoolId}/content`)}
               className="p-2 h-8 w-8"
             >
               <ArrowLeft className="h-4 w-4" />

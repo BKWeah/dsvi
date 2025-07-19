@@ -49,7 +49,7 @@ export default function SchoolContentPage() {
         description: "You don't have permission to access this school",
         variant: "destructive",
       });
-      navigate('/dsvi-admin/schools');
+      navigate('/gss-admin/schools');
     }
   }, [schoolId, hasAccess, accessLoading]);
 
@@ -92,7 +92,7 @@ export default function SchoolContentPage() {
         <MobileTopBar 
           title="School Content" 
           subtitle="Loading..." 
-          backUrl="/dsvi-admin/schools" 
+          backUrl="/gss-admin/schools" 
         />
         <div className="p-4 flex items-center justify-center h-64">
           <div className="text-center">
@@ -110,7 +110,7 @@ export default function SchoolContentPage() {
         <MobileTopBar 
           title="School Content" 
           subtitle="Error" 
-          backUrl="/dsvi-admin/schools" 
+          backUrl="/gss-admin/schools" 
         />
         <div className="p-4">
           <p className="text-muted-foreground">School not found</p>
@@ -125,7 +125,7 @@ export default function SchoolContentPage() {
       <MobileTopBar 
         title="School Content" 
         subtitle={school.name} 
-        backUrl="/dsvi-admin/schools" 
+        backUrl="/gss-admin/schools" 
       />
 
       <div className="p-4 space-y-6">
@@ -133,7 +133,7 @@ export default function SchoolContentPage() {
         <div className="hidden md:flex items-center gap-4">
           <Button
             variant="outline"
-            onClick={() => navigate('/dsvi-admin/schools')}
+            onClick={() => navigate('/gss-admin/schools')}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -158,7 +158,7 @@ export default function SchoolContentPage() {
                 </CardHeader>
                 <CardContent>
                   <Button asChild className="w-full">
-                    <Link to={`/dsvi-admin/schools/${schoolId}/pages/${pageType.type}/edit`}>
+                    <Link to={`/gss-admin/schools/${schoolId}/pages/${pageType.type}/edit`}>
                       <Edit className="h-4 w-4 mr-2" />
                       Edit Page
                     </Link>

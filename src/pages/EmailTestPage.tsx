@@ -1,5 +1,5 @@
 import React from 'react';
-import { EmailTestComponent } from '@/components/dsvi-admin/messaging/EmailTestComponent';
+import { EmailTestComponent } from '@/components/gss-admin/messaging/EmailTestComponent';
 
 export function EmailTestPage() {
   return (

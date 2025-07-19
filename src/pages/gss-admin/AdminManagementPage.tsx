@@ -26,10 +26,10 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { SimpleEmailService } from '@/lib/simple-email-service';
-import { InvitationSuccessDialog } from '@/components/dsvi-admin/InvitationSuccessDialog';
-import { PendingInvitations } from '@/components/dsvi-admin/PendingInvitations';
-import { ViewAdminDialog } from '@/components/dsvi-admin/ViewAdminDialog';
-import { EditAdminDialog } from '@/components/dsvi-admin/EditAdminDialog';
+import { InvitationSuccessDialog } from '@/components/gss-admin/InvitationSuccessDialog';
+import { PendingInvitations } from '@/components/gss-admin/PendingInvitations';
+import { ViewAdminDialog } from '@/components/gss-admin/ViewAdminDialog';
+import { EditAdminDialog } from '@/components/gss-admin/EditAdminDialog';
 import { AdminMigrationUtility } from '@/components/admin/AdminMigrationUtility';
 import { AdminDebugUtility } from '@/components/admin/AdminDebugUtility';
 import { 

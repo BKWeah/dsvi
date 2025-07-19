@@ -19,14 +19,14 @@ import { useToast } from '@/hooks/use-toast';
 import { messagingService } from '@/lib/messaging-service';
 import { emailService } from '@/lib/email-service';
 import { MessagingStats, Message, MessageTemplate } from '@/lib/messaging-types';
-import { ComposeMessageDialog } from '@/components/dsvi-admin/messaging/ComposeMessageDialog';
-import { TemplateManagerDialog } from '@/components/dsvi-admin/messaging/TemplateManagerDialog';
-import { MessageHistoryTable } from '@/components/dsvi-admin/messaging/MessageHistoryTable';
-import { EmailSettingsDialog } from '@/components/dsvi-admin/messaging/EmailSettingsDialog';
-import { QuickEmailSettings } from '@/components/dsvi-admin/messaging/QuickEmailSettings';
-import { SimpleEmailTest } from '@/components/dsvi-admin/messaging/SimpleEmailTest';
-import { MessagingSystemTest } from '@/components/dsvi-admin/messaging/MessagingSystemTest';
-import { TemplateDebugger } from '@/components/dsvi-admin/messaging/TemplateDebugger';
+import { ComposeMessageDialog } from '@/components/gss-admin/messaging/ComposeMessageDialog';
+import { TemplateManagerDialog } from '@/components/gss-admin/messaging/TemplateManagerDialog';
+import { MessageHistoryTable } from '@/components/gss-admin/messaging/MessageHistoryTable';
+import { EmailSettingsDialog } from '@/components/gss-admin/messaging/EmailSettingsDialog';
+import { QuickEmailSettings } from '@/components/gss-admin/messaging/QuickEmailSettings';
+import { SimpleEmailTest } from '@/components/gss-admin/messaging/SimpleEmailTest';
+import { MessagingSystemTest } from '@/components/gss-admin/messaging/MessagingSystemTest';
+import { TemplateDebugger } from '@/components/gss-admin/messaging/TemplateDebugger';
 
 export default function MessagingPanelPage() {
   // No-op change to trigger recompile

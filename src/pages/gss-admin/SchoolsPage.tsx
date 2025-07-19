@@ -8,8 +8,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Plus, ExternalLink, Edit, Settings, UserPlus, Search, Lock } from 'lucide-react';
-import { AddSchoolDialog } from '@/components/dsvi-admin/AddSchoolDialog';
-import { InviteSchoolAdminDialog } from '@/components/dsvi-admin/InviteSchoolAdminDialog';
+import { AddSchoolDialog } from '@/components/gss-admin/AddSchoolDialog';
+import { InviteSchoolAdminDialog } from '@/components/gss-admin/InviteSchoolAdminDialog';
 import { MobileCard } from '@/components/mobile/MobileCard';
 import { MobileTopBar } from '@/components/mobile/MobileTopBar';
 import { useToast } from '@/hooks/use-toast';
@@ -368,7 +368,7 @@ export default function SchoolsPage() {
                       size="sm"
                       className="w-full"
                     >
-                        <Link to={`/dsvi-admin/schools/${school.id}/content`}>
+                        <Link to={`/gss-admin/schools/${school.id}/content`}>
                           <Edit className="h-4 w-4 mr-1" />
                           Edit Page
                         </Link>
@@ -379,7 +379,7 @@ export default function SchoolsPage() {
                       size="sm"
                       className="w-full"
                     >
-                      <Link to={`/dsvi-admin/schools/${school.id}/content`}>
+                      <Link to={`/gss-admin/schools/${school.id}/content`}>
                         <Edit className="h-4 w-4 mr-1" />
                         Edit Page
                       </Link>
@@ -533,7 +533,7 @@ export default function SchoolsPage() {
                         variant="outline"
                         size="sm"
                       >
-                        <Link to={`/dsvi-admin/schools/${school.id}/content`}>
+                        <Link to={`/gss-admin/schools/${school.id}/content`}>
                           <Edit className="h-4 w-4 mr-1" />
                           Edit Page
                         </Link>
@@ -543,7 +543,7 @@ export default function SchoolsPage() {
                         variant="outline"
                         size="sm"
                       >
-                        <Link to={`/dsvi-admin/schools/${school.id}/settings`}>
+                        <Link to={`/gss-admin/schools/${school.id}/settings`}>
                           <Settings className="h-4 w-4 mr-1" />
                           Settings
                         </Link>

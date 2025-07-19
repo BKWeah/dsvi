@@ -8,8 +8,8 @@ import { Plus, ExternalLink, Edit, Settings, UserPlus, Search } from 'lucide-rea
 import { MobileCard } from '@/components/mobile/MobileCard';
 import { MobileTopBar } from '@/components/mobile/MobileTopBar';
 import { BottomAppBar } from '@/components/mobile/BottomAppBar';
-import { AddSchoolDialog } from '@/components/dsvi-admin/AddSchoolDialog';
-import { InviteSchoolAdminDialog } from '@/components/dsvi-admin/InviteSchoolAdminDialog';
+import { AddSchoolDialog } from '@/components/gss-admin/AddSchoolDialog';
+import { InviteSchoolAdminDialog } from '@/components/gss-admin/InviteSchoolAdminDialog';
 import { useToast } from '@/hooks/use-toast';
 
 interface School {
@@ -138,12 +138,12 @@ export default function EnhancedMobileSchoolsPage() {
                 {
                   label: "Content",
                   icon: <Edit className="h-3 w-3" />,
-                  onClick: () => window.open(`/dsvi-admin/schools/${school.id}/content`, '_self')
+                  onClick: () => window.open(`/gss-admin/schools/${school.id}/content`, '_self')
                 },
                 {
                   label: "Settings", 
                   icon: <Settings className="h-3 w-3" />,
-                  onClick: () => window.open(`/dsvi-admin/schools/${school.id}/settings`, '_self')
+                  onClick: () => window.open(`/gss-admin/schools/${school.id}/settings`, '_self')
                 },
                 {
                   label: "Invite",

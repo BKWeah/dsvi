@@ -112,7 +112,7 @@ export default function MobileSchoolSettingsPage() {
         title="School Settings"
         subtitle={school?.name}
         showBackButton
-        onBack={() => navigate('/dsvi-admin/schools')}
+        onBack={() => navigate('/gss-admin/schools')}
         actionButton={{
           label: "Save",
           onClick: handleSave

@@ -1,5 +1,5 @@
 import React from 'react';
-import DSVISchoolRenderer from './school/DSVISchoolRenderer';
+import GSSSchoolRenderer from './school/GSSSchoolRenderer';
 import { School, PageContent } from '@/lib/types';
 
 interface SchoolPageRendererProps {
@@ -13,9 +13,9 @@ export default function SchoolPageRenderer({
   pageContent, 
   currentPage = 'home' 
 }: SchoolPageRendererProps) {
-  // Use the new DSVI School Template
+  // Use the new GSS School Template
   return (
-    <DSVISchoolRenderer 
+    <GSSSchoolRenderer 
       school={school}
       pageContent={pageContent}
       currentPage={currentPage}

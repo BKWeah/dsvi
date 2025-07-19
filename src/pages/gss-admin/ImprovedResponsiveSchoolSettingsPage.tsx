@@ -21,7 +21,7 @@ import { ImageUpload } from '@/components/ui/custom/ImageUpload';
 import { SchoolLogoUpload } from '@/components/ui/custom/SchoolLogoUpload';
 import { ComprehensiveBrandingTab } from '@/components/ui/custom/ComprehensiveBrandingTab';
 import { LiveThemePreview } from '@/components/ui/custom/LiveThemePreview';
-import { SchoolAssignmentManager } from '@/components/dsvi-admin/SchoolAssignmentManager';
+import { SchoolAssignmentManager } from '@/components/gss-admin/SchoolAssignmentManager';
 import { generateSchoolHomepageUrl } from '@/lib/subdomain-utils';
 
 export default function ImprovedResponsiveSchoolSettingsPage() {
@@ -243,7 +243,7 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
         <MobileTopBar 
           title="School Settings" 
           subtitle="Loading..." 
-          backUrl="/dsvi-admin/schools" 
+          backUrl="/gss-admin/schools" 
         />
         
         <div className="p-4 flex items-center justify-center h-64">
@@ -263,7 +263,7 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
         <MobileTopBar 
           title="School Settings" 
           subtitle="Error" 
-          backUrl="/dsvi-admin/schools" 
+          backUrl="/gss-admin/schools" 
         />
         
         <div className="p-4">
@@ -297,7 +297,7 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
       <MobileTopBar 
         title="School Settings" 
         subtitle={school?.name || "Configure school information"}
-        backUrl="/dsvi-admin/schools" 
+        backUrl="/gss-admin/schools" 
       />
 
       {/* Desktop Header */}
@@ -305,7 +305,7 @@ export default function ImprovedResponsiveSchoolSettingsPage() {
         <div className="flex items-center space-x-4">
           <Button
             variant="outline"
-            onClick={() => navigate('/dsvi-admin/schools')}
+            onClick={() => navigate('/gss-admin/schools')}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />

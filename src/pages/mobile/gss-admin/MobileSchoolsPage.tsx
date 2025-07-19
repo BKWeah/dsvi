@@ -7,8 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, ExternalLink, Edit, Settings, UserPlus, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { MobileCard } from '@/components/mobile/MobileCard';
-import { AddSchoolDialog } from '@/components/dsvi-admin/AddSchoolDialog';
-import { InviteSchoolAdminDialog } from '@/components/dsvi-admin/InviteSchoolAdminDialog';
+import { AddSchoolDialog } from '@/components/gss-admin/AddSchoolDialog';
+import { InviteSchoolAdminDialog } from '@/components/gss-admin/InviteSchoolAdminDialog';
 import { useToast } from '@/hooks/use-toast';
 import { generateSchoolHomepageUrl } from '@/lib/subdomain-utils';
 
@@ -139,12 +139,12 @@ export default function MobileSchoolsPage() {
               {
                 label: "Content",
                 icon: <Edit className="h-3 w-3" />,
-                onClick: () => window.open(`/dsvi-admin/schools/${school.id}/content`, '_self')
+                onClick: () => window.open(`/gss-admin/schools/${school.id}/content`, '_self')
               },
               {
                 label: "Settings", 
                 icon: <Settings className="h-3 w-3" />,
-                onClick: () => window.open(`/dsvi-admin/schools/${school.id}/settings`, '_self')
+                onClick: () => window.open(`/gss-admin/schools/${school.id}/settings`, '_self')
               },
               {
                 label: "Invite",

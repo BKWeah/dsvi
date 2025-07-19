@@ -7,8 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Plus, ExternalLink, Edit, Settings, UserPlus, Search, Grid, List } from 'lucide-react';
-import { AddSchoolDialog } from '@/components/dsvi-admin/AddSchoolDialog';
-import { InviteSchoolAdminDialog } from '@/components/dsvi-admin/InviteSchoolAdminDialog';
+import { AddSchoolDialog } from '@/components/gss-admin/AddSchoolDialog';
+import { InviteSchoolAdminDialog } from '@/components/gss-admin/InviteSchoolAdminDialog';
 import { MobileCard } from '@/components/mobile/MobileCard';
 import { useToast } from '@/hooks/use-toast';
 
@@ -168,7 +168,7 @@ export default function ResponsiveSchoolsPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center space-x-2">
-                        <Link to={`/dsvi-admin/schools/${school.id}/settings`}>
+                        <Link to={`/gss-admin/schools/${school.id}/settings`}>
                           <Button variant="outline" size="sm">
                             <Settings className="h-4 w-4 mr-2" /> Settings
                           </Button>
@@ -203,7 +203,7 @@ export default function ResponsiveSchoolsPage() {
                   label: 'Settings',
                   icon: <Settings className="h-4 w-4" />,
                   variant: 'outline' as MobileCardAction['variant'],
-                  href: `/dsvi-admin/schools/${school.id}/settings`,
+                  href: `/gss-admin/schools/${school.id}/settings`,
                 },
                 {
                   label: 'Invite Admin',

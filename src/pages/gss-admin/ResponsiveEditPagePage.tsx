@@ -11,7 +11,7 @@ export default function ResponsiveEditPagePage() {
   const navigate = useNavigate();
 
   const handleSave = () => {
-    navigate(`/dsvi-admin/schools/${schoolId}/content`);
+    navigate(`/gss-admin/schools/${schoolId}/content`);
   };
 
   const formatPageType = (type: string) => {
@@ -30,14 +30,14 @@ export default function ResponsiveEditPagePage() {
       <MobileTopBar 
         title={`Edit ${formatPageType(pageType)}`}
         subtitle="Manage page content"
-        backUrl={`/dsvi-admin/schools/${schoolId}/content`}
+        backUrl={`/gss-admin/schools/${schoolId}/content`}
       />
 
       {/* Desktop Header */}
       <div className="hidden md:flex items-center gap-4 p-6">
         <Button
           variant="outline"
-          onClick={() => navigate(`/dsvi-admin/schools/${schoolId}/content`)}
+          onClick={() => navigate(`/gss-admin/schools/${schoolId}/content`)}
           className="flex items-center gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
