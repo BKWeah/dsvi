@@ -108,7 +108,7 @@ export default function HowItWorksPage() {
                 Simple Process
               </Badge>
               <h1 className="text-4xl md:text-6xl font-bold mb-6">
-                How DSVI
+                How GSS
                 <span className="text-yellow-300"> Works</span>
               </h1>
               <p className="text-xl md:text-2xl text-blue-100">
@@ -170,13 +170,13 @@ export default function HowItWorksPage() {
           </div>
         </section>
 
-        {/* Why Choose DSVI Section */}
+        {/* Why Choose GSS Section */}
         <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-16">
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                  Why Choose DSVI?
+                  Why Choose GSS?
                 </h2>
                 <p className="text-xl text-gray-600">
                   We make the process simple, fast, and affordable for every Liberian school
@@ -210,7 +210,7 @@ export default function HowItWorksPage() {
                 Ready to Start Your Digital Journey?
               </h2>
               <p className="text-xl mb-8 text-blue-100">
-                Join 150+ schools that have already transformed their online presence with DSVI
+                Join 150+ schools that have already transformed their online presence with GSS
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button asChild size="lg" className="bg-white text-blue-600 hover:bg-blue-50">

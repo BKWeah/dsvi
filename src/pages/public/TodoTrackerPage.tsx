@@ -170,7 +170,7 @@ const TodoTrackerPage: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `dsvi-todo-tracker-${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `GSS-todo-tracker-${new Date().toISOString().split('T')[0]}.json`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -182,8 +182,8 @@ const TodoTrackerPage: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>DSVI Development - TODO Tracker (130h MVP)</title>
-        <meta name="description" content="Track development progress for DSVI project - 130 hour MVP scope" />
+        <title>GSS Development - TODO Tracker (130h MVP)</title>
+        <meta name="description" content="Track development progress for GSS project - 130 hour MVP scope" />
       </Helmet>
       
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
@@ -192,7 +192,7 @@ const TodoTrackerPage: React.FC = () => {
           <div className="mb-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">DSVI TODO Tracker - 130h MVP</h1>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">GSS TODO Tracker - 130h MVP</h1>
                 <p className="text-gray-600">Realistic scope with global client approval access via Supabase</p>
               </div>
               <div className="flex items-center gap-2">

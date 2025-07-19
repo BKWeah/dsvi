@@ -56,7 +56,7 @@ export default function MobileSchoolAdminDashboard() {
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-muted-foreground">
-              Contact DSVI admin for school assignment.
+              Contact GSS admin for school assignment.
             </p>
             <Button variant="outline" size="sm">
               Contact Support

@@ -97,7 +97,7 @@ export default function SchoolAdminDashboard() {
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-muted-foreground">
-              You haven't been assigned to any schools yet. Contact your DSVI admin for school assignment.
+              You haven't been assigned to any schools yet. Contact your GSS admin for school assignment.
             </p>
             <Button variant="outline" size="sm">
               Contact Support

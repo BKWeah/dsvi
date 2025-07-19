@@ -142,7 +142,7 @@ const ClientApprovalPage: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>DSVI Project Progress - Client Approval</title>
+        <title>GSS Project Progress - Client Approval</title>
         <meta name="description" content="Review and approve completed development tasks" />
       </Helmet>
       
@@ -152,7 +152,7 @@ const ClientApprovalPage: React.FC = () => {
           <div className="mb-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">DSVI Project Progress</h1>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">GSS Project Progress</h1>
                 <p className="text-gray-600">Client Approval Interface - Review and approve completed tasks</p>
               </div>
               <Button onClick={loadTasks} disabled={loading} variant="outline" size="sm">

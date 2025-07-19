@@ -8,7 +8,7 @@ import { ArrowRight, HelpCircle } from 'lucide-react';
 export default function FAQPage() {
   const faqs = [
     {
-      question: "How much does a DSVI website cost?",
+      question: "How much does a GSS website cost?",
       answer: "Our Standard Package starts at $100/year, Prime Essentials Package at $200/year, and Prime Elite Package at $350/year. All packages include hosting, SSL certificate, and support."
     },
     {
@@ -61,7 +61,7 @@ export default function FAQPage() {
               Got
               <span className="text-yellow-300"> Questions?</span>
             </h1>
-            <p className="text-xl">Find answers to common questions about DSVI services</p>
+            <p className="text-xl">Find answers to common questions about GSS services</p>
           </div>
         </section>
 

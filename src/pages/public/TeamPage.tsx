@@ -27,8 +27,8 @@ export default function TeamPage() {
         'marketing & communications': 'Marketing & Communications',
         'client services': 'Client Services',
         'operations & finance': 'Operations & Finance',
-        'dsvi': 'GSS',
-        'dsvi school directory': 'GyaWe School Directory',
+        'GSS': 'GSS',
+        'GSS school directory': 'GyaWe School Directory',
         'dvi': 'DVI'
       };
       

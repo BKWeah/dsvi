@@ -33,7 +33,7 @@ export default function ContactPage() {
     <>
       <section className="pt-32 pb-20 bg-gradient-to-br from-blue-600 to-green-600 text-white">
         <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">Contact DSVI</h1>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">Contact GSS</h1>
             <p className="text-xl">Get in touch with our team for inquiries and support</p>
           </div>
         </section>
@@ -61,7 +61,7 @@ export default function ContactPage() {
                     <MapPin className="h-6 w-6 text-purple-600" />
                     <div>
                       <p className="font-medium">Office Location</p>
-                      <p className="text-gray-600">DSVI Office</p>
+                      <p className="text-gray-600">GSS Office</p>
                       <p className="text-gray-600">Outland Community, Opp. LTC Compound</p>
                       <p className="text-gray-600">Paynesville, Montserrado County</p>
                       <p className="text-gray-600">Republic of Liberia</p>

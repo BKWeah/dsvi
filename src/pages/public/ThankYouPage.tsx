@@ -32,8 +32,8 @@ export default function ThankYouPage() {
                 <span className="text-yellow-300"> Registration Successful</span>
               </h1>
               <p className="text-xl md:text-2xl text-blue-100">
-                {schoolName ? `${schoolName} has been successfully registered with DSVI` : 
-                'Your school has been successfully registered with DSVI'}
+                {schoolName ? `${schoolName} has been successfully registered with GSS` : 
+                'Your school has been successfully registered with GSS'}
               </p>
             </div>
           </div>
@@ -139,12 +139,12 @@ export default function ThankYouPage() {
               {/* CTA Section */}
               <div className="text-center mt-12">
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  Want to Learn More About DSVI?
+                  Want to Learn More About GSS?
                 </h3>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button asChild size="lg" variant="outline">
                     <Link to="/about">
-                      About DSVI
+                      About GSS
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                   </Button>

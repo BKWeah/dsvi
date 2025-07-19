@@ -137,7 +137,7 @@ export default function SchoolAdminMessagingPage() {
             <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-medium mb-2">No Schools Assigned</h3>
             <p className="text-muted-foreground">
-              You don't have access to any schools yet. Contact a DSVI administrator to get school assignments.
+              You don't have access to any schools yet. Contact a GSS administrator to get school assignments.
             </p>
           </CardContent>
         </Card>

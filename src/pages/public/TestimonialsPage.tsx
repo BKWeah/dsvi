@@ -81,7 +81,7 @@ export default function TestimonialsPage() {
       school: "Liberty High School",
       county: "Montserrado",
       rating: 5,
-      text: "DSVI transformed our school's online presence completely! We went from having no website to a professional platform that showcases our achievements. Parent engagement increased by 300% and we've received inquiries from international partners.",
+      text: "GSS transformed our school's online presence completely! We went from having no website to a professional platform that showcases our achievements. Parent engagement increased by 300% and we've received inquiries from international partners.",
       image: "/api/placeholder/100/100",
       results: "300% increase in parent engagement"
     },
@@ -91,7 +91,7 @@ export default function TestimonialsPage() {
       school: "Saint Paul Elementary",
       county: "Margibi", 
       rating: 5,
-      text: "The website DSVI created for us is not just beautiful—it's functional. We can easily update content, post announcements, and manage our online presence. Our enrollment increased by 40% this academic year.",
+      text: "The website GSS created for us is not just beautiful—it's functional. We can easily update content, post announcements, and manage our online presence. Our enrollment increased by 40% this academic year.",
       image: "/api/placeholder/100/100",
       results: "40% enrollment increase"
     },
@@ -101,7 +101,7 @@ export default function TestimonialsPage() {
       school: "Future Leaders Academy",
       county: "Nimba",
       rating: 5,
-      text: "DSVI's team made the entire process seamless. From registration to launch took exactly 48 hours as promised. The ongoing support has been exceptional, and our community now sees us as a modern, forward-thinking institution.",
+      text: "GSS's team made the entire process seamless. From registration to launch took exactly 48 hours as promised. The ongoing support has been exceptional, and our community now sees us as a modern, forward-thinking institution.",
       image: "/api/placeholder/100/100",
       results: "Enhanced community reputation"
     },
@@ -111,7 +111,7 @@ export default function TestimonialsPage() {
       school: "Bong County Technical Institute",
       county: "Bong",
       rating: 5,
-      text: "Before DSVI, we struggled to communicate with parents and showcase our programs. Now we have a professional online presence that helps us attract quality students and maintain better communication with stakeholders.",
+      text: "Before GSS, we struggled to communicate with parents and showcase our programs. Now we have a professional online presence that helps us attract quality students and maintain better communication with stakeholders.",
       image: "/api/placeholder/100/100",
       results: "Improved stakeholder communication"
     },
@@ -121,7 +121,7 @@ export default function TestimonialsPage() {
       school: "River Cess Community School",
       county: "River Cess",
       rating: 5,
-      text: "Being in a rural area, we thought we'd be left behind digitally. DSVI proved us wrong! Our website has connected us to resources and opportunities we never knew existed. We've even received donations from alumni abroad.",
+      text: "Being in a rural area, we thought we'd be left behind digitally. GSS proved us wrong! Our website has connected us to resources and opportunities we never knew existed. We've even received donations from alumni abroad.",
       image: "/api/placeholder/100/100",
       results: "Connected to global opportunities"
     },
@@ -131,7 +131,7 @@ export default function TestimonialsPage() {
       school: "Grand Bassa Prep Academy",
       county: "Grand Bassa",
       rating: 5,
-      text: "The before and after transformation is incredible. We went from having outdated flyers to a modern, mobile-responsive website that parents access daily. DSVI didn't just build us a website—they built us a digital future.",
+      text: "The before and after transformation is incredible. We went from having outdated flyers to a modern, mobile-responsive website that parents access daily. GSS didn't just build us a website—they built us a digital future.",
       image: "/api/placeholder/100/100",
       results: "Complete digital transformation"
     }

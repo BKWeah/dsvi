@@ -98,7 +98,7 @@ export default function MobileSchoolsPage() {
         {/* Header */}
         <div>
           <h1 className="text-2xl font-bold">Schools Management</h1>
-          <p className="text-muted-foreground">Manage all schools in the DSVI platform</p>
+          <p className="text-muted-foreground">Manage all schools in the GSS platform</p>
         </div>
 
         {/* Search */}

@@ -81,7 +81,7 @@ export const HowItWorksSection: React.FC = () => {
             Simple Process
           </Badge>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            How DSVI Works
+            How GSS Works
           </h2>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
             Get your school online in just 7 simple steps. Our streamlined process ensures 
@@ -121,10 +121,10 @@ export const HowItWorksSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Why Choose DSVI Section */}
+        {/* Why Choose GSS Section */}
         <div className="mt-24">
           <h3 className="text-3xl font-bold text-gray-900 text-center mb-12">
-            Why Choose DSVI?
+            Why Choose GSS?
           </h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
             <div className="text-center">

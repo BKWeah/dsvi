@@ -71,7 +71,7 @@ export const FAQSection: React.FC = () => {
               Frequently Asked Questions
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Everything you need to know about DSVI and our services. Can't find what you're looking for? Contact our support team.
+              Everything you need to know about GSS and our services. Can't find what you're looking for? Contact our support team.
             </p>
           </div>
 

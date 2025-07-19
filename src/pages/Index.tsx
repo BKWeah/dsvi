@@ -28,7 +28,7 @@ export default function Index() {
               <div className="flex gap-4 flex-wrap">
                 {role === 'GSS_ADMIN' && (
                   <Button asChild>
-                    <Link to="/dsvi-admin">DSVI Admin Panel</Link>
+                    <Link to="/dsvi-admin">GSS Admin Panel</Link>
                   </Button>
                 )}
                 {role === 'SCHOOL_ADMIN' && (
