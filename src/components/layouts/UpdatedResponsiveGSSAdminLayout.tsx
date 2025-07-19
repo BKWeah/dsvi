@@ -33,7 +33,7 @@ import {
 import { Link } from 'react-router-dom';
 import { PERMISSION_TYPES, RESTRICTED_PERMISSIONS } from '@/lib/admin/permissions';
 
-export function UpdatedResponsiveDSVIAdminLayout() {
+export function UpdatedResponsiveGSSAdminLayout() {
   const { logout, user } = useAuth();
   const { 
     adminLevel, 
@@ -101,7 +101,7 @@ export function UpdatedResponsiveDSVIAdminLayout() {
         <main className="pb-20">
           <Outlet />
         </main>
-        <BottomAppBar userRole="DSVI_ADMIN" />
+        <BottomAppBar userRole="GSS_ADMIN" />
         
       </div>
 
@@ -112,7 +112,7 @@ export function UpdatedResponsiveDSVIAdminLayout() {
             <Sidebar>
               <SidebarHeader className="p-4">
                 <div className="space-y-2">
-                  <h2 className="text-lg font-semibold">DSVI Admin</h2>
+                  <h2 className="text-lg font-semibold">GSS Admin</h2>
                   <div className="flex items-center gap-2">
                     {isLevel1Admin ? (
                       <Badge className="bg-purple-100 text-purple-800">
@@ -140,7 +140,7 @@ export function UpdatedResponsiveDSVIAdminLayout() {
                   {isDashboardEnabled && (
                     <SidebarMenuItem>
                       <SidebarMenuButton asChild>
-                        <Link to="/dsvi-admin/dashboard">
+                        <Link to="/gss-admin/dashboard">
                           <BarChart3 className="h-4 w-4" />
                           <span>Dashboard</span>
                         </Link>
@@ -150,7 +150,7 @@ export function UpdatedResponsiveDSVIAdminLayout() {
                   {isSchoolsEnabled && canAccessFeature(PERMISSION_TYPES.CMS_ACCESS) && (
                     <SidebarMenuItem>
                       <SidebarMenuButton asChild>
-                        <Link to="/dsvi-admin/schools">
+                        <Link to="/gss-admin/schools">
                           <School className="h-4 w-4" />
                           <span>Schools</span>
                         </Link>
@@ -160,7 +160,7 @@ export function UpdatedResponsiveDSVIAdminLayout() {
                   {isRequestsEnabled && canAccessFeature(PERMISSION_TYPES.CMS_ACCESS, RESTRICTED_PERMISSIONS.APPROVE_SCHOOL_REQUESTS) && (
                     <SidebarMenuItem>
                       <SidebarMenuButton asChild>
-                        <Link to="/dsvi-admin/requests">
+                        <Link to="/gss-admin/requests">
                           <Users className="h-4 w-4" />
                           <span>School Requests</span>
                         </Link>
@@ -170,7 +170,7 @@ export function UpdatedResponsiveDSVIAdminLayout() {
                   {isSubscriptionsEnabled && canAccessFeature(PERMISSION_TYPES.SUBSCRIPTION_VIEW) && (
                     <SidebarMenuItem>
                       <SidebarMenuButton asChild>
-                        <Link to="/dsvi-admin/subscriptions">
+                        <Link to="/gss-admin/subscriptions">
                           <CreditCard className="h-4 w-4" />
                           <span>Subscriptions</span>
                         </Link>
@@ -180,7 +180,7 @@ export function UpdatedResponsiveDSVIAdminLayout() {
                   {isMessagingEnabled && canAccessFeature(PERMISSION_TYPES.MESSAGING) && (
                     <SidebarMenuItem>
                       <SidebarMenuButton asChild>
-                        <Link to="/dsvi-admin/messaging">
+                        <Link to="/gss-admin/messaging">
                           <MessageSquare className="h-4 w-4" />
                           <span>Messaging</span>
                         </Link>
@@ -194,7 +194,7 @@ export function UpdatedResponsiveDSVIAdminLayout() {
                       <SidebarSeparator />
                       <SidebarMenuItem>
                         <SidebarMenuButton asChild>
-                          <Link to="/dsvi-admin/admin-management">
+                          <Link to="/gss-admin/admin-management">
                             <UserCog className="h-4 w-4" />
                             <span>Admin Management</span>
                           </Link>
@@ -202,7 +202,7 @@ export function UpdatedResponsiveDSVIAdminLayout() {
                       </SidebarMenuItem>
                       {/* <SidebarMenuItem>
                         <SidebarMenuButton asChild>
-                          <Link to="/dsvi-admin/admin-test">
+                          <Link to="/gss-admin/admin-test">
                             <Settings2 className="h-4 w-4" />
                             <span>Test Admin System</span>
                           </Link>

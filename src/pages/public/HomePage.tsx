@@ -174,12 +174,12 @@ export default function HomePage({ setHeroRef }: HomePageProps) {
         </div>
       </section>
 
-      {/* DSVI Directory Promotion Section */}
+      {/* GyaWe School Directory Promotion Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Explore the DSVI Ecosystem
+              Explore the GyaWe School Solutions (GSS) Ecosystem
             </h2>
             <p className="text-xl text-gray-600">
               Discover and connect with Liberian schools through our comprehensive directory platform
@@ -194,7 +194,7 @@ export default function HomePage({ setHeroRef }: HomePageProps) {
                   <Search className="h-10 w-10 text-blue-600" />
                 </div>
                 <CardTitle className="text-2xl text-gray-900">
-                  Explore the DSVI School Directory
+                  Explore the GyaWe School Directory
                 </CardTitle>
                 <CardDescription className="text-lg text-gray-600">
                   Find Any Verified Liberian School, Instantly

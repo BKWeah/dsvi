@@ -109,7 +109,7 @@ export const PERMISSION_DESCRIPTIONS = {
   [PERMISSION_TYPES.ANNOUNCEMENTS]: 'Edit announcements or homepage highlights',
   [PERMISSION_TYPES.CONTACT_FORMS]: 'Manage contact form inquiries',
   [PERMISSION_TYPES.SCHOOL_MAINTENANCE]: 'Perform updates or minor fixes on selected school sites',
-  [PERMISSION_TYPES.SCHOOL_STATUS]: 'Set school status as "Self-managed" or "DSVI-managed"',
+  [PERMISSION_TYPES.SCHOOL_STATUS]: 'Set school status as "Self-managed" or "GSS-managed"',
   [PERMISSION_TYPES.MESSAGING]: 'Send in-app or email messages to assigned schools',
   [PERMISSION_TYPES.MESSAGE_TEMPLATES]: 'Use message templates (welcome notices, renewal reminders)',
   [PERMISSION_TYPES.SUBSCRIPTION_VIEW]: 'View subscription status for specific schools',

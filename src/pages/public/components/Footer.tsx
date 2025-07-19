@@ -30,8 +30,8 @@ export const Footer: React.FC = () => {
             <div className="flex items-center space-x-3 mb-6">
               <img src="/updates_assets/DSVI Official Logo.png" alt="DSVI Official Logo" className="h-10 w-10 object-contain" />
               <div>
-                <span className="text-xl font-bold">DSVI</span>
-                <p className="text-xs text-gray-400 -mt-1">Digital School Visibility Initiative</p>
+                <span className="text-xl font-bold">GSS</span>
+                <p className="text-xs text-gray-400 -mt-1">GyaWe School Solutions</p>
               </div>
             </div>
             <p className="text-gray-400 mb-6 leading-relaxed">
@@ -157,7 +157,7 @@ export const Footer: React.FC = () => {
               <ExternalLink className="h-4 w-4" />
             </Link>
           </div>
-          <p>&copy; 2025 Digital School Visibility Initiative (DSVI). All rights reserved.</p>
+          <p>&copy; 2025 GyaWe School Solutions (GSS). All rights reserved.</p>
           <p className="text-sm mt-2">Empowering Liberian education through digital innovation • Serving all 15 counties of Liberia</p>
         </div>
       </div>

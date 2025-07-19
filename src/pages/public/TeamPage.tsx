@@ -28,7 +28,7 @@ export default function TeamPage() {
         'client services': 'Client Services',
         'operations & finance': 'Operations & Finance',
         'dsvi': 'DSVI',
-        'dsvi school directory': 'DSVI School Directory',
+        'dsvi school directory': 'GyaWe School Directory',
         'dvi': 'DVI'
       };
       

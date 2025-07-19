@@ -12,7 +12,7 @@ import { FeatureFlagProvider } from "./contexts/FeatureFlagContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AdminProtectedRoute } from "./components/AdminProtectedRoute";
 import { FeatureProtectedRoute } from "./components/feature-flags/FeatureProtectedRoute";
-import { UpdatedResponsiveDSVIAdminLayout } from "./components/layouts/UpdatedResponsiveDSVIAdminLayout";
+import { UpdatedResponsiveGSSAdminLayout } from "./components/layouts/UpdatedResponsiveGSSAdminLayout";
 import { UpdatedResponsiveSchoolAdminLayout } from "./components/layouts/UpdatedResponsiveSchoolAdminLayout";
 import { PublicSchoolLayout } from "./components/layouts/PublicSchoolLayout";
 import { SubdomainSchoolLayout } from "./components/layouts/SubdomainSchoolLayout";
@@ -45,16 +45,16 @@ import RegisterPage from "./pages/public/RegisterPage";
 import TodoTrackerPage from "./pages/public/TodoTrackerPage";
 import ClientApprovalPage from "./pages/public/ClientApprovalPage";
 import DebugSupabasePage from "./pages/public/DebugSupabasePage";
-import DSVIAdminDashboard from "./pages/dsvi-admin/DSVIAdminDashboard";
-import SchoolsPage from "./pages/dsvi-admin/SchoolsPage";
-import SchoolRequestsPage from "./pages/dsvi-admin/SchoolRequestsPage";
-import SchoolContentPage from "./pages/dsvi-admin/SchoolContentPage";
-import EditPagePage from "./pages/dsvi-admin/EditPagePage";
-import SchoolSettingsPage from "./pages/dsvi-admin/SchoolSettingsPage";
-import SubscriptionTrackerPage from "./pages/dsvi-admin/SubscriptionTrackerPage";
-import MessagingPanelPage from "./pages/dsvi-admin/MessagingPanelPage";
-import AdminManagementPage from "./pages/dsvi-admin/AdminManagementPage";
-import AdminLevelTestPage from "./pages/dsvi-admin/AdminLevelTestPage";
+import GSSAdminDashboard from "./pages/gss-admin/GSSAdminDashboard";
+import SchoolsPage from "./pages/gss-admin/SchoolsPage";
+import SchoolRequestsPage from "./pages/gss-admin/SchoolRequestsPage";
+import SchoolContentPage from "./pages/gss-admin/SchoolContentPage";
+import EditPagePage from "./pages/gss-admin/EditPagePage";
+import SchoolSettingsPage from "./pages/gss-admin/SchoolSettingsPage";
+import SubscriptionTrackerPage from "./pages/gss-admin/SubscriptionTrackerPage";
+import MessagingPanelPage from "./pages/gss-admin/MessagingPanelPage";
+import AdminManagementPage from "./pages/gss-admin/AdminManagementPage";
+import AdminLevelTestPage from "./pages/gss-admin/AdminLevelTestPage";
 import Level2AdminSignupPage from "./pages/Level2AdminSignupPage";
 import SchoolAdminDashboard from "./pages/school-admin/SchoolAdminDashboard";
 import EditSchoolPagePage from "./pages/school-admin/EditSchoolPagePage";
@@ -135,23 +135,23 @@ const App = () => {
   </PageFade>
 } />
             
-            {/* DSVI Admin Routes */}
+            {/* GyaWe School Solutions (GSS) Admin Routes */}
             <Route 
-              path="/dsvi-admin" 
+              path="/gss-admin" 
               element={
-                <AdminProtectedRoute allowedRoles={['DSVI_ADMIN']}>
-                  <UpdatedResponsiveDSVIAdminLayout />
+                <AdminProtectedRoute allowedRoles={['GSS_ADMIN']}>
+                  <UpdatedResponsiveGSSAdminLayout />
                 </AdminProtectedRoute>
               }
             >
               <Route index element={
                 <FeatureProtectedRoute feature="dashboard">
-                  <DSVIAdminDashboard />
+                  <GSSAdminDashboard />
                 </FeatureProtectedRoute>
               } />
               <Route path="dashboard" element={
                 <FeatureProtectedRoute feature="dashboard">
-                  <DSVIAdminDashboard />
+                  <GSSAdminDashboard />
                 </FeatureProtectedRoute>
               } />
               <Route path="schools" element={
@@ -180,7 +180,7 @@ const App = () => {
                 </AdminProtectedRoute>
               } />
               <Route path="admin-test" element={
-                <AdminProtectedRoute allowedRoles={['DSVI_ADMIN']}>
+                <AdminProtectedRoute allowedRoles={['GSS_ADMIN']}>
                   <AdminLevelTestPage />
                 </AdminProtectedRoute>
               } />
@@ -205,7 +205,7 @@ const App = () => {
 <Route 
   path="/deploy" 
   element={
-    <ProtectedRoute roles={['DSVI_ADMIN']}>
+    <ProtectedRoute roles={['GSS_ADMIN']}>
       <PageFade><DeploymentManagePage /></PageFade>
     </ProtectedRoute>
   } 

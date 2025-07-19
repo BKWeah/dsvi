@@ -32,7 +32,7 @@ export const teamMembers: TeamMember[] = [
     icon: Briefcase,
     description: "Provides the overarching vision, leads external partnerships, secures strategic alliances, and ensures organizational sustainability.",
     hasPhoto: true,
-    email: "john.gyawu@libdsvi.com"
+    email: "john.gyawu@gyawe.com"
   },
   {
     name: "Boniface K. Weah, Jr.",
@@ -42,7 +42,7 @@ export const teamMembers: TeamMember[] = [
     icon: Briefcase,
     description: "Leads day-to-day operations, manages internal coordination, executes strategy, and ensures the effective delivery of services across all divisions.",
     hasPhoto: true,
-    email: "director@libdsvi.com",
+    email: "director@gyawe.com",
     linkedin: "#"
   },
 
@@ -54,7 +54,7 @@ export const teamMembers: TeamMember[] = [
     avatar: "OS",
     icon: Code,
     description: "Oversees all platforms, websites, and tech systems including performance, hosting, updates, and integrations.",
-    email: "oluwaseun.shobayo@libdsvi.com",
+    email: "oluwaseun.shobayo@gyawe.com",
     github: "#"
   },
   {
@@ -92,7 +92,7 @@ export const teamMembers: TeamMember[] = [
     department: "Marketing & Communications",
     avatar: "MC",
     icon: Megaphone,
-    description: "Manages brand visibility, outreach, digital communication, and promotional campaigns across LDSI.",
+    description: "Manages brand visibility, outreach, digital communication, and promotional campaigns across GyaWe School Solutions (GSS).",
     isVacant: true
   },
   {
@@ -181,11 +181,11 @@ export const teamMembers: TeamMember[] = [
     isVacant: true
   },
 
-  // DSVI Division
+  // GyaWe School Solutions (GSS) Division
   {
     name: "Vacant",
-    role: "DSVI Supervisor",
-    department: "DSVI",
+    role: "GSS Supervisor",
+    department: "GSS",
     avatar: "DS",
     icon: Building,
     description: "Oversees website services and support for schools, ensuring accurate reflection of school identity, academic integrity, and educational messaging.",
@@ -194,7 +194,7 @@ export const teamMembers: TeamMember[] = [
   {
     name: "Vacant",
     role: "Educational Liaison Specialist",
-    department: "DSVI",
+    department: "GSS",
     avatar: "EL",
     icon: Users,
     description: "Collaborates with school reps to align academic content with website structure and user needs.",
@@ -202,19 +202,19 @@ export const teamMembers: TeamMember[] = [
   },
   {
     name: "Vacant",
-    role: "DSVI QA Specialist",
-    department: "DSVI",
+    role: "GSS QA Specialist",
+    department: "GSS",
     avatar: "DQ",
     icon: Shield,
     description: "Conducts quality reviews on all school sites to ensure they meet agreed functionality and design expectations.",
     isVacant: true
   },
 
-  // DSVI School Directory Division
+  // GyaWe School Directory Division
   {
     name: "Vacant",
     role: "Directory Supervisor",
-    department: "DSVI School Directory",
+    department: "GyaWe School Directory",
     avatar: "DiS",
     icon: Search,
     description: "Manages the central school listing platform, ensuring listings are authentic and promotions are executed smoothly.",
@@ -223,7 +223,7 @@ export const teamMembers: TeamMember[] = [
   {
     name: "Vacant",
     role: "Directory Admin Specialist",
-    department: "DSVI School Directory",
+    department: "GyaWe School Directory",
     avatar: "DA",
     icon: Settings,
     description: "Manages school profiles, categories, metadata, and backend updates on the directory.",
@@ -232,7 +232,7 @@ export const teamMembers: TeamMember[] = [
   {
     name: "Vacant",
     role: "School Verification Specialist",
-    department: "DSVI School Directory",
+    department: "GyaWe School Directory",
     avatar: "SV",
     icon: UserCheck,
     description: "Validates the legitimacy and accreditation of listed schools.",
@@ -241,7 +241,7 @@ export const teamMembers: TeamMember[] = [
   {
     name: "Vacant",
     role: "Promotions & Boost Specialist",
-    department: "DSVI School Directory",
+    department: "GyaWe School Directory",
     avatar: "PB",
     icon: TrendingUp,
     description: "Manages in-directory promotional campaigns and boosts for subscribed institutions.",
@@ -315,18 +315,18 @@ export const departments: Department[] = [
     count: teamMembers.filter(member => member.department === "Operations & Finance").length 
   },
   { 
-    name: "DSVI", 
+    name: "GSS", 
     color: "bg-indigo-100 text-indigo-800", 
     bgColor: "bg-indigo-600",
     icon: Building,
-    count: teamMembers.filter(member => member.department === "DSVI").length 
+    count: teamMembers.filter(member => member.department === "GSS").length 
   },
   { 
-    name: "DSVI School Directory", 
+    name: "GyaWe School Directory", 
     color: "bg-cyan-100 text-cyan-800", 
     bgColor: "bg-cyan-600",
     icon: Search,
-    count: teamMembers.filter(member => member.department === "DSVI School Directory").length 
+    count: teamMembers.filter(member => member.department === "GyaWe School Directory").length 
   },
   { 
     name: "DVI", 

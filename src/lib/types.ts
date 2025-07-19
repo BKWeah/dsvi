@@ -1,11 +1,11 @@
-// TypeScript interfaces for DSVI CMS data models
+// TypeScript interfaces for GyaWe School Solutions (GSS) CMS data models
 // Based on the comprehensive brief specifications
 
 export interface UserProfile {
   id: string; // Supabase user ID
   email?: string;
   name?: string;
-  role: 'DSVI_ADMIN' | 'SCHOOL_ADMIN';
+  role: 'GSS_ADMIN' | 'SCHOOL_ADMIN';
   school_id?: string; // if SCHOOL_ADMIN, links to School.id
   created_at?: string;
   updated_at?: string;

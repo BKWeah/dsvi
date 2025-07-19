@@ -75,7 +75,7 @@ export const DirectorySection: React.FC = () => {
                 <Search className="h-10 w-10 text-blue-600" />
               </div>
               <CardTitle className="text-2xl md:text-3xl text-gray-900 mb-3">
-                Explore the DSVI School Directory
+                Explore the GyaWe School Directory
               </CardTitle>
               <CardDescription className="text-lg text-gray-600 font-medium">
                 Find Any Verified Liberian School, Instantly

@@ -34,7 +34,7 @@ interface RecentActivity {
   created_at: string;
 }
 
-export default function DSVIAdminDashboard() {
+export default function GSSAdminDashboard() {
   const [stats, setStats] = useState<DashboardStats>({
     totalSchools: 0,
     activeSchools: 0,
@@ -144,7 +144,7 @@ export default function DSVIAdminDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">DSVI Admin Dashboard</h1>
+        <h1 className="text-3xl font-bold">GSS Admin Dashboard</h1>
         <p className="text-muted-foreground">Overview of schools and subscriptions</p>
       </div>
 
@@ -285,19 +285,19 @@ export default function DSVIAdminDashboard() {
           </CardHeader>
           <CardContent className="space-y-3">
             <Button asChild className="w-full">
-              <Link to="/dsvi-admin/schools">
+              <Link to="/gss-admin/schools">
                 <School className="h-4 w-4 mr-2" />
                 Manage Schools
               </Link>
             </Button>
             <Button asChild variant="outline" className="w-full">
-              <Link to="/dsvi-admin/requests">
+              <Link to="/gss-admin/requests">
                 <Users className="h-4 w-4 mr-2" />
                 Review Requests ({stats.pendingRequests})
               </Link>
             </Button>
             <Button asChild variant="outline" className="w-full">
-              <Link to="/dsvi-admin/subscriptions">
+              <Link to="/gss-admin/subscriptions">
                 <Calendar className="h-4 w-4 mr-2" />
                 Subscription Tracker
               </Link>

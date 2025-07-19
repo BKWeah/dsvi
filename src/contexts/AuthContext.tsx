@@ -33,9 +33,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const role = user?.user_metadata?.role || null;
 
-  // Helper function to fetch admin level for DSVI admins using new consolidated table
+  // Helper function to fetch admin level for GSS admins using new consolidated table
   const fetchAdminLevel = async (user: User) => {
-    if (user.user_metadata?.role === 'DSVI_ADMIN') {
+    if (user.user_metadata?.role === 'GSS_ADMIN') {
       try {
         // Use the new function that works with consolidated table
         const { data, error } = await supabase
@@ -46,7 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log('✅ Admin level fetched:', data);
         } else {
           setAdminLevel(null);
-          console.log('ℹ️ DSVI admin found without admin level in consolidated table');
+          console.log('ℹ️ GSS admin found without admin level in consolidated table');
         }
       } catch (error) {
         console.warn('❌ Failed to fetch admin level:', error);
@@ -135,7 +135,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           p_name: name
         });
 
-        // Fetch admin level for DSVI admins
+        // Fetch admin level for GSS admins
         await fetchAdminLevel(data.user);
       } catch (syncError) {
         console.warn('Failed to sync user profile:', syncError);
@@ -174,7 +174,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await supabase.rpc('upsert_user_profile', upsertParams);
 
         // Check if this is a Level 2 admin signup based on invite token
-        if (role === 'DSVI_ADMIN' && metadata?.inviteToken) {
+        if (role === 'GSS_ADMIN' && metadata?.inviteToken) {
           try {
             console.log('🔄 Processing Level 2 admin signup with DIRECT approach...');
             console.log('🔄 Invite token:', metadata.inviteToken);
@@ -219,9 +219,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.error('❌ Failed to process Level 2 admin signup:', adminError);
           }
         }
-        // For DSVI admins without invite token or with skipAutoAdminCreation
-        else if (role === 'DSVI_ADMIN') {
-          console.log('🔄 DSVI_ADMIN signup without invite token - checking if admin profile migration needed');
+        // For GSS admins without invite token or with skipAutoAdminCreation
+        else if (role === 'GSS_ADMIN') {
+          console.log('🔄 GSS_ADMIN signup without invite token - checking if admin profile migration needed');
           
           // Try to fetch admin level to see if migration is needed
           try {

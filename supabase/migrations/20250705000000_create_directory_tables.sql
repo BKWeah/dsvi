@@ -1,5 +1,5 @@
 -- ===============================================================================
--- DSVI School Directory Platform - Database Schema
+-- GyaWe School Directory Platform - Database Schema
 -- Date: 2025-07-05
 -- Purpose: Create tables for the school directory platform
 -- ===============================================================================
@@ -251,4 +251,4 @@ COMMENT ON TABLE directory_manual_schools IS 'Non-DSVI schools submitted to the 
 COMMENT ON TABLE directory_ads IS 'Promotional ad campaigns for schools in the directory';
 COMMENT ON TABLE directory_ad_targeting IS 'Targeting criteria for ad campaigns';
 
-SELECT 'DSVI School Directory database schema created successfully!' as status;
+SELECT 'GyaWe School Directory database schema created successfully!' as status;

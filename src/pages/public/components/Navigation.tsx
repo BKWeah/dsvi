@@ -124,8 +124,8 @@ export const Navigation: React.FC<NavigationProps> = () => {
             <Link to="/" className="flex items-center space-x-3 group">
               <img src="/updates_assets/DSVI Official Logo.png" alt="DSVI Official Logo" className="h-10 w-10 object-contain group-hover:scale-110 transition-transform duration-300" />
               <div>
-                <span className={`text-xl font-black ${textColorClass}`}>DSVI</span>
-                <p className={`text-xs ${subTextColorClass} -mt-1`}>Digital School Visibility Initiative</p>
+                <span className={`text-xl font-black ${textColorClass}`}>GSS</span>
+                <p className={`text-xs ${subTextColorClass} -mt-1`}>GyaWe School Solutions</p>
               </div>
             </Link>
           </div>

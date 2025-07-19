@@ -25,7 +25,7 @@ export default function AboutPage() {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
               <Badge className="mb-6 bg-white/20 text-white border-white/30">
-                About DSVI
+                About GyaWe School Solutions (GSS)
               </Badge>
               <h1 className="text-4xl md:text-6xl font-bold mb-6">
                 Empowering Liberian Education
@@ -38,26 +38,26 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* What is DSVI Section */}
+        {/* What is GSS Section */}
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-16">
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                  What is DSVI?
+                  What is GyaWe School Solutions (GSS)?
                 </h2>
               </div>
               
               <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
                 <div className="text-left">
                   <p className="text-lg text-gray-600 leading-relaxed">
-                    The Digital School Visibility Initiative (DSVI) is the flagship service of the Liberia Digital Service Initiative (LDSI), created to help schools across Liberia establish a strong, credible, and professional online presence.
+                    GyaWe School Solutions (GSS) is the flagship service of GyaWe Global Solutions (GGS), created to help schools across Liberia establish a strong, credible, and professional online presence.
                   </p>
                   <p className="text-lg text-gray-600 leading-relaxed mt-6">
-                    DSVI brings every school into the digital age by providing custom-built, mobile-responsive websites that are intuitive, reliable, and tailored to the specific communication needs of administrators, educators, and parents.
+                    GyaWe School Solutions (GSS) brings every school into the digital age by providing custom-built, mobile-responsive websites that are intuitive, reliable, and tailored to the specific communication needs of administrators, educators, and parents.
                   </p>
                   <p className="text-lg text-gray-600 leading-relaxed mt-4">
-                    More than just websites, DSVI delivers affordable digital tools that enable schools to showcase achievements, engage their communities, and access new opportunities for growth and visibility. Each platform is uniquely crafted to reflect the identity of the school it serves, supporting daily operations, real-time updates, and long-term credibility.
+                    More than just websites, GyaWe School Solutions (GSS) delivers affordable digital tools that enable schools to showcase achievements, engage their communities, and access new opportunities for growth and visibility. Each platform is uniquely crafted to reflect the identity of the school it serves, supporting daily operations, real-time updates, and long-term credibility.
                   </p>
                 </div>
                 <div className="flex justify-center">
@@ -82,7 +82,7 @@ export default function AboutPage() {
                   </div>
                 </div>
                 <div className="order-1 md:order-2 text-left">
-                  <h3 className="text-2xl font-normal text-gray-900 mb-4">The Digital School Visibility Initiative (DSVI) is designed to help schools enhance their professional presence and engagement in today's digital environment. Its core purpose is to:</h3>
+                  <h3 className="text-2xl font-normal text-gray-900 mb-4">GyaWe School Solutions (GSS) is designed to help schools enhance their professional presence and engagement in today's digital environment. Its core purpose is to:</h3>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
                       <Activity className="h-6 w-6 text-blue-600 flex-shrink-0" />
@@ -98,7 +98,7 @@ export default function AboutPage() {
                     </div>
                   </div>
                   <p className="text-lg text-gray-600 leading-relaxed mt-4">
-                    Every DSVI website reflects the mission, values, and vibrancy of the school it represents, supporting better engagement and operational excellence in a digital age.
+                    Every GyaWe School Solutions (GSS) website reflects the mission, values, and vibrancy of the school it represents, supporting better engagement and operational excellence in a digital age.
                   </p>
                 </div>
               </div>
@@ -225,7 +225,7 @@ export default function AboutPage() {
                     <Quote className="h-12 w-12 text-blue-600 flex-shrink-0 mt-2" />
                     <div>
                       <blockquote className="text-lg md:text-xl text-gray-700 leading-relaxed mb-8 italic">
-                        "At LDSI, we believe every institution, whether a school, business, or nonprofit, deserves the power of a professional digital presence, no matter its size or location. Through platforms like DSVI, the DSVI School Directory, and DVI, we go beyond building websites, delivering access, amplifying visibility, and opening pathways for connection, growth, and meaningful impact across Liberia. Thank you for allowing us to walk with you on this journey of digital transformation."
+                        "At GyaWe Global Solutions (GGS), we believe every institution, whether a school, business, or nonprofit, deserves the power of a professional digital presence, no matter its size or location. Through platforms like GyaWe School Solutions (GSS), the GyaWe School Directory, and GyaWe Visibility Solutions (GVS), we go beyond building websites, delivering access, amplifying visibility, and opening pathways for connection, growth, and meaningful impact across Liberia. Thank you for allowing us to walk with you on this journey of digital transformation."
                       </blockquote>
                       
                       <div className="flex items-center gap-4">
@@ -237,7 +237,7 @@ export default function AboutPage() {
                             Boniface Koffa Weah, Jr.
                           </p>
                           <p className="text-gray-600">
-                            Managing Director, Liberia Digital Service Initiative (LDSI)
+                            Managing Director, GyaWe Global Solutions (GGS)
                           </p>
                         </div>
                       </div>
@@ -257,7 +257,7 @@ export default function AboutPage() {
                 Ready to Transform Your School's Digital Presence?
               </h2>
               <p className="text-xl mb-8 text-blue-100">
-                Join 150+ schools already benefiting from DSVI's professional website solutions
+                Join 150+ schools already benefiting from GyaWe School Solutions (GSS)'s professional website solutions
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button asChild size="lg" className="bg-white text-blue-600 hover:bg-blue-50">

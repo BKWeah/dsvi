@@ -1,4 +1,4 @@
--- Comprehensive initial migration for DSVI CMS
+-- Comprehensive initial migration for GSS CMS
 -- Creates all tables with complete schema including theme system
 
 -- Create schools table with all necessary columns
